@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ca Làm: shift scheduling, Phase 1 demo</title>
+<title>Watchtower: shift scheduling, Phase 1 demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -193,6 +193,30 @@ small{font-size:.78rem;color:var(--muted)}
 .bar.gone{border-color:var(--red);background:var(--red-soft)}
 .bar.noshow{opacity:.45;text-decoration:line-through}
 .bar:hover{filter:brightness(.96)}
+.roster{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden}
+.rs-row{display:grid;grid-template-columns:230px minmax(0,1fr) 220px;gap:.7rem;align-items:center;padding:.35rem .7rem;border-top:1px solid var(--line)}
+.rs-head{background:var(--sunk);border-top:0;font-size:.78rem;font-weight:600;color:var(--muted)}
+.rs-grp{padding:.45rem .7rem;background:var(--sunk);border-top:1px solid var(--line);font-size:.8rem;font-weight:600}
+.rs-grp small{font-weight:400;margin-left:.3rem}
+.rs-name{min-width:0;font-size:.87rem}
+.rs-name small{display:block;line-height:1.25}
+.rs-cells{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
+.rs-ph{line-height:1.2}
+.rs-ph b{display:block;color:var(--ink);font-size:.82rem}
+.rs-ph small{display:block;font-size:.7rem;font-weight:400}
+.rs-ph .short{color:var(--red);font-weight:600}
+.rc{border:1.5px solid transparent;border-radius:var(--r-s);height:30px;padding:0 .3rem;font-size:.72rem;cursor:pointer;background:var(--sunk);color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+.rc:hover{border-color:var(--ink)}
+.rc.on{background:var(--jade-soft);color:var(--jade);font-weight:600}
+.rc.def{background:transparent;border-style:dashed;border-color:var(--muted);color:var(--ink)}
+.rc.asg{background:var(--jade);border-color:var(--jade);color:var(--jade-ink);font-weight:600}
+.rc.asg.out{background:var(--amber);border-color:var(--amber);color:var(--surface)}
+.rc-code{display:none;margin-right:.25rem}
+.rs-today{display:flex;flex-wrap:wrap;gap:.2rem;align-items:center;font-size:.8rem;min-width:0}
+.rs-today .tag{white-space:normal;text-align:left}
+button.tag{border:0;cursor:pointer;font-family:inherit}
+.rs-off{border-top:1px solid var(--line);padding:.5rem .7rem}
+.rs-off summary{cursor:pointer;font-size:.85rem;font-weight:600}
 
 /* lateness */
 .scale{display:flex;gap:3px;margin:.4rem 0 1.2rem;max-width:880px}
@@ -317,6 +341,9 @@ legend{font-size:.82rem;font-weight:600;padding:0 .3rem}
   .tl-row{grid-template-columns:1fr}
   .tl-row .track{margin:0 .7rem .35rem}
   .tl-axis .tl-name{display:none}
+  .rs-row{grid-template-columns:1fr;gap:.35rem}
+  .rs-head .rs-name,.rs-head .rs-today{display:none}
+  .rc-code{display:inline}
   .scale{flex-wrap:wrap}
   .scale .sc{flex:1 1 45%!important}
   h1{font-size:1.35rem}
@@ -373,10 +400,10 @@ const timeOpts=(from,to,sel,step=15)=>{let o='';for(let m=from;m<=to;m+=step)o+=
 /* ---------- seed ---------- */
 function seed(){
   const r=rng(11);
-  let lang='en';try{lang=localStorage.getItem('calam-lang')||'en'}catch(e){}
+  let lang='en';try{lang=localStorage.getItem('watchtower-lang')||'en'}catch(e){}
   S={lang,role:'admin',view:'availability',sview:'register',meId:'s0',stage:'registration',day:0,lday:0,
      staff:[],avail:{},needs:[],asg:[],skips:{},sel:new Set(),log:[],search:'',showFormer:false,editNeeds:false,seq:1,
-     aday:0,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
+     aday:0,smode:'roster',rsort:'time',rpos:'',rfree:false,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
   const order=['SV','BA','CI','CO','KI','OC','SV','BA'];
   NAMES.forEach((n,i)=>{
     const main=order[i%order.length],q=new Set([main]);
@@ -515,7 +542,7 @@ function topbar(){
     [L('Arranging','Xếp lịch'),L('Draft, hidden from staff','Bản nháp, nhân viên chưa thấy')],
     [L('Published','Đã công bố'),L('Week of 21–27/09','Tuần 21–27/09')]];
   return `<header class="top">
-  <div class="brand"><span class="logo" aria-hidden="true"></span><div><b>Ca Làm</b><small>${L('Phase 1 demo','Bản demo giai đoạn 1')}</small></div></div>
+  <div class="brand"><span class="logo" aria-hidden="true"></span><div><b>Watchtower</b><small>${L('Phase 1 demo','Bản demo giai đoạn 1')}</small></div></div>
   <ol class="stepper" aria-label="${L('Where the week is','Tiến độ tuần')}">${labels.map((l,i)=>`<li class="${i<cur?'done':i===cur?'cur':''}" ${i===cur?'aria-current="step"':''}><span class="num">${i+1}</span><span><b>${l[0]}</b><small>${l[1]}</small></span></li>`).join('')}</ol>
   ${S.stage==='registration'?`<button class="btn sm" data-a="closeReg">${L('Skip to Saturday 15:00','Chuyển tới 15:00 thứ Bảy')}</button>`:''}
   <div class="top-right">
@@ -636,8 +663,10 @@ function vSchedule(){
   </div>
   <div class="stats">${stat(S.asg.length,L('shifts','ca'))}${stat(people,L('staff scheduled','nhân viên có ca'))}${!pub?stat(gl,L('active staff with no shift','nhân viên chưa có ca'),gl?'warn':''):''}${un.length?stat(un.length,L('shifts need someone new','ca cần người thay'),'bad'):''}</div>
   ${un.length?`<div class="notice bad">${L(`${un.length} shifts belong to staff who have left. They’re kept on the schedule so nothing goes missing. Open each one and choose who takes it.`,`${un.length} ca thuộc về nhân viên đã nghỉ. Các ca vẫn được giữ trên lịch để không bị sót. Mở từng ca và chọn người thay.`)}</div>`:''}
-  ${!S.asg.length?`<div class="notice">${L('Click any cell in the coverage table to add a shift for that period and position, or start from a sample draft.','Bấm vào ô bất kỳ trong bảng độ phủ để thêm ca cho khung giờ và vị trí đó, hoặc bắt đầu từ bản nháp mẫu.')}</div>`:''}
-  ${dayTabs('day',d,x=>underCount(x)>0)}`;
+  ${!S.asg.length?`<div class="notice">${L('Start with Who registered to see which shifts each person signed up for that day, then click a shift to assign them. The Coverage tab shows what each position still needs. Or start from a sample draft.','Bắt đầu từ tab Ai đăng ký để xem từng người đăng ký ca nào trong ngày, rồi bấm vào một ca để xếp họ. Tab Độ phủ cho thấy mỗi vị trí còn thiếu bao nhiêu. Hoặc bắt đầu từ bản nháp mẫu.')}</div>`:''}
+  ${dayTabs('day',d,x=>underCount(x)>0)}
+  <div class="toolbar" style="margin-top:.9rem"><div class="seg" role="group" aria-label="${L('View','Chế độ xem')}"><button aria-pressed="${S.smode==='roster'}" data-a="smode" data-v="roster">${L('Who registered','Ai đăng ký')}</button><button aria-pressed="${S.smode==='cover'}" data-a="smode" data-v="cover">${L('Coverage and shifts','Độ phủ và ca')}</button></div></div>`;
+  if(S.smode==='roster')return h+rosterView(d);
   h+=`<div class="sec-head"><h2>${L('Coverage','Độ phủ')}, ${dayL(d)} ${DATES[d]}</h2><button class="btn sm" data-a="editNeeds">${S.editNeeds?L('Done','Xong'):L('Edit headcount needed','Sửa số người cần')}</button></div>`;
   if(S.narrow&&!S.editNeeds)h+=covNarrow(d);else{
   h+=`<div class="scroll"><table class="cov"><thead><tr><th></th>${POS.map(p=>`<th>${posName(p.id)}</th>`).join('')}</tr></thead><tbody>`;
@@ -660,6 +689,45 @@ function vSchedule(){
   if(S.narrow)return h+'<div class="mlist">'+list.map(shiftCard).join('')+'</div>';
   h+=`<div class="tl"><div class="tl-row tl-axis"><div class="tl-name"></div><div class="track">${[7,9,11,13,15,17,19,21,23].map(x=>`<span style="left:${(x*60-DAY_START)/SPAN*100}%">${pad(x)}</span>`).join('')}</div></div>`;
   h+=list.map(tlRow).join('')+'</div>';
+  return h;
+}
+function rosterView(d){
+  const pf=S.rpos,all=act().filter(s=>!pf||s.quals.includes(pf)),byName=(a,b)=>a.name.localeCompare(b.name,'vi');
+  const dayAsg=sid=>S.asg.filter(a=>a.staffId===sid&&a.day===d).sort((a,b)=>a.start-b.start);
+  const reg=[],def=[],off=[];
+  all.forEach(s=>{if(regStatus(s.id)==='none')def.push(s);else if(dayMin(s.id,d))reg.push(s);else off.push(s)});
+  const row0=s=>S.avail[s.id].days[d],first=s=>row0(s).indexOf(true),nP=s=>row0(s).filter(Boolean).length;
+  const last=s=>row0(s).lastIndexOf(true),mins=s=>dayMin(s.id,d),dawn=(a,b)=>first(a)-first(b)||last(a)-last(b)||byName(a,b);
+  const SORTS={time:dawn,most:(a,b)=>nP(b)-nP(a)||dawn(a,b),fewest:(a,b)=>nP(a)-nP(b)||dawn(a,b),long:(a,b)=>mins(b)-mins(a)||dawn(a,b),short:(a,b)=>mins(a)-mins(b)||dawn(a,b)};
+  reg.sort(SORTS[S.rsort]||dawn);def.sort(byName);off.sort(byName);
+  const sched=all.filter(s=>dayAsg(s.id).length).length,keep=s=>!S.rfree||!dayAsg(s.id).length;
+  const free=[...reg,...def];
+  let h=`<div class="stats">${stat(reg.length,L('registered for this day','đăng ký làm ngày này'))}${stat(def.length,L('didn’t register, counted as free','chưa đăng ký, tính là rảnh'))}${stat(off.length,L('can’t work this day','không làm được ngày này'))}${stat(`${sched}/${reg.length+def.length}`,L('already have a shift today','đã có ca hôm nay'))}</div>
+  <div class="toolbar"><label class="as">${L('Has experience in','Có kinh nghiệm')} <select data-c="rpos"><option value="">${L('Any position','Mọi vị trí')}</option>${POS.map(p=>`<option value="${p.id}" ${pf===p.id?'selected':''}>${posName(p.id)}</option>`).join('')}</select></label>
+  <label class="as">${L('Sort','Sắp xếp')} <select data-c="rsort">${[['time',L('Morning to evening','Sáng tới tối')],['most',L('Most shifts first','Nhiều ca trước')],['fewest',L('Fewest shifts first','Ít ca trước')],['long',L('Most hours first','Nhiều giờ trước')],['short',L('Fewest hours first','Ít giờ trước')]].map(([k,t])=>`<option value="${k}" ${S.rsort===k?'selected':''}>${t}</option>`).join('')}</select></label>
+  <label class="as"><input type="checkbox" data-c="rfree" ${S.rfree?'checked':''}> ${L('Only staff with no shift today','Chỉ người chưa có ca hôm nay')}</label></div>`;
+  const head=`<div class="rs-row rs-head"><div class="rs-name">${L('Staff','Nhân viên')}</div><div class="rs-cells">${PERIODS.map(p=>{
+    const n=free.filter(s=>isAvail(s.id,d,p.id)).length,need=pf?S.needs[d][p.id][pf]:totalNeed(d,p.id);
+    return `<div class="rs-ph"><b>${p.code}</b><small>${shm(p.s)}–${shm(p.e)}</small><small class="${n<need?'short':''}">${n} ${L('free','rảnh')} · ${L('need','cần')} ${need}</small></div>`}).join('')}</div><div class="rs-today">${L('Shifts today','Ca hôm nay')}</div></div>`;
+  const row=s=>{
+    const list=dayAsg(s.id),isDef=regStatus(s.id)==='none';
+    const cells=PERIODS.map(p=>{
+      const a=list.find(x=>x.start<p.e&&x.end>p.s),av=isAvail(s.id,d,p.id);
+      const cls=a?'asg'+(outside(s.id,d,a.start,a.end)?' out':''):isDef?'def':av?'on':'';
+      const state=a?L(`scheduled ${hm(a.start)}–${hm(a.end)}`,`đã xếp ${hm(a.start)}–${hm(a.end)}`):isDef?L('didn’t register, counted as free','chưa đăng ký, tính là rảnh'):av?L('registered','đã đăng ký'):L('not registered for this period','không đăng ký ca này');
+      const da=a?`data-a="editAsg" data-id="${a.id}"`:`data-a="rAdd" data-id="${s.id}" data-d="${d}" data-p="${p.id}"`;
+      return `<button class="rc ${cls}" ${da} title="${esc(s.name)}, ${p.code}: ${esc(state)}" aria-label="${esc(s.name)}, ${p.code} ${hm(p.s)}–${hm(p.e)}: ${esc(state)}"><span class="rc-code">${p.code}</span>${a?esc(posName(a.primary)):av?'✓':'–'}</button>`}).join('');
+    const today=list.length?list.map(a=>`<button class="tag ${outside(s.id,d,a.start,a.end)?'warn':'ok'}" data-a="editAsg" data-id="${a.id}">${hm(a.start)}–${hm(a.end)} ${esc(a.positions.map(posName).join(' + '))}</button>`).join(''):`<span class="muted">${L('No shift yet','Chưa có ca')}</span>`;
+    return `<div class="rs-row"><div class="rs-name"><span class="sw" style="background:${s.color}"></span>${esc(s.name)}${statusTag(s.id)}<small class="muted">${isDef?'':L(`${nP(s)} shifts, ${hrs(mins(s))}`,`${nP(s)} ca, ${hrs(mins(s))}`)+' · '}${s.quals.map(posName).join(', ')}</small></div><div class="rs-cells">${cells}</div><div class="rs-today">${today}</div></div>`;
+  };
+  const grp=(t,n,list)=>{const v=list.filter(keep);return `<div class="rs-grp">${t} <small class="muted">${S.rfree?L(`${v.length} of ${n} with no shift yet`,`${v.length}/${n} người chưa có ca`):n}</small></div>`+(v.length?v.map(row).join(''):`<p class="pad muted" style="margin:0">${L('Everyone here already has a shift today.','Mọi người trong nhóm này đã có ca hôm nay.')}</p>`)};
+  h+=`<div class="roster">${head}`;
+  if(reg.length)h+=grp(L('Registered for this day','Đăng ký làm ngày này'),reg.length,reg);
+  if(def.length)h+=grp(L('Didn’t register, counted as free for every shift','Chưa đăng ký, tính là rảnh mọi ca'),def.length,def);
+  if(!reg.length&&!def.length)h+=`<p class="pad muted" style="margin:0">${L('Nobody can work this day.','Không ai làm được ngày này.')}</p>`;
+  if(off.length)h+=`<details class="rs-off"><summary>${L('Can’t work this day','Không làm được ngày này')} (${off.length})</summary><p class="hint">${L('They registered other days but not this one. You can still give them a shift here; it’s flagged as outside availability.','Họ đăng ký ngày khác nhưng không đăng ký ngày này. Bạn vẫn xếp ca được, ca sẽ bị đánh dấu ngoài lịch rảnh.')}</p><div class="mchips">${off.map(s=>{const n=dayAsg(s.id).length;return `<button class="tag ${n?'warn':'muted'}" data-a="rAdd" data-id="${s.id}" data-d="${d}" data-p="0">${esc(s.name)}${n?L(', has a shift',', đã có ca'):''}</button>`}).join('')}</div></details>`;
+  h+='</div>';
+  h+=`<p class="legend"><span>${tag('ok','✓')} ${L('Registered','Đã đăng ký')}</span><span><span class="rc def" style="height:auto;display:inline-block;cursor:default">✓</span> ${L('Didn’t register, counted as free','Chưa đăng ký, tính là rảnh')}</span><span><span class="rc asg" style="height:auto;display:inline-block;cursor:default">${L('Position','Vị trí')}</span> ${L('Already scheduled','Đã xếp ca')}</span><span>${L('Click a shift to assign that person to it.','Bấm vào một ca để xếp người đó vào ca.')}</span></p>`;
   return h;
 }
 function tlRow(a){
@@ -957,7 +1025,7 @@ function setWeek(fill){
 }
 const ACT={
   role:ds=>{S.role=ds.v;render();window.scrollTo(0,0)},
-  lang:ds=>{S.lang=ds.v;try{localStorage.setItem('calam-lang',ds.v)}catch(e){}render();if(D)renderModal()},
+  lang:ds=>{S.lang=ds.v;try{localStorage.setItem('watchtower-lang',ds.v)}catch(e){}render();if(D)renderModal()},
   reset:()=>{seed();D=null;renderModal();render();toast(L('Demo reset.','Đã làm lại demo.'))},
   closeReg:()=>{S.stage='arranging';log('system',bi(()=>L('Registration closed and locked','Đóng và khóa đăng ký')),'','','');if(S.role==='admin')S.view='schedule';render();toast(L('Registration is closed. Availability is locked.','Đã đóng đăng ký. Lịch rảnh đã khóa.'))},
   view:ds=>{S.view=ds.v;render();window.scrollTo(0,0)},
@@ -970,6 +1038,8 @@ const ACT={
   selFree:()=>{S.sel=new Set(act().filter(s=>regStatus(s.id)!=='partial').map(s=>s.id));render()},
   sample:()=>{sampleDraft();render();toast(L('Sample draft created. Staff can’t see it yet.','Đã tạo bản nháp mẫu. Nhân viên chưa thấy.'))},
   editNeeds:()=>{S.editNeeds=!S.editNeeds;render()},
+  smode:ds=>{S.smode=ds.v;render()},
+  rAdd:ds=>openAsg({staffId:ds.id,day:+ds.d,p:+ds.p,pos:S.rpos||undefined}),
   newAsg:ds=>openAsg({day:ds.d!=null?+ds.d:S.day,p:ds.p!=null?+ds.p:0,pos:ds.pos}),
   editAsg:ds=>openAsg({id:ds.id}),
   backAsg:()=>openAsg({id:D.id}),
@@ -1096,6 +1166,9 @@ const CHG={
   need:t=>{S.needs[+t.dataset.d][+t.dataset.p][t.dataset.pos]=Math.max(0,parseInt(t.value,10)||0)},
   posrate:t=>{const p=POS.find(x=>x.id===t.dataset.pos),o=p.rate;p.rate=Math.max(0,parseInt(t.value,10)||0);S.openRates=true;log('owner',bi(()=>L(`Default rate, ${posName(p.id)}`,`Lương mặc định, ${posName(p.id)}`)),vnd(o),vnd(p.rate),'');render()},
   showFormer:t=>{S.showFormer=t.checked;render()},
+  rpos:t=>{S.rpos=t.value;render()},
+  rfree:t=>{S.rfree=t.checked;render()},
+  rsort:t=>{S.rsort=t.value;render()},
   dnum:t=>{D[t.dataset.f]=+t.value;D.err='';if(D.type==='asg'&&t.dataset.f==='start'&&D.end<=D.start)D.end=Math.min(DAY_END,D.start+60);if(D.type==='swap')D.target='';renderModal()},
   dstr:t=>{D[t.dataset.f]=t.value;D.err='';renderModal()},
   dflag:t=>{D[t.dataset.f]=t.checked;renderModal()},

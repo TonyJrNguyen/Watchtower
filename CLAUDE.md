@@ -1,4 +1,4 @@
-# Ca Làm — shift scheduling & people management
+# Watchtower — shift scheduling & people management
 
 Nguồn chân lý duy nhất cho requirement là:
 **`docs/prd/shift-scheduling-solution-requirements.md`**
@@ -15,7 +15,7 @@ Chỉ build bốn nhóm sau. Đừng động vào bất kỳ thứ gì thuộc P
 
 1. Account Management (FR-A1–FR-A10)
 2. Availability Registration, whole-period, cửa sổ Thứ Năm 00:00 – Thứ Bảy 15:00 (FR-S1–FR-S19)
-3. Shift Assignment: draft/publish, publish gate, early-departure, swap (FR-O1–FR-O40, trừ FR-O34–FR-O37 là Phase 2)
+3. Shift Assignment: draft/publish, publish gate, early-departure, swap (FR-O1–FR-O41, trừ FR-O34–FR-O37 là Phase 2)
 4. Manual lateness recording + mọi rule tính từ đó: grace 10 phút, late penalty từ phút 11, trừ lương gấp đôi từ phút 16, anomaly khi khoản trừ ≥ ca (FR-O24–FR-O26, FR-S9, FR-S17, FR-S18, FR-T18, FR-B1, FR-B17)
 
 **Không build ở Phase 1:** thông báo/push (§4.8, toàn bộ FR-N*), control centre
@@ -26,7 +26,7 @@ trừ FR-T18) là Phase 3, đang chờ quyết định G51.
 **Đã build ở Phase 1** (khác với bản thu hẹp gốc): responsive đầy đủ hai chiều
 cho cả Chủ quán lẫn Nhân viên (NFR-5) — xem `prototypes/phase1-demo.html` để
 biết layout mobile cho từng màn (per-ngày cho lịch rảnh, thẻ độ phủ theo ca
-cho xếp lịch, thẻ cho danh sách nhân viên/nhật ký).
+và thẻ từng nhân viên cho chế độ "Ai đăng ký" (FR-O41) ở xếp lịch, thẻ cho danh sách nhân viên/nhật ký).
 
 ## Luật xuyên suốt, áp dụng cho mọi màn
 
