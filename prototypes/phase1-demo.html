@@ -139,7 +139,6 @@ small{font-size:.78rem;color:var(--muted)}
 .fpop .hint{margin:.1rem .3rem .4rem}
 .fpop,.fpop *{text-align:left}
 .fsec{border-top:1px solid var(--line);padding:.15rem 0}
-.fsec:first-of-type{border-top:0}
 .fsec-h{display:flex;align-items:center;gap:.4rem;width:100%;padding:.4rem .1rem;border:0;background:none;font:inherit;font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;cursor:pointer}
 .fsec-h::before{content:'▸';font-size:.7rem;transition:transform .15s}
 .fsec-h[aria-expanded="true"]::before{transform:rotate(90deg)}
@@ -152,11 +151,14 @@ small{font-size:.78rem;color:var(--muted)}
 .fopt .t{flex:1;min-width:0}
 .fopt .n{flex:none;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:1.4rem;text-align:right}
 .fopt.zero .t{color:var(--muted)}
-.fselbar{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem;padding:0 .3rem}
-.fselbar small{flex-basis:100%;color:var(--muted)}
+.selrow{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .4rem;min-height:1.9rem}
+.selrow .selall{display:flex;align-items:center;gap:.45rem;flex:1 0 auto;font-size:.87rem;font-weight:600;cursor:pointer}
+.selrow .selall input{margin:0}
+.selrow .selall span{white-space:nowrap}
+.selrow .btn{flex:none}
 .fpop-foot{position:sticky;bottom:0;background:var(--surface);display:flex;align-items:center;gap:.4rem;padding:.5rem 0;border-top:1px solid var(--line)}
 .fchips{display:flex;flex-wrap:wrap;gap:.15rem}
-.fchips .tag{margin:0}
+.fchips .tag{margin:0;white-space:normal;text-align:left}
 .plist{list-style:none;margin:0;padding:.3rem;overflow-y:auto}
 .plist label{display:flex;align-items:center;gap:.1rem;padding:.3rem .4rem;border-radius:var(--r-s);cursor:pointer;font-size:.87rem;flex-wrap:wrap}
 .plist label:hover{background:var(--sunk)}
@@ -516,7 +518,7 @@ function seed(){
   const r=rng(11);
   let lang='en';try{lang=localStorage.getItem('watchtower-lang')||'en'}catch(e){}
   S={lang,role:'admin',view:'schedule',sview:'register',pp:null,meId:'s0',stage:'registration',day:0,lday:0,
-     staff:[],avail:{},needs:[],asg:[],skips:{},sel:new Set(),flt:new Set(),fopen:false,fcol:new Set(),selBase:'all',log:[],search:'',showFormer:false,editNeeds:false,seq:1,
+     staff:[],avail:{},needs:[],asg:[],skips:{},sel:new Set(),fopen:false,fcol:new Set(),selBase:'all',log:[],search:'',showFormer:false,editNeeds:false,seq:1,
      aday:0,smode:'roster',rsort:'time',rpos:'',rfree:false,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
   const order=['SV','BA','CI','CO','KI','OC','QC','SV','BA'];
   NAMES.forEach((n,i)=>{
@@ -530,6 +532,8 @@ function seed(){
     S.staff[i].nick=suggestNick(n,S.staff[i].id);
   });
   const NONE=[0,7,15,23,31,38],ALL=[4,19],FEW=[11,27];
+  // Split registrations: free in the morning and again in the evening with a gap between, on every day they work
+  const SPLIT={3:[1,1,0,1,1],12:[1,0,0,0,1],22:[1,0,1,0,1],30:[0,1,0,1,1],35:[1,1,0,0,1]};
   S.staff.forEach((s,i)=>{
     if(NONE.includes(i)){S.avail[s.id]={mode:'none',days:emptyWeek()};return}
     const days=emptyWeek();
@@ -542,7 +546,7 @@ function seed(){
         if(off.has(d))continue;
         const x=r()<0.75?style:r();
         const pat=x<0.4?[1,1,1,1,1]:x<0.68?[1,1,1,0,0]:x<0.92?[0,0,0,1,1]:[0,1,1,1,0];
-        days[d]=pat.map(Boolean);
+        days[d]=(SPLIT[i]||pat).map(Boolean);
       }
     }
     S.avail[s.id]={mode:'set',days};
@@ -673,6 +677,17 @@ function sampleDraft(){
     }
     for(const x of extras)for(const pos of x.pos){const s=pick(d,x.ps,pos,6);if(s){addAsg(s.id,d,x.s,x.e,[pos],pos);cnt[s.id]=(cnt[s.id]||0)+1}}
   }
+  // Staff who registered split shifts get both halves on a few days, as two separate shifts
+  const runs=(sid,d)=>{const o=[];PERIODS.forEach(p=>{if(!isAvail(sid,d,p.id))return;const l=o[o.length-1];if(l&&l.e===p.s)l.e=p.e;else o.push({s:p.s,e:p.e})});return o};
+  pool.filter(s=>S.avail[s.id].mode==='set').forEach(s=>{
+    let n=0;
+    for(let d=0;d<7&&n<3;d++){
+      const rs=runs(s.id,d);if(rs.length<2)continue;
+      const pos=s.quals[0];
+      rs.forEach(x=>{if(!busy(s.id,d,x.s,x.e))addAsg(s.id,d,x.s,x.e,[pos],pos)});
+      n++;
+    }
+  });
   [0,2,5].forEach(d=>{
     const oc=S.asg.find(a=>a.day===d&&a.primary==='OC'&&a.start===420&&who(a.staffId).quals.includes('CO'));
     const co=S.asg.find(a=>a.day===d&&a.primary==='CO'&&a.start===420&&a.positions.length===1);
@@ -779,7 +794,7 @@ function calBody(){
     }
   });
   h+='</div></div>'+calLegend();
-  if(!sel.length)h+=`<div class="empty small"><p>${fOn().length&&S.sel.size?L('Nobody ticked matches the filters. Change the filters on the left.','Không ai được chọn khớp bộ lọc. Hãy đổi bộ lọc bên trái.'):L('Tick staff on the left to see them on the calendar.','Chọn nhân viên bên trái để hiện trên lịch.')}</p></div>`;
+  if(!sel.length)h+=`<div class="empty small"><p>${L('Tick staff on the left to see them on the calendar.','Chọn nhân viên bên trái để hiện trên lịch.')}</p></div>`;
   return h;
 }
 function calNarrow(sel){
@@ -789,11 +804,14 @@ function calNarrow(sel){
     return `<div class="mrow"><div class="mrow-h"><b>${p.code}</b><small>${hm(p.s)}–${hm(p.e)}</small></div>${cellHead(d,p.id,ppl)}<div class="mchips">${ppl.map(x=>pill(x.s,d,p.id,x.st,false)).join('')||`<small>${L('No one','Không ai')}</small>`}${addBtn(d,p.id)}</div></div>`}).join('')+'</div>';
   return h+calLegend();
 }
-/* Calendar filters. Person-level, over the whole week: a match shows all of that person's cells.
-   Inside a group any ticked option matches (OR); across groups every group must match (AND). */
+/* Staff selection for the calendar. The ticked staff list is the only state: whoever is ticked shows.
+   Each filter option describes a set of staff over the whole week and mirrors the selection — ticked when all of
+   them are selected, "–" when some are, empty when none — and ticking it selects them all, unticking deselects them.
+   Groups include a "none" option where needed, so every staff member is described in every group. */
 const staffAsg=sid=>S.asg.filter(a=>a.staffId===sid);
-function fGroups(){
-  const reg=S.stage==='registration',g=[];
+function fGroups(all){
+  const reg=!all&&S.stage==='registration',g=[];
+  const short=s=>belowContract(s.id),out=s=>staffAsg(s.id).some(a=>outside(s.id,a.day,a.start,a.end)),noexp=s=>staffAsg(s.id).some(a=>a.positions.some(p=>!s.quals.includes(p)));
   g.push({id:'reg',t:L('Registration','Đăng ký'),o:[
     ['some',L('Registered some shifts','Đăng ký một số ca'),s=>regStatus(s.id)==='partial'],
     ['all',L('Free all week','Rảnh cả tuần'),s=>regStatus(s.id)==='all'],
@@ -804,64 +822,61 @@ function fGroups(){
       ['nopos',L('Placed, no position yet','Đã xếp, chưa có vị trí'),s=>staffAsg(s.id).some(a=>!a.positions.length)],
       ['pos',L('Placed with a position','Đã xếp, có vị trí'),s=>staffAsg(s.id).some(a=>a.positions.length)],
       ['two',L('Covers two positions','Kiêm hai vị trí'),s=>staffAsg(s.id).some(a=>a.positions.length>1)]]});
-    g.push({id:'ppos',t:L('Placed as','Vị trí được xếp'),pos:true,o:POS.map(p=>[p.id,'',s=>staffAsg(s.id).some(a=>a.positions.includes(p.id))])});
+    g.push({id:'ppos',t:L('Placed as','Vị trí được xếp'),pos:true,o:[...POS.map(p=>[p.id,'',s=>staffAsg(s.id).some(a=>a.positions.includes(p.id))]),
+      ['none',L('No position yet','Chưa có vị trí'),s=>!staffAsg(s.id).some(a=>a.positions.length)]]});
   }
-  g.push({id:'exp',t:L('Has experience in','Có kinh nghiệm'),pos:true,o:POS.map(p=>[p.id,'',s=>s.quals.includes(p.id)])});
+  g.push({id:'exp',t:L('Has experience in','Có kinh nghiệm'),pos:true,o:[...POS.map(p=>[p.id,'',s=>s.quals.includes(p.id)]),
+    ['none',L('No experience listed','Chưa có kinh nghiệm'),s=>!s.quals.length]]});
   g.push({id:'warn',t:L('Needs a look','Cần chú ý'),o:[
-    ['short',L('Short hours: registered under 5 days of 8h','Thiếu giờ: đăng ký dưới 5 ngày đủ 8 tiếng'),s=>belowContract(s.id)],
-    ...(reg?[]:[
-    ['out',L('Placed outside availability','Xếp ngoài lịch rảnh'),s=>staffAsg(s.id).some(a=>outside(s.id,a.day,a.start,a.end))],
-    ['noexp',L('Placed in a position without experience','Xếp vị trí chưa có kinh nghiệm'),s=>staffAsg(s.id).some(a=>a.positions.some(p=>!s.quals.includes(p)))]])]});
+    ['short',L('Short hours: registered under 5 days of 8h','Thiếu giờ: đăng ký dưới 5 ngày đủ 8 tiếng'),short],
+    ...(reg?[]:[['out',L('Placed outside availability','Xếp ngoài lịch rảnh'),out],['noexp',L('Placed in a position without experience','Xếp vị trí chưa có kinh nghiệm'),noexp]]),
+    ['ok',L('Nothing to look at','Không có gì cần chú ý'),s=>!short(s)&&!out(s)&&!noexp(s)]]});
   return g;
 }
-// Only options of groups that exist at this stage count, so a filter set earlier can't hide people silently
-const fOn=()=>fGroups().flatMap(g=>g.o.filter(o=>S.flt.has(g.id+':'+o[0])).map(o=>({g,o,k:g.id+':'+o[0]})));
-function passF(s,on=fOn()){
-  const by={};on.forEach(x=>(by[x.g.id]=by[x.g.id]||[]).push(x.o[2]));
-  return Object.values(by).every(fs=>fs.some(fn=>fn(s)));
+const fKey=(g,o)=>g.id+':'+o[0];
+const fOptLabel=(g,o)=>g.pos&&o[1]===''?posName(o[0]):o[1];
+const shown=()=>act().filter(s=>S.sel.has(s.id));
+const members=o=>act().filter(o[2]);
+// all / none / mixed for any set of staff against the current selection
+const triState=list=>{const n=list.filter(s=>S.sel.has(s.id)).length;return !list.length||!n?'none':n===list.length?'all':'mixed'};
+const cbAttrs=st=>`${st==='all'?'checked':''} ${st==='mixed'?'data-mixed="1" aria-checked="mixed"':''}`;
+// Master checkbox under the search box: ticked → "Deselect all", empty → "Select all";
+// mixed → "–" with Invert selection beside it, and the label offers the opposite of where the user started.
+function selRow(){
+  const st=triState(act()),del=st==='all'||(st==='mixed'&&S.selBase!=='none');
+  return `<label class="selall"><input type="checkbox" data-c="selBox" ${cbAttrs(st)}><span>${del?L('Deselect all','Bỏ chọn tất cả'):L('Select all','Chọn tất cả')}</span></label>${st==='mixed'?`<button class="btn xs ghost" data-a="selInv">${L('Invert selection','Đảo lựa chọn')}</button>`:''}`;
 }
-const fLabel=x=>x.g.pos?`${esc(x.g.t)}: ${plab(x.o[0])}`:esc(x.o[1]);
-const shown=()=>{const on=fOn();return act().filter(s=>S.sel.has(s.id)&&passF(s,on))};
-// Facet count: people who pass every active filter outside this group and match this option
-function fCount(g,o,on){const rest=on.filter(x=>x.g.id!==g.id);return act().filter(s=>passF(s,rest)&&o[2](s)).length}
-// What "Select all / Deselect all / Invert" act on: people matching the filters and the name search
-const listed=(on=fOn())=>{const q=fold(S.search||'');return act().filter(s=>passF(s,on)&&(!q||fold(s.name+' '+s.nick).includes(q)))};
-function selBar(){
-  const l=listed(),n=l.filter(s=>S.sel.has(s.id)).length,all=l.length&&n===l.length;
-  const bAll=`<button class="btn xs" data-a="selAll">${L('Select all','Chọn tất cả')}</button>`,bNone=`<button class="btn xs" data-a="selNone">${L('Deselect all','Bỏ chọn tất cả')}</button>`,bInv=`<button class="btn xs ghost" data-a="selInv">${L('Invert selection','Đảo lựa chọn')}</button>`;
-  // All ticked → Deselect all. None → Select all. Mixed → Invert, plus the opposite of where the user started.
-  const btns=!l.length?'':all?bNone:!n?bAll:bInv+(S.selBase==='none'?bAll:bNone);
-  return `<small>${L(`${n} of ${l.length} listed are on the calendar`,`${n}/${l.length} người trong danh sách đang hiện trên lịch`)}</small>${btns}`;
-}
-const refreshSel=()=>{const b=document.getElementById('fselbar');if(b)b.innerHTML=selBar()};
-function fSec(id,title,active,body){
+// indeterminate is a property only, so it is set after every render
+const markMixed=()=>document.querySelectorAll('[data-mixed="1"]').forEach(b=>b.indeterminate=true);
+function fSec(id,title,badge,body){
   const open=!S.fcol.has(id);
-  return `<div class="fsec"><button class="fsec-h" data-a="fSec" data-v="${id}" aria-expanded="${open}" aria-controls="fs-${id}">${esc(title)}${active?`<span class="fbadge">${active}</span>`:''}</button>${open?`<div class="fsec-b" id="fs-${id}">${body}</div>`:''}</div>`;
+  return `<div class="fsec"><button class="fsec-h" data-a="fSec" data-v="${id}" aria-expanded="${open}" aria-controls="fs-${id}">${esc(title)}${badge?`<span class="fbadge">${badge}</span>`:''}</button>${open?`<div class="fsec-b" id="fs-${id}">${body}</div>`:''}</div>`;
 }
-function filterPop(on,a){
-  const n=a.filter(s=>passF(s,on)).length;
-  let h=fSec('sel',L('Show on the calendar','Hiện trên lịch'),0,`<div class="fselbar" id="fselbar">${selBar()}</div>`);
-  h+=fGroups().map(g=>{
-    const opts=g.o.map(o=>{const k=g.id+':'+o[0],c=fCount(g,o,on);return `<label class="fopt ${c?'':'zero'}"><input type="checkbox" data-c="flt" value="${k}" ${S.flt.has(k)?'checked':''}><span class="t">${g.pos?plab(o[0]):esc(o[1])}</span><span class="n" aria-label="${L(`${c} match`,`${c} người khớp`)}">${c}</span></label>`}).join('');
-    return fSec(g.id,g.t,on.filter(x=>x.g.id===g.id).length,opts);
+function filterPop(){
+  const a=act();
+  const h=fGroups().map(g=>{
+    let on=0;
+    const opts=g.o.map(o=>{
+      const m=members(o),st=triState(m),n=m.filter(s=>S.sel.has(s.id)).length;if(st!=='none')on++;
+      return `<label class="fopt ${m.length?'':'zero'}"><input type="checkbox" data-c="flt" value="${fKey(g,o)}" ${cbAttrs(st)} ${m.length?'':'disabled'}><span class="t">${g.pos&&o[1]===''?plab(o[0]):esc(o[1])}</span><span class="n" aria-label="${L(`${n} of ${m.length} selected`,`${n}/${m.length} người đang chọn`)}">${st==='mixed'?`${n}/${m.length}`:m.length}</span></label>`}).join('');
+    return fSec(g.id,g.t,'',opts);
   }).join('');
   return `<div class="fpop" id="fpop" role="dialog" aria-label="${L('Filters','Bộ lọc')}">
-    <p class="hint">${L('Within a group, people match any ticked option; across groups, they must match every group. The number is how many would match.','Trong một nhóm: khớp một trong các lựa chọn; giữa các nhóm: phải khớp tất cả. Con số là số người sẽ khớp.')}</p>
+    <p class="hint">${L('Tick an option to show everyone it describes; untick it to hide them. A “–” means only some of them are showing. The number is how many staff it describes.','Tick một lựa chọn để hiện mọi người có thuộc tính đó; bỏ tick để ẩn họ. Dấu “–” nghĩa là mới hiện một phần. Con số là số nhân viên có thuộc tính đó.')}</p>
     ${h}
-    <div class="fpop-foot"><small class="muted grow">${L(`${n} of ${a.length} staff match`,`${n}/${a.length} nhân viên khớp`)}</small><button class="btn xs ghost" data-a="fClear" ${on.length?'':'disabled'}>${L('Clear filters','Xóa bộ lọc')}</button><button class="btn xs" data-a="fToggle">${L('Done','Xong')}</button></div></div>`;
+    <div class="fpop-foot"><small class="muted grow">${L(`${shown().length} of ${a.length} staff on the calendar`,`${shown().length}/${a.length} nhân viên đang hiện trên lịch`)}</small><button class="btn xs" data-a="fToggle">${L('Done','Xong')}</button></div></div>`;
 }
 function picker(){
-  const a=act(),on=fOn(),list=a.filter(s=>passF(s,on)),vis=shown().length;
+  const a=act(),vis=shown().length;
   return `${S.narrow?`<details class="panel mfold" ${S.fopen||S.mfold?'open':''}><summary>${L('Choose staff to show','Chọn nhân viên để hiện')} (${vis}/${a.length})</summary>`:''}
     <aside class="panel picker">
       <div class="picker-head">
         <div class="fbar"><input type="search" placeholder="${L('Find staff','Tìm nhân viên')}" aria-label="${L('Find staff','Tìm nhân viên')}" data-i="staffsearch" value="${esc(S.search)}">
-          <button class="btn sm ${on.length?'on':''}" data-a="fToggle" aria-expanded="${!!S.fopen}" aria-controls="fpop">${L('Filters','Bộ lọc')}${on.length?`<span class="fbadge">${on.length}</span>`:''}</button>
-          ${S.fopen?filterPop(on,a):''}</div>
-        ${on.length?`<div class="fchips">${on.map(x=>`<button class="tag info" data-a="fOff" data-v="${x.k}" aria-label="${L('Remove filter','Bỏ lọc')}: ${esc(x.g.pos?x.g.t+': '+posName(x.o[0]):x.o[1])}">${fLabel(x)} ×</button>`).join('')}<button class="tag muted" data-a="fClear">${L('Clear filters','Xóa bộ lọc')}</button></div>
-        <small class="muted">${L(`${list.length} of ${a.length} staff match`,`${list.length}/${a.length} nhân viên khớp`)}</small>`:''}
+          <button class="btn sm" data-a="fToggle" aria-expanded="${!!S.fopen}" aria-controls="fpop">${L('Filters','Bộ lọc')}</button>
+          ${S.fopen?filterPop():''}</div>
+        <div class="selrow" id="selrow">${selRow()}</div>
       </div>
-      <ul class="plist">${list.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><label><input type="checkbox" data-c="sel" value="${s.id}" ${S.sel.has(s.id)?'checked':''}><span class="nm">${esc(s.name)}</span>${statusTag(s.id)}</label></li>`).join('')||`<li class="muted pad" data-name="">${L('Nobody matches these filters.','Không ai khớp bộ lọc.')}</li>`}</ul>
+      <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><label><input type="checkbox" data-c="sel" value="${s.id}" ${S.sel.has(s.id)?'checked':''}><span class="nm">${esc(s.name)}</span>${statusTag(s.id)}</label></li>`).join('')}</ul>
     </aside>${S.narrow?'</details>':''}`;
 }
 function flowSteps(){
@@ -1358,13 +1373,11 @@ const ACT={
   view:ds=>{S.view=ds.v;S.pp=null;render();window.scrollTo(0,0)},
   sview:ds=>{S.sview=ds.v;render()},
   day:ds=>{S[ds.k]=+ds.d;render()},
-  selAll:()=>{listed().forEach(s=>S.sel.add(s.id));S.selBase='all';render();refocus('[data-a="selNone"]')},
-  selNone:()=>{listed().forEach(s=>S.sel.delete(s.id));S.selBase='none';render();refocus('[data-a="selAll"]')},
-  selInv:()=>{listed().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus('[data-a="selInv"]')},
+  selAll:()=>{S.sel=new Set(act().map(s=>s.id));S.selBase='all';render();refocus('[data-c="selBox"]')},
+  selNone:()=>{S.sel=new Set();S.selBase='none';render();refocus('[data-c="selBox"]')},
+  selInv:()=>{act().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus(document.querySelector('[data-a="selInv"]')?'[data-a="selInv"]':'[data-c="selBox"]')},
   fSec:ds=>{S.fcol.has(ds.v)?S.fcol.delete(ds.v):S.fcol.add(ds.v);render();refocus(`[data-a="fSec"][data-v="${ds.v}"]`)},
   fToggle:()=>{S.fopen=!S.fopen;render();const b=document.querySelector(S.fopen?'#fpop input':'[data-a="fToggle"]');if(b)b.focus()},
-  fOff:ds=>{S.flt.delete(ds.v);render()},
-  fClear:()=>{S.flt.clear();render();const b=document.querySelector(S.fopen?'#fpop input':'[data-a="fToggle"]');if(b)b.focus()},
   sample:()=>{sampleDraft();render();toast(L('Sample draft created. Staff can’t see it yet.','Đã tạo bản nháp mẫu. Nhân viên chưa thấy.'))},
   editNeeds:()=>{S.editNeeds=!S.editNeeds;render()},
   smode:ds=>{S.smode=ds.v;render()},
@@ -1378,7 +1391,6 @@ const ACT={
   },
   addOpen:ds=>openDialog({type:'add',d:+ds.d,p:+ds.p,q:''}),
   addPick:ds=>{const d=D.d,p=D.p,s=who(ds.id);closeModal();S.sel.add(ds.id);S.pp=null;
-    if(!passF(s)){S.flt.clear();toast(L(`Filters cleared so ${s.name} shows on the calendar.`,`Đã xóa bộ lọc để ${s.name} hiện trên lịch.`))}
     ACT.ppOpen({id:ds.id,d,p})},
   ppClose:()=>{S.pp=null;render()},
   ppDay:ds=>{const P=S.pp;P.d=Math.min(6,Math.max(0,P.d+ +ds.v));P.sel=PERIODS.map(()=>false);P.err='';render()},
@@ -1518,8 +1530,11 @@ const ACT={
 };
 const CHG={
   me:t=>{S.meId=t.value;render()},
-  sel:t=>{t.checked?S.sel.add(t.value):S.sel.delete(t.value);const r=document.getElementById('avail-right');if(r)r.innerHTML=calBody();refreshSel()},
-  flt:t=>{t.checked?S.flt.add(t.value):S.flt.delete(t.value);render();refocus(`[data-c="flt"][value="${t.value}"]`)},
+  selBox:()=>{const st=triState(act());(st==='all'||(st==='mixed'&&S.selBase!=='none')?ACT.selNone:ACT.selAll)()},
+  sel:t=>{t.checked?S.sel.add(t.value):S.sel.delete(t.value);const sc=document.querySelector('.plist')?.scrollTop||0;render();const l=document.querySelector('.plist');if(l)l.scrollTop=sc;refocus(`[data-c="sel"][value="${t.value}"]`)},
+  // A filter option selects everyone it describes, or deselects them when they are all selected already
+  flt:t=>{const [gid,oid]=t.value.split(':'),g=fGroups().find(x=>x.id===gid),m=members(g.o.find(o=>o[0]===oid)),add=triState(m)!=='all';
+    m.forEach(s=>add?S.sel.add(s.id):S.sel.delete(s.id));render();refocus(`[data-c="flt"][value="${t.value}"]`)},
   need:t=>{S.needs[+t.dataset.d][+t.dataset.p][t.dataset.pos]=Math.max(0,parseInt(t.value,10)||0)},
   posrate:t=>{const p=POS.find(x=>x.id===t.dataset.pos),o=p.rate;p.rate=Math.max(0,parseInt(t.value,10)||0);S.openRates=true;log('owner',bi(()=>L(`Default rate, ${posName(p.id)}`,`Lương mặc định, ${posName(p.id)}`)),vnd(o),vnd(p.rate),'');render()},
   showFormer:t=>{S.showFormer=t.checked;render()},
@@ -1535,7 +1550,7 @@ const CHG={
   squal:t=>{D.quals=t.checked?[...D.quals,t.value]:D.quals.filter(x=>x!==t.value)},
 };
 const INP={
-  staffsearch:t=>{S.search=t.value;filterPicker();refreshSel()},
+  staffsearch:t=>{S.search=t.value;filterPicker()},
   candq:t=>{D.q=t.value;filterCands()},
   dtext:t=>{D[t.dataset.f]=t.value},
   pptext:t=>{S.pp.reason=t.value},
@@ -1558,6 +1573,7 @@ function render(){
   if(!who(S.meId)||!who(S.meId).active)S.meId=act()[0].id;
   document.getElementById('app').innerHTML=topbar()+(S.role==='admin'?adminShell():staffShell());
   if(S.search)filterPicker();
+  markMixed();
 }
 seed();render();
 if(typeof matchMedia!=='undefined'){const mq=matchMedia('(max-width:760px)');const on=e=>{if(S.narrow!==e.matches){S.narrow=e.matches;render()}};mq.addEventListener?mq.addEventListener('change',on):mq.addListener(on)}
