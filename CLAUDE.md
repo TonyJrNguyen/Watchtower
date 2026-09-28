@@ -25,8 +25,16 @@ trừ FR-T18) là Phase 3, đang chờ quyết định G51.
 
 **Đã build ở Phase 1** (khác với bản thu hẹp gốc): responsive đầy đủ hai chiều
 cho cả Chủ quán lẫn Nhân viên (NFR-5) — xem `prototypes/phase1-demo.html` để
-biết layout mobile cho từng màn (per-ngày cho lịch rảnh, thẻ độ phủ theo ca
-và thẻ từng nhân viên cho chế độ "Ai đăng ký" (FR-O41) ở xếp lịch, thẻ cho danh sách nhân viên/nhật ký).
+biết layout mobile cho từng màn (calendar tuần theo từng ngày, side panel thành
+bottom sheet, thẻ độ phủ theo ca và thẻ từng nhân viên cho "Ai đăng ký" (FR-O41),
+thẻ cho danh sách nhân viên/nhật ký).
+
+Từ v1.4, Lịch rảnh và Xếp lịch là **một màn calendar tuần** (FR-O10, FR-O42–FR-O44):
+xem ai đăng ký → xếp người → gán vị trí, tất cả trước khi công bố. Màu là **vị trí**,
+nhân viên phân biệt bằng **Biệt danh** duy nhất (FR-A11). Biệt danh chỉ hiện ở
+calendar hoặc chỗ cần dạng biểu diễn thu gọn; chỗ nào hiện được họ tên đầy đủ
+thì chỉ hiện họ tên, không kèm biệt danh. Khách nói "role" nghĩa là
+*position/vị trí* — trong code luôn dùng position, "role" chỉ dành cho phân quyền.
 
 ## Luật xuyên suốt, áp dụng cho mọi màn
 
