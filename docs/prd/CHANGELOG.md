@@ -3,6 +3,13 @@
 Mỗi dòng ứng với một commit áp dụng patch từ phiên chat với Claude. Chi tiết
 từng thay đổi xem trong nội dung commit hoặc lịch sử chat.
 
+## v1.6 — 2026-09-28
+- Theo feedback trên prototype Bộ lọc v1.5 cùng ngày (prototype đã cập nhật ở commit bed078a)
+- Viết lại FR-O11: **danh sách nhân viên được tick là trạng thái duy nhất**. Mỗi lựa chọn trong Bộ lọc phản chiếu lựa chọn đó như bộ lọc bảng tính — tick khi mọi người nó mô tả đều đang chọn, "–" khi một phần, trống khi không ai; tick thì chọn hết, bỏ tick thì bỏ chọn họ. Thêm lựa chọn "không" cho các nhóm (Chưa có vị trí, Chưa có kinh nghiệm, Không có gì cần chú ý) để ai cũng được mô tả trong mọi nhóm. Bỏ logic OR/AND, chip bộ lọc và nút Xóa bộ lọc
+- Chọn tất cả / Bỏ chọn tất cả / Đảo lựa chọn chuyển thành **checkbox tổng** dưới ô tìm nhân viên, tác động lên toàn bộ nhân viên đang làm
+- §3.5, §5 (mục resolved mới), §5.0 (hành vi Bộ lọc v1.5 chuyển sang *Superseded*) và §5.3 cập nhật tương ứng
+- Chỉ là hiển thị/thao tác, không có quy tắc nghiệp vụ mới, nên không đưa vào danh sách *pending confirmation*
+
 ## v1.5 — 2026-09-28
 - Theo feedback trên prototype calendar v1.4 cùng ngày
 - Thêm FR-O46 (Phase 1): nút **Thêm** trong mỗi ô ca của calendar để xếp người không đăng ký ca đó. Mặc định danh sách chỉ có những người không đăng ký ca này (không kèm tag "Không đăng ký ca này"); tìm theo tên thì hiện thêm người đã đăng ký, người chưa đăng ký tuần (tính là rảnh) và người đã xếp ca này, kèm tag. Chọn người thì mở side panel với ca đó đã chọn; ca bị đánh dấu ngoài lịch rảnh như FR-O12
