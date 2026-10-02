@@ -165,7 +165,14 @@ small{font-size:.78rem;color:var(--muted)}
 .plist input{margin:0 .45rem 0 0}
 .plist .nm{flex:1;min-width:0}
 .tgrid-wrap{overflow-x:auto;border-radius:var(--r-l);border:1px solid var(--line)}
-.tgrid{display:grid;grid-template-columns:78px repeat(7,minmax(104px,1fr));gap:1px;background:var(--line);min-width:820px}
+.tgrid{--cols:7;display:grid;grid-template-columns:78px repeat(var(--cols),minmax(104px,1fr));gap:1px;background:var(--line);min-width:820px}
+.tgrid.few{min-width:0}
+.tg-day.ro small{color:var(--muted)}
+/* calendar range bar: Day / 3 Days / Week, previous and next */
+.calbar{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;margin:0 0 .6rem}
+.calbar .rng{font-weight:600;font-size:.95rem}
+.calbar .navb{display:inline-flex;align-items:center}
+.calbar .icon:disabled{opacity:.35;cursor:not-allowed}
 .tgrid>div{background:var(--surface);padding:.3rem .45rem;min-width:0;overflow:hidden}
 .tgrid>.tg-cell{overflow:visible}
 .tg-corner,.tg-day{background:var(--sunk)!important}
@@ -470,7 +477,11 @@ const POS=[
   {id:'KI',vi:'Bếp',en:'Kitchen',rate:30000,c:'#7A5530'}];
 const DEN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],DEN_L=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const DVI=['T2','T3','T4','T5','T6','T7','CN'],DVI_L=['Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy','Chủ Nhật'];
-const DATES=['21/09','22/09','23/09','24/09','25/09','26/09','27/09'];
+// The week being built. Earlier weeks are kept in S.weeks and swapped in with withWeek(), which swaps DATES too.
+let DATES=['21/09','22/09','23/09','24/09','25/09','26/09','27/09'];
+// Calendar dates are whole days counted from 1970-01-01 (UTC, so no clock or time zone can move a day)
+const WK0=Date.UTC(2026,8,21)/864e5,HIST=3,CMIN=WK0-7*HIST,CMAX=WK0+6;
+const MON_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const SKIP=[{id:'vac',en:'On vacation',vi:'Đang nghỉ phép'},{id:'few',en:'Registered too few shifts',vi:'Đăng ký quá ít ca'},{id:'enough',en:'Enough staff already',vi:'Đã đủ người'}];
 const STAGE_DATE={registration:'17/09',arranging:'19/09',published:'21/09'};
 
@@ -519,7 +530,7 @@ function seed(){
   let lang='en';try{lang=localStorage.getItem('watchtower-lang')||'en'}catch(e){}
   S={lang,role:'admin',view:'schedule',sview:'register',pp:null,meId:'s0',stage:'registration',day:0,lday:0,
      staff:[],avail:{},needs:[],asg:[],skips:{},sel:new Set(),fopen:false,fcol:new Set(),selBase:'all',log:[],search:'',showFormer:false,editNeeds:false,seq:1,
-     aday:0,smode:'roster',rsort:'time',rpos:'',rfree:false,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
+     weeks:{},wk:0,home:null,cal:{view:'week',anchor:WK0,pick:WK0},smode:'roster',rsort:'time',rpos:'',rfree:false,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
   const order=['SV','BA','CI','CO','KI','OC','QC','SV','BA'];
   NAMES.forEach((n,i)=>{
     const main=order[i%order.length],q=new Set([main]);
@@ -531,11 +542,30 @@ function seed(){
       quals:POS.map(p=>p.id).filter(p=>q.has(p)),rate,active:true,login:mkLogin(n),pwSetAt:'15/09'});
     S.staff[i].nick=suggestNick(n,S.staff[i].id);
   });
-  const NONE=[0,7,15,23,31,38],ALL=[4,19],FEW=[11,27];
+  S.avail=genAvail(r,[0,7,15,23,31,38],[4,19],[11,27]);
+  for(let d=0;d<7;d++){
+    S.needs[d]=PERIODS.map(p=>{
+      const b={QC:1,CI:2,CO:2,BA:3,SV:3,OC:1,KI:2};
+      if(d>=5){b.SV++;b.BA++}
+      if(p.id===1){b.SV++;b.BA++}
+      if(p.id===4){b.CO++;b.SV++}
+      return b;
+    });
+  }
+  S.sel=new Set(S.staff.map(s=>s.id));
+  // earlier weeks: published, read-only on the calendar, each with its own registrations and shifts
+  for(let k=-1;k>=-HIST;k--){
+    const rk=rng(40-k),sh=i=>(i-5*k)%NAMES.length;
+    S.weeks[k]={avail:genAvail(rk,[0,7,15,23,31,38].map(sh),[4,19].map(sh),[11,27].map(sh)),asg:[],needs:JSON.parse(JSON.stringify(S.needs)),stage:'published',skips:{},dates:weekDates(k)};
+    withWeek(k,()=>sampleDraft(60-k));
+  }
+}
+function genAvail(r,NONE,ALL,FEW){
+  const av={};
   // Split registrations: free in the morning and again in the evening with a gap between, on every day they work
   const SPLIT={3:[1,1,0,1,1],12:[1,0,0,0,1],22:[1,0,1,0,1],30:[0,1,0,1,1],35:[1,1,0,0,1]};
   S.staff.forEach((s,i)=>{
-    if(NONE.includes(i)){S.avail[s.id]={mode:'none',days:emptyWeek()};return}
+    if(NONE.includes(i)){av[s.id]={mode:'none',days:emptyWeek()};return}
     const days=emptyWeek();
     if(ALL.includes(i))days.forEach(d=>d.fill(true));
     else{
@@ -549,18 +579,51 @@ function seed(){
         days[d]=(SPLIT[i]||pat).map(Boolean);
       }
     }
-    S.avail[s.id]={mode:'set',days};
+    av[s.id]={mode:'set',days};
   });
-  for(let d=0;d<7;d++){
-    S.needs[d]=PERIODS.map(p=>{
-      const b={QC:1,CI:2,CO:2,BA:3,SV:3,OC:1,KI:2};
-      if(d>=5){b.SV++;b.BA++}
-      if(p.id===1){b.SV++;b.BA++}
-      if(p.id===4){b.CO++;b.SV++}
-      return b;
-    });
-  }
-  S.sel=new Set(S.staff.map(s=>s.id));
+  return av;
+}
+
+/* ---------- weeks and calendar dates ----------
+   Week k starts on Monday WK0+7k: 0 is the week being built, negative k are earlier weeks.
+   withWeek(k,fn) runs fn with week k's data in place of the working week, the way bi() swaps the language,
+   so every rule (isAvail, regStatus, headCount, …) reads that week unchanged. */
+const WKEYS=['avail','asg','needs','stage','skips'];
+function withWeek(k,fn){
+  if(k===S.wk)return fn();
+  const save={dates:DATES,wk:S.wk};WKEYS.forEach(x=>save[x]=S[x]);
+  if(S.wk===0)S.home={...save};
+  const W=k===0?S.home:S.weeks[k];
+  WKEYS.forEach(x=>S[x]=W[x]);DATES=W.dates;S.wk=k;
+  try{return fn()}finally{WKEYS.forEach(x=>S[x]=save[x]);DATES=save.dates;S.wk=save.wk}
+}
+const isRO=()=>S.wk!==0;
+const nDate=n=>new Date(n*864e5);
+const ddmm=n=>{const t=nDate(n);return pad(t.getUTCDate())+'/'+pad(t.getUTCMonth()+1)};
+const dow=n=>((n-WK0)%7+7)%7;
+const monday=n=>n-dow(n);
+const weekOf=n=>Math.floor((n-WK0)/7);
+const weekDates=k=>Array.from({length:7},(_,d)=>ddmm(WK0+7*k+d));
+const calLen=()=>({day:1,'3d':3,week:7})[S.cal.view];
+// keep the range inside the weeks that have data: the earliest seeded week up to the week being built
+function calClamp(){const c=S.cal;let a=c.view==='week'?monday(c.anchor):c.anchor;c.anchor=Math.max(CMIN,Math.min(CMAX-calLen()+1,a))}
+function visibleDays(){calClamp();return Array.from({length:calLen()},(_,i)=>{const n=S.cal.anchor+i,k=weekOf(n);return{n,k,d:n-WK0-7*k}})}
+// the visible days grouped by week, so a rule can be evaluated once per week with that week's data
+function visWeeks(){const m=new Map();visibleDays().forEach(v=>{if(!m.has(v.k))m.set(v.k,[]);m.get(v.k).push(v.d)});return[...m].map(([k,ds])=>({k,ds}))}
+const anyVis=fn=>visWeeks().some(({k,ds})=>withWeek(k,()=>fn(ds)));
+// Who the calendar can show for these dates: free in at least one visible period (registered it, or registered
+// nothing and counted as free), or holding a shift on a visible day. Everyone else is out of range.
+const inRange=s=>anyVis(ds=>ds.some(d=>PERIODS.some(p=>isAvail(s.id,d,p.id))||S.asg.some(a=>a.staffId===s.id&&a.day===d)));
+const rangeStaff=()=>act().filter(inRange);
+const calStaff=()=>rangeStaff().filter(s=>S.sel.has(s.id));
+// registration is still open only when every visible day belongs to the week being built
+const calReg=()=>S.stage==='registration'&&visWeeks().every(w=>w.k===0);
+function rangeLabel(){
+  const v=visibleDays(),a=v[0].n,b=v[v.length-1].n;
+  const one=n=>S.lang==='vi'?`${(v.length===1?DVI_L:DVI)[dow(n)]} ${ddmm(n)}`:`${(v.length===1?DEN_L:DEN)[dow(n)]} ${nDate(n).getUTCDate()} ${MON_EN[nDate(n).getUTCMonth()]}`;
+  if(v.length===1)return one(a);
+  if(S.lang==='en'&&nDate(a).getUTCMonth()===nDate(b).getUTCMonth())return `${DEN[dow(a)]} ${nDate(a).getUTCDate()} – ${one(b)}`;
+  return `${one(a)} – ${one(b)}`;
 }
 
 /* ---------- domain rules ---------- */
@@ -659,8 +722,9 @@ function log(actor,what,before,after,reason,key){
 }
 const actorName=a=>a==='owner'?L('Owner','Chủ quán'):a==='system'?L('System','Hệ thống'):(who(a)?.name||a);
 
-function sampleDraft(){
-  const r=rng(5),cnt={},excl=new Set(['s15','s33','s38']);
+// hist: a seed for an earlier, already published week — complete, no exclusions, not logged
+function sampleDraft(hist){
+  const r=rng(hist||5),cnt={},excl=new Set(hist?[]:['s15','s33','s38']);
   const pool=act().filter(s=>!excl.has(s.id));
   const onDay=(sid,d)=>S.asg.some(a=>a.staffId===sid&&a.day===d);
   const pick=(d,ps,pos,cap)=>{
@@ -699,6 +763,7 @@ function sampleDraft(){
     if(a.positions.includes('QC'))a.det.QC=[r()<0.5?'in':'out'];
     if(a.positions.includes('SV')&&r()<0.4)a.det.SV=['run'];
   }
+  if(hist)return;
   // the weekend is left at step 2: people placed, positions not yet given
   for(const a of S.asg)if(a.day>=5&&r()<0.45){a.positions=[];a.primary=null;a.det={}}
   log('owner',bi(()=>L('Created a sample draft','Tạo bản nháp mẫu')),'',bi(()=>L(`${S.asg.length} shifts`,`${S.asg.length} ca`)),bi(()=>L('Demo helper','Công cụ demo')));
@@ -758,8 +823,8 @@ function ppState(s,d,p){
   return{a,cls,style,line,rank:a?(a.positions.length?0:1):2};
 }
 function pill(s,d,p,st,right){
-  const cur=S.pp&&S.pp.sid===s.id&&S.pp.d===d;
-  return `<button class="pp${st.cls}${cur?' cur':''}" style="${st.style}" data-a="ppOpen" data-id="${s.id}" data-d="${d}" data-p="${p}" aria-label="${esc(s.name)} (${esc(s.nick)}), ${esc(st.line)}">${esc(s.nick)}<span class="pp-x${right?' r':''}" aria-hidden="true">${esc(s.name)}<small>${esc(st.line)}</small></span></button>`;
+  const cur=S.pp&&S.pp.sid===s.id&&S.pp.d===d&&(S.pp.k||0)===S.wk;
+  return `<button class="pp${st.cls}${cur?' cur':''}" style="${st.style}" data-a="ppOpen" data-id="${s.id}" data-d="${d}" data-p="${p}" data-w="${S.wk}" aria-label="${esc(s.name)} (${esc(s.nick)}), ${esc(st.line)}">${esc(s.nick)}<span class="pp-x${right?' r':''}" aria-hidden="true">${esc(s.name)}<small>${esc(st.line)}</small></span></button>`;
 }
 const posIdx=a=>a?POS.findIndex(q=>q.id===(a.primary||a.positions[0])):99;
 function cellPeople(sel,d,p){
@@ -772,58 +837,76 @@ function cellHead(d,p,ppl){
   return `<div class="tg-cnt ${h<need?'short':''}"><b title="${L('placed / needed','đã xếp / cần')}">${h}/${need}</b><span title="${L('free, not placed yet','rảnh, chưa được xếp')}">+${waiting} ${L('free','rảnh')}</span></div>`;
 }
 // "Add" in a CA cell: lets the owner place someone who isn't showing there (didn't register it, or isn't ticked)
-const addBtn=(d,p)=>S.stage==='registration'?'':`<button class="tg-add" data-a="addOpen" data-d="${d}" data-p="${p}" aria-label="${L(`Add someone to ${PERIODS[p].code}, ${dayL(d)}`,`Thêm người vào ${PERIODS[p].code}, ${dayL(d)}`)}">+ ${L('Add','Thêm')}</button>`;
+const addBtn=(d,p)=>S.stage==='registration'||isRO()?'':`<button class="tg-add" data-a="addOpen" data-d="${d}" data-p="${p}" aria-label="${L(`Add someone to ${PERIODS[p].code}, ${dayL(d)}`,`Thêm người vào ${PERIODS[p].code}, ${dayL(d)}`)}">+ ${L('Add','Thêm')}</button>`;
 function calLegend(){
-  const ex=esc(act()[0]?.nick||'Mai N'),c=POS[3].c;
+  const ex=esc(act()[0]?.nick||'Mai N'),c=POS[3].c,reg=calReg();
   return `<p class="legend"><span><span class="pp static">${ex}</span>${L('Registered, not placed yet','Đã đăng ký, chưa xếp')}</span><span><span class="pp def static">${ex}</span>${L('Didn’t register, counted as free','Chưa đăng ký, tính là rảnh')}</span><span><span class="pp sched static">${ex}</span>${L('Placed, no position yet','Đã xếp, chưa có vị trí')}</span><span><span class="pp pos out static" style="--c:${c}">${ex}</span>${L('Placed outside availability','Xếp ngoài lịch rảnh')}</span></p>
   <p class="legend"><span>${L('Colour is the position:','Màu là vị trí:')}</span>${POS.map(p=>`<span>${plab(p.id)}</span>`).join('')}<span>${L('Two colours: covers two positions.','Hai màu: kiêm hai vị trí.')}</span></p>
-  ${S.stage==='registration'?'':`<p class="legend"><span>${L('In each cell: people placed / people needed, then how many more are free but not placed yet.','Trong mỗi ô: số người đã xếp / số người cần, sau đó là số người còn rảnh chưa được xếp.')}</span></p>`}
-  ${S.stage==='registration'?'':`<p class="legend"><span>${L('+ Add in a cell places someone who didn’t register that shift. It’s allowed, and flagged as outside availability.','+ Thêm trong một ô để xếp người không đăng ký ca đó. Vẫn được phép và sẽ được đánh dấu ngoài lịch rảnh.')}</span></p>`}
+  ${reg?'':`<p class="legend"><span>${L('In each cell: people placed / people needed, then how many more are free but not placed yet.','Trong mỗi ô: số người đã xếp / số người cần, sau đó là số người còn rảnh chưa được xếp.')}</span></p>`}
+  ${reg?'':`<p class="legend"><span>${L('+ Add in a cell places someone who didn’t register that shift. It’s allowed, and flagged as outside availability.','+ Thêm trong một ô để xếp người không đăng ký ca đó. Vẫn được phép và sẽ được đánh dấu ngoài lịch rảnh.')}</span></p>`}
   <p class="legend"><span>${L('Point at a name to see it in full. Click or tap it to place that person and give them a position, in the panel alongside.','Rê chuột vào tên để xem đầy đủ. Bấm hoặc chạm để xếp người đó và gán vị trí ở bảng bên cạnh.')}</span></p>`;
 }
+// Day / 3 Days / Week, previous and next. The view is kept while moving through dates.
+function calBar(){
+  const v=visibleDays(),first=v[0].n,last=v[v.length-1].n;
+  const views=[['day',L('Day','Ngày')],['3d',L('3 Days','3 ngày')],['week',L('Week','Tuần')]];
+  return `<div class="calbar"><div class="seg" role="group" aria-label="${L('Calendar view','Chế độ xem lịch')}">${views.map(([k,t])=>`<button aria-pressed="${S.cal.view===k}" data-a="calView" data-v="${k}">${t}</button>`).join('')}</div>
+    <span class="navb"><button class="icon" data-a="calNav" data-v="-1" ${first<=CMIN?'disabled':''} aria-label="${L('Previous dates','Khoảng trước')}">‹</button><button class="icon" data-a="calNav" data-v="1" ${last>=CMAX?'disabled':''} aria-label="${L('Next dates','Khoảng sau')}">›</button></span>
+    <span class="rng" aria-live="polite">${esc(rangeLabel())}</span>
+    <button class="btn xs ghost" data-a="calHome" ${first===WK0?'disabled':''}>${L('Week being scheduled','Tuần đang xếp')}</button></div>
+  ${v.some(x=>x.k!==0)?`<div class="notice">${L('Earlier weeks are published. They’re shown here to look at only: placing people and giving positions happen in the week being scheduled.','Các tuần trước đã công bố, ở đây chỉ để xem: xếp người và gán vị trí làm ở tuần đang xếp.')}</div>`:''}`;
+}
 function calBody(){
-  const sel=shown();
-  if(S.narrow)return calNarrow(sel);
-  let h=`<div class="tgrid-wrap"><div class="tgrid" style="grid-template-rows:auto ${PERIODS.map(p=>`minmax(${Math.max(58,(p.e-p.s)/60*20)}px,auto)`).join(' ')}">`;
-  h+=`<div class="tg-corner"><small>${L('Rows sized by length','Hàng theo độ dài ca')}</small></div>`+DEN.map((_,d)=>`<div class="tg-day"><b>${dayL(d)}</b><small>${DATES[d]}</small></div>`).join('');
+  const sel=calStaff(),rs=rangeStaff(),v=visibleDays();
+  let h=calBar();
+  if(!rs.length)return h+`<div class="empty small"><p>${L('No one registered for these dates.','Không ai đăng ký trong những ngày này.')}</p></div>`+calLegend();
+  if(S.narrow)return h+calNarrow(sel,v);
+  const n=v.length;
+  h+=`<div class="tgrid-wrap"><div class="tgrid ${n<7?'few':''}" style="--cols:${n};grid-template-rows:auto ${PERIODS.map(p=>`minmax(${Math.max(58,(p.e-p.s)/60*20)}px,auto)`).join(' ')}">`;
+  h+=`<div class="tg-corner"><small>${L('Rows sized by length','Hàng theo độ dài ca')}</small></div>`+v.map(x=>`<div class="tg-day ${x.k?'ro':''}"><b>${dayL(dow(x.n))}</b><small>${ddmm(x.n)}${x.k?' · '+L('published','đã công bố'):''}</small></div>`).join('');
   PERIODS.forEach(p=>{
     h+=`<div class="tg-period"><b>${p.code}</b><small>${hm(p.s)}–${hm(p.e)}</small></div>`;
-    for(let d=0;d<7;d++){
-      const ppl=cellPeople(sel,d,p.id);
-      h+=`<div class="tg-cell ${sel.length&&!ppl.length?'empty':''}">${cellHead(d,p.id,ppl)}${ppl.map(x=>pill(x.s,d,p.id,x.st,d>=5)).join('')||`<small>${L('No one','Không ai')}</small>`}${addBtn(d,p.id)}</div>`;
-    }
+    v.forEach((x,i)=>{h+=withWeek(x.k,()=>{
+      const ppl=cellPeople(sel,x.d,p.id);
+      return `<div class="tg-cell ${sel.length&&!ppl.length?'empty':''}">${cellHead(x.d,p.id,ppl)}${ppl.map(y=>pill(y.s,x.d,p.id,y.st,n>2&&i>=n-2)).join('')||`<small>${L('No one','Không ai')}</small>`}${addBtn(x.d,p.id)}</div>`;
+    })});
   });
   h+='</div></div>'+calLegend();
   if(!sel.length)h+=`<div class="empty small"><p>${L('Tick staff on the left to see them on the calendar.','Chọn nhân viên bên trái để hiện trên lịch.')}</p></div>`;
   return h;
 }
-function calNarrow(sel){
-  const d=S.aday;
-  let h=dayTabs('aday',d)+'<div class="mlist" style="margin-top:.7rem">';
-  h+=PERIODS.map(p=>{const ppl=cellPeople(sel,d,p.id);
-    return `<div class="mrow"><div class="mrow-h"><b>${p.code}</b><small>${hm(p.s)}–${hm(p.e)}</small></div>${cellHead(d,p.id,ppl)}<div class="mchips">${ppl.map(x=>pill(x.s,d,p.id,x.st,false)).join('')||`<small>${L('No one','Không ai')}</small>`}${addBtn(d,p.id)}</div></div>`}).join('')+'</div>';
+// On a phone the calendar shows one day at a time (NFR-5): tabs for the visible days; Day view needs none
+function calNarrow(sel,v){
+  const x=v.find(y=>y.n===S.cal.pick)||v[0];
+  let h=v.length>1?`<div class="daytabs" role="tablist">${v.map(y=>`<button role="tab" aria-selected="${y.n===x.n}" data-a="calPick" data-n="${y.n}"><b>${dayL(dow(y.n))}</b><small>${ddmm(y.n)}</small></button>`).join('')}</div>`:'';
+  h+='<div class="mlist" style="margin-top:.7rem">'+withWeek(x.k,()=>PERIODS.map(p=>{const ppl=cellPeople(sel,x.d,p.id);
+    return `<div class="mrow"><div class="mrow-h"><b>${p.code}</b><small>${hm(p.s)}–${hm(p.e)}</small></div>${cellHead(x.d,p.id,ppl)}<div class="mchips">${ppl.map(y=>pill(y.s,x.d,p.id,y.st,false)).join('')||`<small>${L('No one','Không ai')}</small>`}${addBtn(x.d,p.id)}</div></div>`}).join(''))+'</div>';
   return h+calLegend();
 }
 /* Staff selection for the calendar. The ticked staff list is the only state: whoever is ticked shows.
-   Each filter option describes a set of staff over the whole week and mirrors the selection — ticked when all of
-   them are selected, "–" when some are, empty when none — and ticking it selects them all, unticking deselects them.
-   Groups include a "none" option where needed, so every staff member is described in every group. */
-const staffAsg=sid=>S.asg.filter(a=>a.staffId===sid);
-function fGroups(all){
-  const reg=!all&&S.stage==='registration',g=[];
-  const short=s=>belowContract(s.id),out=s=>staffAsg(s.id).some(a=>outside(s.id,a.day,a.start,a.end)),noexp=s=>staffAsg(s.id).some(a=>a.positions.some(p=>!s.quals.includes(p)));
+   Each filter option describes a set of staff and mirrors the selection — ticked when all of them are selected,
+   "–" when some are, empty when none — and ticking it selects them all, unticking deselects them.
+   Groups include a "none" option where needed, so every staff member is described in every group.
+   Options only describe staff in range for the visible dates (inRange). Placing, placed-as and the two placing
+   warnings look at the shifts on the visible days; registration and short hours stay weekly, for the week(s)
+   the visible days belong to, since "Free all week" is how the owner reads them. */
+// some shift on a visible day passes test (evaluated with that day's week in place)
+const visAsg=(s,test)=>anyVis(ds=>S.asg.some(a=>a.staffId===s.id&&ds.includes(a.day)&&test(a)));
+function fGroups(){
+  const reg=calReg(),g=[],wk=f=>s=>anyVis(()=>f(s));
+  const short=wk(s=>belowContract(s.id)),out=s=>visAsg(s,a=>outside(s.id,a.day,a.start,a.end)),noexp=s=>visAsg(s,a=>a.positions.some(p=>!s.quals.includes(p)));
   g.push({id:'reg',t:L('Registration','Đăng ký'),o:[
-    ['some',L('Registered some shifts','Đăng ký một số ca'),s=>regStatus(s.id)==='partial'],
-    ['all',L('Free all week','Rảnh cả tuần'),s=>regStatus(s.id)==='all'],
-    ['none',L('Didn’t register, counted as free','Chưa đăng ký, tính là rảnh'),s=>regStatus(s.id)==='none']]});
+    ['some',L('Registered some shifts','Đăng ký một số ca'),wk(s=>regStatus(s.id)==='partial')],
+    ['all',L('Free all week','Rảnh cả tuần'),wk(s=>regStatus(s.id)==='all')],
+    ['none',L('Didn’t register, counted as free','Chưa đăng ký, tính là rảnh'),wk(s=>regStatus(s.id)==='none')]]});
   if(!reg){
     g.push({id:'plc',t:L('Placing','Xếp lịch'),o:[
-      ['nosh',L('No shift yet','Chưa có ca nào'),s=>!staffAsg(s.id).length],
-      ['nopos',L('Placed, no position yet','Đã xếp, chưa có vị trí'),s=>staffAsg(s.id).some(a=>!a.positions.length)],
-      ['pos',L('Placed with a position','Đã xếp, có vị trí'),s=>staffAsg(s.id).some(a=>a.positions.length)],
-      ['two',L('Covers two positions','Kiêm hai vị trí'),s=>staffAsg(s.id).some(a=>a.positions.length>1)]]});
-    g.push({id:'ppos',t:L('Placed as','Vị trí được xếp'),pos:true,o:[...POS.map(p=>[p.id,'',s=>staffAsg(s.id).some(a=>a.positions.includes(p.id))]),
-      ['none',L('No position yet','Chưa có vị trí'),s=>!staffAsg(s.id).some(a=>a.positions.length)]]});
+      ['nosh',L('No shift yet','Chưa có ca nào'),s=>!visAsg(s,()=>true)],
+      ['nopos',L('Placed, no position yet','Đã xếp, chưa có vị trí'),s=>visAsg(s,a=>!a.positions.length)],
+      ['pos',L('Placed with a position','Đã xếp, có vị trí'),s=>visAsg(s,a=>a.positions.length)],
+      ['two',L('Covers two positions','Kiêm hai vị trí'),s=>visAsg(s,a=>a.positions.length>1)]]});
+    g.push({id:'ppos',t:L('Placed as','Vị trí được xếp'),pos:true,o:[...POS.map(p=>[p.id,'',s=>visAsg(s,a=>a.positions.includes(p.id))]),
+      ['none',L('No position yet','Chưa có vị trí'),s=>!visAsg(s,a=>a.positions.length)]]});
   }
   g.push({id:'exp',t:L('Has experience in','Có kinh nghiệm'),pos:true,o:[...POS.map(p=>[p.id,'',s=>s.quals.includes(p.id)]),
     ['none',L('No experience listed','Chưa có kinh nghiệm'),s=>!s.quals.length]]});
@@ -836,14 +919,14 @@ function fGroups(all){
 const fKey=(g,o)=>g.id+':'+o[0];
 const fOptLabel=(g,o)=>g.pos&&o[1]===''?posName(o[0]):o[1];
 const shown=()=>act().filter(s=>S.sel.has(s.id));
-const members=o=>act().filter(o[2]);
+const members=o=>rangeStaff().filter(o[2]);
 // all / none / mixed for any set of staff against the current selection
 const triState=list=>{const n=list.filter(s=>S.sel.has(s.id)).length;return !list.length||!n?'none':n===list.length?'all':'mixed'};
 const cbAttrs=st=>`${st==='all'?'checked':''} ${st==='mixed'?'data-mixed="1" aria-checked="mixed"':''}`;
 // Master checkbox under the search box: ticked → "Deselect all", empty → "Select all";
 // mixed → "–" with Invert selection beside it, and the label offers the opposite of where the user started.
 function selRow(){
-  const st=triState(act()),del=st==='all'||(st==='mixed'&&S.selBase!=='none');
+  const st=triState(rangeStaff()),del=st==='all'||(st==='mixed'&&S.selBase!=='none');
   return `<label class="selall"><input type="checkbox" data-c="selBox" ${cbAttrs(st)}><span>${del?L('Deselect all','Bỏ chọn tất cả'):L('Select all','Chọn tất cả')}</span></label>${st==='mixed'?`<button class="btn xs ghost" data-a="selInv">${L('Invert selection','Đảo lựa chọn')}</button>`:''}`;
 }
 // indeterminate is a property only, so it is set after every render
@@ -853,7 +936,7 @@ function fSec(id,title,badge,body){
   return `<div class="fsec"><button class="fsec-h" data-a="fSec" data-v="${id}" aria-expanded="${open}" aria-controls="fs-${id}">${esc(title)}${badge?`<span class="fbadge">${badge}</span>`:''}</button>${open?`<div class="fsec-b" id="fs-${id}">${body}</div>`:''}</div>`;
 }
 function filterPop(){
-  const a=act();
+  const a=rangeStaff();
   const h=fGroups().map(g=>{
     let on=0;
     const opts=g.o.map(o=>{
@@ -864,10 +947,18 @@ function filterPop(){
   return `<div class="fpop" id="fpop" role="dialog" aria-label="${L('Filters','Bộ lọc')}">
     <p class="hint">${L('Tick an option to show everyone it describes; untick it to hide them. A “–” means only some of them are showing. The number is how many staff it describes.','Tick một lựa chọn để hiện mọi người có thuộc tính đó; bỏ tick để ẩn họ. Dấu “–” nghĩa là mới hiện một phần. Con số là số nhân viên có thuộc tính đó.')}</p>
     ${h}
-    <div class="fpop-foot"><small class="muted grow">${L(`${shown().length} of ${a.length} staff on the calendar`,`${shown().length}/${a.length} nhân viên đang hiện trên lịch`)}</small><button class="btn xs" data-a="fToggle">${L('Done','Xong')}</button></div></div>`;
+    <div class="fpop-foot"><small class="muted grow">${L(`${calStaff().length} of ${a.length} staff on the calendar`,`${calStaff().length}/${a.length} nhân viên đang hiện trên lịch`)}</small><button class="btn xs" data-a="fToggle">${L('Done','Xong')}</button></div></div>`;
+}
+// The staff list holds only staff in range for the visible dates. Ticks of the others are kept, so they come back as they were.
+function statusTagVis(sid){
+  const any=f=>anyVis(()=>f());
+  if(any(()=>regStatus(sid)==='all'))return tag('ok',L('Free all week','Rảnh cả tuần'));
+  if(any(()=>regStatus(sid)==='none'))return tag('info',L('Not registered','Chưa đăng ký'));
+  if(any(()=>belowContract(sid)))return tag('warn',L('Short hours','Thiếu giờ'));
+  return '';
 }
 function picker(){
-  const a=act(),vis=shown().length;
+  const a=rangeStaff(),vis=calStaff().length,out=act().length-a.length;
   return `${S.narrow?`<details class="panel mfold" ${S.fopen||S.mfold?'open':''}><summary>${L('Choose staff to show','Chọn nhân viên để hiện')} (${vis}/${a.length})</summary>`:''}
     <aside class="panel picker">
       <div class="picker-head">
@@ -876,7 +967,8 @@ function picker(){
           ${S.fopen?filterPop():''}</div>
         <div class="selrow" id="selrow">${selRow()}</div>
       </div>
-      <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><label><input type="checkbox" data-c="sel" value="${s.id}" ${S.sel.has(s.id)?'checked':''}><span class="nm">${esc(s.name)}</span>${statusTag(s.id)}</label></li>`).join('')}</ul>
+      <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><label><input type="checkbox" data-c="sel" value="${s.id}" ${S.sel.has(s.id)?'checked':''}><span class="nm">${esc(s.name)}</span>${statusTagVis(s.id)}</label></li>`).join('')}</ul>
+      ${out?`<p class="hint" style="margin:.2rem .7rem .6rem">${L(`${out} not shown: nothing registered and no shift in these dates.`,`${out} người không hiện: không đăng ký và không có ca trong những ngày này.`)}</p>`:''}
     </aside>${S.narrow?'</details>':''}`;
 }
 function flowSteps(){
@@ -917,8 +1009,13 @@ function vWeek(){
   h+=`<div class="toolbar" style="margin-top:.9rem"><div class="seg" role="group" aria-label="${L('View','Chế độ xem')}"><button aria-pressed="${S.smode==='roster'}" data-a="smode" data-v="roster">${L('Who registered','Ai đăng ký')}</button><button aria-pressed="${S.smode==='cover'}" data-a="smode" data-v="cover">${L('Coverage by position and shifts','Độ phủ theo vị trí và ca')}</button></div></div>`;
   return h+(S.smode==='roster'?rosterView(d):coverView(d));
 }
-function sidePanel(){
-  const P=S.pp,s=who(P.sid),d=P.d,ro=S.stage==='registration',pub=S.stage==='published';
+// Days the panel's ‹ › step through: the visible calendar days, or the panel's own week when opened from
+// outside the visible range (the roster below, the publish dialog)
+function ppDays(){const P=S.pp,k=P.k||0,v=visibleDays();return v.some(x=>x.k===k&&x.d===P.d)?v:[0,1,2,3,4,5,6].map(d=>({k,d}))}
+function sidePanel(){return withWeek(S.pp.k||0,sidePanelWeek)}
+function sidePanelWeek(){
+  const P=S.pp,s=who(P.sid),d=P.d,past=isRO(),ro=S.stage==='registration'||past,pub=S.stage==='published';
+  const nav=ppDays(),ni=nav.findIndex(x=>x.k===(P.k||0)&&x.d===d);
   const cells=dayCells(s.id,d),w=weekLoad(s.id),def=regStatus(s.id)==='none';
   const free=i=>!(cells[i]&&cells[i].lock),nsel=P.sel.filter((v,i)=>v&&free(i)).length;
   const rows=PERIODS.map((p,i)=>{
@@ -930,7 +1027,7 @@ function sidePanel(){
     return `<div class="sp-row ${on?'on':''} ${can?'':'lock'}" ${can?`data-a="ppRow" data-i="${i}" role="checkbox" aria-checked="${on}" tabindex="0"`:''}><input type="checkbox" ${on?'checked':''} ${can?'':'disabled'} tabindex="-1" aria-hidden="true" style="pointer-events:none"><div><b>${p.code} <small style="display:inline;font-weight:400">${shm(p.s)}–${shm(p.e)}</small></b>${reg}</div><div class="st">${st}</div></div>`;
   }).join('');
   const nq=P.pos.filter(x=>!s.quals.includes(x));
-  let body=ro?`<div class="notice">${L('Registration is still open. You can see what they registered; placing people opens when it locks.','Đăng ký còn mở. Bạn xem được họ đăng ký gì; xếp lịch mở khi đăng ký khóa.')}</div>`:'';
+  let body=past?`<div class="notice">${L('This week is published and past. You can look at what they registered and held; it can’t be changed here.','Tuần này đã công bố và đã qua. Bạn xem được họ đăng ký và có ca gì; không sửa ở đây.')}</div>`:ro?`<div class="notice">${L('Registration is still open. You can see what they registered; placing people opens when it locks.','Đăng ký còn mở. Bạn xem được họ đăng ký gì; xếp lịch mở khi đăng ký khóa.')}</div>`:'';
   body+=`<div class="sp-sec">${L('Shifts this day','Ca trong ngày')}</div>`;
   if(!ro)body+=`<div class="quick"><span class="muted">${L('Select','Chọn')}</span><button class="btn xs" data-a="ppSel" data-v="reg">${L('Registered shifts','Ca đã đăng ký')}</button><button class="btn xs" data-a="ppSel" data-v="all">${L('All','Tất cả')}</button><button class="btn xs ghost" data-a="ppSel" data-v="none">${L('None','Bỏ chọn')}</button></div>`;
   body+=rows;
@@ -948,7 +1045,7 @@ function sidePanel(){
     ${P.err?`<p class="err" role="alert">${P.err}</p>`:''}`;
   }
   return `<aside class="spanel" aria-label="${esc(s.name)}"><div class="sp-head"><div class="grow"><h2>${esc(s.name)}</h2>
-    <div class="nav"><button class="icon" data-a="ppDay" data-v="-1" ${d===0?'disabled':''} aria-label="${L('Previous day','Ngày trước')}">‹</button><b>${dayL(d)} ${DATES[d]}</b><button class="icon" data-a="ppDay" data-v="1" ${d===6?'disabled':''} aria-label="${L('Next day','Ngày sau')}">›</button></div>
+    <div class="nav"><button class="icon" data-a="ppDay" data-v="-1" ${ni<=0?'disabled':''} aria-label="${L('Previous day','Ngày trước')}">‹</button><b>${dayL(d)} ${DATES[d]}</b><button class="icon" data-a="ppDay" data-v="1" ${ni>=nav.length-1?'disabled':''} aria-label="${L('Next day','Ngày sau')}">›</button></div>
     <small>${esc(availWeekText(s.id))} · ${L(`placed this week: ${w.n} shifts, ${hrs(w.min)}`,`đã xếp tuần này: ${w.n} ca, ${hrs(w.min)}`)}</small><br>
     <small>${L('Experience','Kinh nghiệm')}: ${s.quals.map(q=>plab(q)).join(' ')||'–'}</small></div>
     <button class="icon" data-a="ppClose" aria-label="${L('Close','Đóng')}">×</button></div>
@@ -1344,6 +1441,13 @@ function toast(msg,ms=3200){const t=document.getElementById('toast');t.textConte
 const tempPw=()=>Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
 
 /* ---------- actions ---------- */
+// after the visible range changes: keep the phone's day inside it, and close a side panel left outside it
+function calMoved(){
+  const v=visibleDays();
+  if(!v.some(x=>x.n===S.cal.pick))S.cal.pick=v[0].n;
+  if(S.pp&&!v.some(x=>x.k===(S.pp.k||0)&&x.d===S.pp.d))S.pp=null;
+  render();
+}
 function setAvail(d,fn){
   const sid=S.meId,A=S.avail[sid],before=bi(()=>availDayText(sid,d));
   if(A.mode==='none'){A.mode='set';A.days=emptyWeek()}
@@ -1373,9 +1477,9 @@ const ACT={
   view:ds=>{S.view=ds.v;S.pp=null;render();window.scrollTo(0,0)},
   sview:ds=>{S.sview=ds.v;render()},
   day:ds=>{S[ds.k]=+ds.d;render()},
-  selAll:()=>{S.sel=new Set(act().map(s=>s.id));S.selBase='all';render();refocus('[data-c="selBox"]')},
-  selNone:()=>{S.sel=new Set();S.selBase='none';render();refocus('[data-c="selBox"]')},
-  selInv:()=>{act().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus(document.querySelector('[data-a="selInv"]')?'[data-a="selInv"]':'[data-c="selBox"]')},
+  selAll:()=>{rangeStaff().forEach(s=>S.sel.add(s.id));S.selBase='all';render();refocus('[data-c="selBox"]')},
+  selNone:()=>{rangeStaff().forEach(s=>S.sel.delete(s.id));S.selBase='none';render();refocus('[data-c="selBox"]')},
+  selInv:()=>{rangeStaff().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus(document.querySelector('[data-a="selInv"]')?'[data-a="selInv"]':'[data-c="selBox"]')},
   fSec:ds=>{S.fcol.has(ds.v)?S.fcol.delete(ds.v):S.fcol.add(ds.v);render();refocus(`[data-a="fSec"][data-v="${ds.v}"]`)},
   fToggle:()=>{S.fopen=!S.fopen;render();const b=document.querySelector(S.fopen?'#fpop input':'[data-a="fToggle"]');if(b)b.focus()},
   sample:()=>{sampleDraft();render();toast(L('Sample draft created. Staff can’t see it yet.','Đã tạo bản nháp mẫu. Nhân viên chưa thấy.'))},
@@ -1383,17 +1487,23 @@ const ACT={
   smode:ds=>{S.smode=ds.v;render()},
   /* side panel: one staff member, one day */
   ppOpen:ds=>{
-    const sid=ds.id,d=+ds.d,p=+ds.p;
-    if(S.pp&&S.pp.sid===sid&&S.pp.d===d){S.pp.sel[p]=!S.pp.sel[p]||S.stage==='registration';S.pp.err=''}
-    else{const c=dayCells(sid,d)[p],pos=c?(c.primary?[c.primary,...c.positions.filter(x=>x!==c.primary)]:[...c.positions]):[];
-      S.pp={sid,d,sel:PERIODS.map((_,i)=>i===p),pos,det:c?detCopy(c.det):{},reason:'',err:''}}
+    const sid=ds.id,d=+ds.d,p=+ds.p,k=+(ds.w||0);
+    if(S.pp&&S.pp.sid===sid&&S.pp.d===d&&(S.pp.k||0)===k){S.pp.sel[p]=!S.pp.sel[p]||S.stage==='registration'||k!==0;S.pp.err=''}
+    else{const c=withWeek(k,()=>dayCells(sid,d)[p]),pos=c?(c.primary?[c.primary,...c.positions.filter(x=>x!==c.primary)]:[...c.positions]):[];
+      S.pp={sid,d,k,sel:PERIODS.map((_,i)=>i===p),pos,det:c?detCopy(c.det):{},reason:'',err:''}}
     render();
   },
   addOpen:ds=>openDialog({type:'add',d:+ds.d,p:+ds.p,q:''}),
   addPick:ds=>{const d=D.d,p=D.p,s=who(ds.id);closeModal();S.sel.add(ds.id);S.pp=null;
     ACT.ppOpen({id:ds.id,d,p})},
   ppClose:()=>{S.pp=null;render()},
-  ppDay:ds=>{const P=S.pp;P.d=Math.min(6,Math.max(0,P.d+ +ds.v));P.sel=PERIODS.map(()=>false);P.err='';render()},
+  ppDay:ds=>{const P=S.pp,nav=ppDays(),i=nav.findIndex(x=>x.k===(P.k||0)&&x.d===P.d),t=nav[Math.min(nav.length-1,Math.max(0,i+ +ds.v))];
+    P.k=t.k;P.d=t.d;P.sel=PERIODS.map(()=>false);P.err='';render()},
+  /* calendar range: the view is kept while moving; switching view keeps the first visible day (Week snaps to its Monday) */
+  calView:ds=>{const first=visibleDays()[0].n;S.cal.view=ds.v;S.cal.anchor=first;calMoved()},
+  calNav:ds=>{S.cal.anchor+=(+ds.v)*calLen();calMoved()},
+  calHome:()=>{S.cal.anchor=WK0;calMoved()},
+  calPick:ds=>{S.cal.pick=+ds.n;render()},
   ppRow:ds=>{const i=+ds.i;S.pp.sel[i]=!S.pp.sel[i];S.pp.err='';render()},
   ppSel:ds=>{const P=S.pp;P.sel=PERIODS.map(p=>ds.v==='all'||(ds.v==='reg'&&isAvail(P.sid,P.d,p.id)));render()},
   ppPos:ds=>{const P=S.pp,id=ds.v;if(P.pos.includes(id)){P.pos=P.pos.filter(x=>x!==id);delete P.det[id]}else P.pos.push(id);P.err='';render()},
@@ -1530,7 +1640,7 @@ const ACT={
 };
 const CHG={
   me:t=>{S.meId=t.value;render()},
-  selBox:()=>{const st=triState(act());(st==='all'||(st==='mixed'&&S.selBase!=='none')?ACT.selNone:ACT.selAll)()},
+  selBox:()=>{const st=triState(rangeStaff());(st==='all'||(st==='mixed'&&S.selBase!=='none')?ACT.selNone:ACT.selAll)()},
   sel:t=>{t.checked?S.sel.add(t.value):S.sel.delete(t.value);const sc=document.querySelector('.plist')?.scrollTop||0;render();const l=document.querySelector('.plist');if(l)l.scrollTop=sc;refocus(`[data-c="sel"][value="${t.value}"]`)},
   // A filter option selects everyone it describes, or deselects them when they are all selected already
   flt:t=>{const [gid,oid]=t.value.split(':'),g=fGroups().find(x=>x.id===gid),m=members(g.o.find(o=>o[0]===oid)),add=triState(m)!=='all';
