@@ -1011,7 +1011,6 @@ function picker(){
           <button class="btn sm" data-a="fToggle" aria-expanded="${!!S.fopen}" aria-controls="fpop">${L('Filters','Bộ lọc')}</button>
           ${S.fopen?filterPop():''}</div>
         <div class="selrow" id="selrow">${selRow()}</div>
-        <p class="hint" style="margin:.15rem 0 0">${L('Click a name to show only that person; tick boxes to show several.','Bấm vào tên để chỉ hiện người đó; tick ô vuông để hiện nhiều người.')}</p>
       </div>
       <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><div class="prow"><input type="checkbox" data-c="sel" value="${s.id}" aria-label="${esc(s.name)}" ${S.sel.has(s.id)?'checked':''}><button type="button" class="nm only" data-a="selOnly" data-id="${s.id}" title="${esc(L(`Show only ${s.name}`,`Chỉ hiện ${s.name}`))}">${esc(s.name)}</button>${statusTagVis(s.id)}</div></li>`).join('')}</ul>
       ${out?`<p class="hint" style="margin:.2rem .7rem .6rem">${L(`${out} not shown: nothing registered and no shift in these dates.`,`${out} người không hiện: không đăng ký và không có ca trong những ngày này.`)}</p>`:''}
