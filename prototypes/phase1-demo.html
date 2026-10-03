@@ -149,6 +149,10 @@ small{font-size:.78rem;color:var(--muted)}
 .fopt:hover{background:var(--sunk)}
 .fopt input{margin:0;flex:none}
 .fopt .t{flex:1;min-width:0}
+/* the name or option text is its own button: clicking it shows only that person or group, the checkbox adds or removes */
+.only{border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.only:hover:not(:disabled),.only:focus-visible{text-decoration:underline}
+.only:disabled{cursor:default}
 .fopt .n{flex:none;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:1.4rem;text-align:right}
 .fopt.zero .t{color:var(--muted)}
 .selrow{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .4rem;min-height:1.9rem}
@@ -160,8 +164,8 @@ small{font-size:.78rem;color:var(--muted)}
 .fchips{display:flex;flex-wrap:wrap;gap:.15rem}
 .fchips .tag{margin:0;white-space:normal;text-align:left}
 .plist{list-style:none;margin:0;padding:.3rem;overflow-y:auto}
-.plist label{display:flex;align-items:center;gap:.1rem;padding:.3rem .4rem;border-radius:var(--r-s);cursor:pointer;font-size:.87rem;flex-wrap:wrap}
-.plist label:hover{background:var(--sunk)}
+.plist label,.plist .prow{display:flex;align-items:center;gap:.1rem;padding:.3rem .4rem;border-radius:var(--r-s);cursor:pointer;font-size:.87rem;flex-wrap:wrap}
+.plist label:hover,.plist .prow:hover{background:var(--sunk)}
 .plist input{margin:0 .45rem 0 0}
 .plist .nm{flex:1;min-width:0}
 .tgrid-wrap{overflow-x:auto;border-radius:var(--r-l);border:1px solid var(--line)}
@@ -530,7 +534,7 @@ function seed(){
   let lang='en';try{lang=localStorage.getItem('watchtower-lang')||'en'}catch(e){}
   S={lang,role:'admin',view:'schedule',sview:'register',pp:null,meId:'s0',stage:'registration',day:0,lday:0,
      staff:[],avail:{},needs:[],asg:[],skips:{},sel:new Set(),fopen:false,fcol:new Set(),selBase:'all',log:[],search:'',showFormer:false,editNeeds:false,seq:1,
-     weeks:{},wk:0,home:null,cal:{view:'week',anchor:WK0,pick:WK0},smode:'roster',rsort:'time',rpos:'',rfree:false,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
+     weeks:{},wk:0,home:null,lwk:0,cal:{view:'week',anchor:WK0,pick:WK0},smode:'roster',rsort:'time',rpos:'',rfree:false,narrow:(typeof matchMedia!=='undefined'&&matchMedia('(max-width:760px)').matches)};
   const order=['SV','BA','CI','CO','KI','OC','QC','SV','BA'];
   NAMES.forEach((n,i)=>{
     const main=order[i%order.length],q=new Set([main]);
@@ -554,11 +558,51 @@ function seed(){
   }
   S.sel=new Set(S.staff.map(s=>s.id));
   // earlier weeks: published, read-only on the calendar, each with its own registrations and shifts
+  const H=[];
   for(let k=-1;k>=-HIST;k--){
     const rk=rng(40-k),sh=i=>(i-5*k)%NAMES.length;
     S.weeks[k]={avail:genAvail(rk,[0,7,15,23,31,38].map(sh),[4,19].map(sh),[11,27].map(sh)),asg:[],needs:JSON.parse(JSON.stringify(S.needs)),stage:'published',skips:{},dates:weekDates(k)};
-    withWeek(k,()=>sampleDraft(60-k));
+    withWeek(k,()=>{sampleDraft(60-k);histWeek(k,H)});
   }
+  // newest first, like entries the demo adds as you use it; all before 17/09, when this week's registration opens
+  S.log=H.sort((a,b)=>b.at-a.at).map(({at,...e})=>e);
+}
+/* An earlier week's story, written to its shifts and to the activity log in the order it happened:
+   registrations Thursday to Saturday, the lock at Saturday 15:00, skips and publication on Sunday,
+   then late arrivals recorded on the day and held ones reviewed the next morning, with a reason.
+   The most recent earlier week (14–20/09) is still under way on 17/09, so only Monday to Wednesday have happened. */
+function histWeek(k,H){
+  const r=rng(80-k),mon=WK0+7*k,ri=(a,b)=>a+Math.floor(r()*(b-a+1));
+  const add=(n,min,actor,what,before,after,reason)=>H.push({at:n*1440+min,t:ddmm(n)+' '+hm(min),actor,what,before:before||'',after:after||'',reason:reason||''});
+  const shuffle=l=>{for(let i=l.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[l[i],l[j]]=[l[j],l[i]]}return l};
+  shuffle(act().filter(s=>S.avail[s.id].mode==='set')).slice(0,7).forEach(s=>
+    add(mon-ri(3,5),ri(480,1320),s.id,bi(()=>L('Availability, whole week','Lịch rảnh, cả tuần')),bi(()=>L('nothing registered','chưa đăng ký')),bi(()=>availWeekText(s.id))));
+  add(mon-2,900,'system',bi(()=>L('Registration closed and locked','Đóng và khóa đăng ký')));
+  act().filter(s=>!S.asg.some(a=>a.staffId===s.id)).forEach(s=>{const x=SKIP[ri(0,SKIP.length-1)];S.skips[s.id]=x.id;
+    add(mon-1,ri(1080,1170),'owner',bi(()=>L('Skipped for this week','Bỏ qua tuần này')),'',s.name,{en:x.en,vi:x.vi})});
+  add(mon-1,ri(1180,1260),'owner',bi(()=>L('Published the week','Công bố lịch tuần')),'',bi(()=>L(`${S.asg.length} shifts for ${new Set(S.asg.map(a=>a.staffId)).size} staff, ${DATES[0]}–${DATES[6]}`,`${S.asg.length} ca cho ${new Set(S.asg.map(a=>a.staffId)).size} nhân viên, ${DATES[0]}–${DATES[6]}`)));
+  // one late arrival per person at most; held ones need a day after them for the review
+  const last=k===-1?2:6,seen=new Set();
+  const pool=shuffle(S.asg.filter(a=>a.day<=last)).filter(a=>!seen.has(a.staffId)&&seen.add(a.staffId));
+  const kinds=['ontime','ontime','pen','pen','pen','ded','ded','held'];
+  const RES=[
+    {kind:'correct',en:'Typed the wrong time. Checked the camera: they arrived 12 minutes late.',vi:'Gõ nhầm giờ. Đã xem camera: đến trễ 12 phút.'},
+    {kind:'reduced',minutes:30,en:'Motorbike broke down on the way and they called ahead. Agreed to deduct 30 minutes.',vi:'Xe hỏng giữa đường và đã gọi báo trước. Thống nhất trừ 30 phút.'},
+    {kind:'ontime',en:'I sent them to buy ice before the shift. Not late.',vi:'Tôi nhờ đi mua đá trước ca. Không tính trễ.'},
+    {kind:'noshow',en:'Sick and didn’t come in. Told us on Zalo after the shift started.',vi:'Bị ốm, không đi làm. Báo qua Zalo sau khi ca đã bắt đầu.'}];
+  kinds.forEach((kd,i)=>{
+    const a=pool.find(x=>!x._used&&(kd!=='held'||x.day<last||k!==-1)&&(kd!=='ded'||x.end-x.start>=60));if(!a)return;a._used=true;
+    const len=a.end-a.start,n=mon+a.day,s=who(a.staffId);
+    const m=kd==='ontime'?ri(5,10):kd==='pen'?ri(11,15):kd==='ded'?Math.max(16,Math.min(ri(16,40),Math.floor((len-1)/2))):Math.ceil(len/2)+ri(5,20);
+    a.arrival=a.start+m;
+    const arr=()=>L(`arrived ${hm(a.arrival)}`,`đến lúc ${hm(a.arrival)}`);
+    add(n,Math.min(1430,a.start+m+ri(10,50)),'owner',bi(()=>L(`Arrival, ${s.name}, ${dayS(a.day)} ${hm(a.start)}`,`Giờ đến, ${s.name}, ${dayS(a.day)} ${hm(a.start)}`)),bi(()=>L('on time, nothing recorded','đúng giờ, chưa ghi')),bi(arr));
+    if(kd!=='held')return;
+    const x=RES[(-k-1+i)%RES.length],before=bi(()=>L(`${hm(a.arrival)}, held`,`${hm(a.arrival)}, tạm giữ`));
+    if(x.kind==='correct')a.arrival=a.start+12;else if(x.kind==='noshow'){a.noShow=true;a.res={kind:'noshow'}}else a.res=x.kind==='reduced'?{kind:'reduced',minutes:x.minutes}:{kind:x.kind};
+    add(n+1,ri(500,560),'owner',bi(()=>L(`Reviewed lateness, ${s.name}, ${dayS(a.day)}`,`Xử lý đi trễ, ${s.name}, ${dayS(a.day)}`)),before,bi(()=>lateTag(a,late(a)).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()),{en:x.en,vi:x.vi});
+  });
+  S.asg.forEach(a=>delete a._used);
 }
 function genAvail(r,NONE,ALL,FEW){
   const av={};
@@ -941,11 +985,12 @@ function filterPop(){
     let on=0;
     const opts=g.o.map(o=>{
       const m=members(o),st=triState(m),n=m.filter(s=>S.sel.has(s.id)).length;if(st!=='none')on++;
-      return `<label class="fopt ${m.length?'':'zero'}"><input type="checkbox" data-c="flt" value="${fKey(g,o)}" ${cbAttrs(st)} ${m.length?'':'disabled'}><span class="t">${g.pos&&o[1]===''?plab(o[0]):esc(o[1])}</span><span class="n" aria-label="${L(`${n} of ${m.length} selected`,`${n}/${m.length} người đang chọn`)}">${st==='mixed'?`${n}/${m.length}`:m.length}</span></label>`}).join('');
+      const lab=fOptLabel(g,o);
+      return `<div class="fopt ${m.length?'':'zero'}"><input type="checkbox" data-c="flt" value="${fKey(g,o)}" aria-label="${esc(lab)}" ${cbAttrs(st)} ${m.length?'':'disabled'}><button type="button" class="t only" data-a="fltOnly" data-v="${fKey(g,o)}" ${m.length?'':'disabled'} title="${esc(L(`Show only: ${lab}`,`Chỉ hiện: ${lab}`))}">${g.pos&&o[1]===''?plab(o[0]):esc(o[1])}</button><span class="n" aria-label="${L(`${n} of ${m.length} selected`,`${n}/${m.length} người đang chọn`)}">${st==='mixed'?`${n}/${m.length}`:m.length}</span></div>`}).join('');
     return fSec(g.id,g.t,'',opts);
   }).join('');
   return `<div class="fpop" id="fpop" role="dialog" aria-label="${L('Filters','Bộ lọc')}">
-    <p class="hint">${L('Tick an option to show everyone it describes; untick it to hide them. A “–” means only some of them are showing. The number is how many staff it describes.','Tick một lựa chọn để hiện mọi người có thuộc tính đó; bỏ tick để ẩn họ. Dấu “–” nghĩa là mới hiện một phần. Con số là số nhân viên có thuộc tính đó.')}</p>
+    <p class="hint">${L('Click an option’s name to show only the staff it describes. Tick its box to add them to who’s showing; untick it to hide them. A “–” means only some of them are showing. The number is how many staff it describes.','Bấm vào tên một lựa chọn để chỉ hiện những người có thuộc tính đó. Tick ô vuông để thêm họ vào danh sách đang hiện; bỏ tick để ẩn họ. Dấu “–” nghĩa là mới hiện một phần. Con số là số nhân viên có thuộc tính đó.')}</p>
     ${h}
     <div class="fpop-foot"><small class="muted grow">${L(`${calStaff().length} of ${a.length} staff on the calendar`,`${calStaff().length}/${a.length} nhân viên đang hiện trên lịch`)}</small><button class="btn xs" data-a="fToggle">${L('Done','Xong')}</button></div></div>`;
 }
@@ -966,8 +1011,9 @@ function picker(){
           <button class="btn sm" data-a="fToggle" aria-expanded="${!!S.fopen}" aria-controls="fpop">${L('Filters','Bộ lọc')}</button>
           ${S.fopen?filterPop():''}</div>
         <div class="selrow" id="selrow">${selRow()}</div>
+        <p class="hint" style="margin:.15rem 0 0">${L('Click a name to show only that person; tick boxes to show several.','Bấm vào tên để chỉ hiện người đó; tick ô vuông để hiện nhiều người.')}</p>
       </div>
-      <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><label><input type="checkbox" data-c="sel" value="${s.id}" ${S.sel.has(s.id)?'checked':''}><span class="nm">${esc(s.name)}</span>${statusTagVis(s.id)}</label></li>`).join('')}</ul>
+      <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><div class="prow"><input type="checkbox" data-c="sel" value="${s.id}" aria-label="${esc(s.name)}" ${S.sel.has(s.id)?'checked':''}><button type="button" class="nm only" data-a="selOnly" data-id="${s.id}" title="${esc(L(`Show only ${s.name}`,`Chỉ hiện ${s.name}`))}">${esc(s.name)}</button>${statusTagVis(s.id)}</div></li>`).join('')}</ul>
       ${out?`<p class="hint" style="margin:.2rem .7rem .6rem">${L(`${out} not shown: nothing registered and no shift in these dates.`,`${out} người không hiện: không đăng ký và không có ca trong những ngày này.`)}</p>`:''}
     </aside>${S.narrow?'</details>':''}`;
 }
@@ -1168,9 +1214,18 @@ function explain(a,l){
     case 'noshow':return L('Marked as not worked. The shift is unpaid and doesn’t count toward the bonus.','Đã ghi là không đi làm. Ca không tính lương và không tính vào thưởng.');
   }
 }
+// Which week the lateness screen shows: earlier weeks are there to look back at, read-only
+function lateWeekBar(){
+  return `<div class="toolbar"><div class="seg" role="group" aria-label="${L('Week','Tuần')}">${[...Array(HIST)].map((_,i)=>i-HIST).concat(0).map(k=>{const w=weekDates(k);
+    return `<button aria-pressed="${S.lwk===k}" data-a="lwk" data-v="${k}">${w[0]}–${w[6]}${k?'':L(' (being scheduled)',' (đang xếp)')}</button>`}).join('')}</div></div>`;
+}
 function vLateness(){
-  if(S.stage!=='published')return `<div class="vhead"><h1>${L('Lateness','Đi trễ')}</h1></div>`+emptyState(L('Lateness is recorded against published shifts','Đi trễ được ghi nhận trên ca đã công bố'),L('Publish the week first. Then you can record anyone who arrives late.','Hãy công bố lịch tuần trước. Sau đó bạn có thể ghi nhận người đến trễ.'),`<button class="btn" data-a="view" data-v="schedule">${L('Go to schedule','Tới lịch làm')}</button>`);
-  const d=S.lday,list=S.asg.filter(a=>a.day===d&&who(a.staffId).active).sort((a,b)=>a.start-b.start||who(a.staffId).name.localeCompare(who(b.staffId).name,'vi'));
+  if(S.lwk)return withWeek(S.lwk,lateWeek);
+  if(S.stage!=='published')return `<div class="vhead"><h1>${L('Lateness','Đi trễ')}</h1></div>${lateWeekBar()}`+emptyState(L('Lateness is recorded against published shifts','Đi trễ được ghi nhận trên ca đã công bố'),L('Publish the week first. Then you can record anyone who arrives late. Earlier weeks can be opened above.','Hãy công bố lịch tuần trước. Sau đó bạn có thể ghi nhận người đến trễ. Các tuần trước mở được ở phía trên.'),`<button class="btn" data-a="view" data-v="schedule">${L('Go to schedule','Tới lịch làm')}</button>`);
+  return lateWeek();
+}
+function lateWeek(){
+  const ro=isRO(),d=S.lday,list=S.asg.filter(a=>a.day===d&&who(a.staffId).active).sort((a,b)=>a.start-b.start||who(a.staffId).name.localeCompare(who(b.staffId).name,'vi'));
   const affected=act().filter(s=>S.asg.some(a=>a.staffId===s.id&&(a.arrival!=null||a.noShow)));
   const an=anomalies();
   let h=`<div class="vhead"><h1>${L('Lateness','Đi trễ')}</h1><p class="lede">${L('Everyone counts as on time unless you record otherwise. Enter the actual arrival time and the rest is worked out for you.','Mọi người được tính là đúng giờ nếu bạn không ghi nhận gì. Nhập giờ đến thực tế, hệ thống tự tính phần còn lại.')}</p></div>
@@ -1180,16 +1235,18 @@ function vLateness(){
     <div class="sc bad" style="flex:16"><b>16+</b><small>${L('Deduct 2× the minutes late, bonus lost','Trừ gấp 2 số phút trễ, mất thưởng')}</small></div>
     <div class="sc held" style="flex:14"><b>${L('Deduction ≥ shift','Khoản trừ ≥ ca')}</b><small>${L('Held for your review','Tạm giữ chờ bạn xem')}</small></div>
   </div>
+  ${lateWeekBar()}
+  ${ro?`<div class="notice">${L('An earlier week, shown to look back at. Arrivals and reviews can’t be changed here; what was recorded and why is in the activity log.','Tuần trước, chỉ để xem lại. Không sửa giờ đến hay quyết định ở đây; những gì đã ghi và lý do nằm trong nhật ký.')}</div>`:''}
   ${an.length?`<div class="notice bad">${L(`${an.length} held for review. Nothing has been deducted for these yet.`,`${an.length} trường hợp đang tạm giữ. Chưa trừ lương cho các trường hợp này.`)}</div>`:''}
   ${dayTabs('lday',d,x=>S.asg.some(a=>a.day===x&&late(a).k==='anomaly'))}
   <div class="late-layout" style="margin-top:1rem"><section class="panel">`;
   h+=list.length?list.map(a=>{const s=who(a.staffId),l=late(a);
     return `<div class="lrow"><div><span class="who">${esc(s.name)}</span> <span class="meta">${hm(a.start)}–${hm(a.end)}, ${posList(a)}</span></div>
-    <div class="acts">${l.k==='anomaly'?`<button class="btn sm primary" data-a="resDlg" data-id="${a.id}">${L('Review','Xem xét')}</button>`:''}${l.k==='default'?`<button class="btn sm" data-a="arrDlg" data-id="${a.id}">${L('Record arrival','Ghi giờ đến')}</button>`:`<button class="btn sm" data-a="arrDlg" data-id="${a.id}">${L('Change','Sửa')}</button><button class="btn sm ghost" data-a="arrClear" data-id="${a.id}">${L('Clear','Xóa')}</button>`}</div>
+    <div class="acts">${ro?'':(l.k==='anomaly'?`<button class="btn sm primary" data-a="resDlg" data-id="${a.id}">${L('Review','Xem xét')}</button>`:'')+(l.k==='default'?`<button class="btn sm" data-a="arrDlg" data-id="${a.id}">${L('Record arrival','Ghi giờ đến')}</button>`:`<button class="btn sm" data-a="arrDlg" data-id="${a.id}">${L('Change','Sửa')}</button><button class="btn sm ghost" data-a="arrClear" data-id="${a.id}">${L('Clear','Xóa')}</button>`)}</div>
     <div>${lateTag(a,l)}</div></div>`}).join(''):`<p class="pad muted">${L('No shifts on this day.','Không có ca nào trong ngày.')}</p>`;
-  h+=`</section><section><h2>${L('This week so far','Tuần này đến nay')}</h2>`;
+  h+=`</section><section><h2>${ro?L('That week','Tuần đó'):L('This week so far','Tuần này đến nay')}</h2>`;
   h+=affected.length?`<div class="scroll" style="margin-top:.5rem"><table class="tbl"><thead><tr><th>${L('Staff','Nhân viên')}</th><th class="num">${L('Penalties','Lần trễ')}</th><th class="num">${L('Deducted','Bị trừ')}</th><th>${L('Attendance bonus','Thưởng chuyên cần')}</th></tr></thead><tbody>${affected.map(s=>{const w=weekStats(s.id);return `<tr><td>${esc(s.name)}</td><td class="num">${w.pen}</td><td class="num">${w.ded?vnd(w.ded):'–'}</td><td>${bonusTag(w)}</td></tr>`}).join('')}</tbody></table></div><p class="hint">${L('The bonus shown is a preview. Confirming it at the weekly close comes in Phase 2.','Thưởng hiển thị chỉ là dự tính. Xác nhận khi chốt tuần thuộc giai đoạn 2.')}</p>`
-    :`<div class="empty small"><p class="muted">${L('No lateness recorded yet this week.','Tuần này chưa ghi nhận đi trễ.')}</p></div>`;
+    :`<div class="empty small"><p class="muted">${ro?L('No lateness recorded that week.','Tuần đó không ghi nhận đi trễ.'):L('No lateness recorded yet this week.','Tuần này chưa ghi nhận đi trễ.')}</p></div>`;
   return h+'</section></div>';
 }
 
@@ -1479,6 +1536,9 @@ const ACT={
   day:ds=>{S[ds.k]=+ds.d;render()},
   selAll:()=>{rangeStaff().forEach(s=>S.sel.add(s.id));S.selBase='all';render();refocus('[data-c="selBox"]')},
   selNone:()=>{rangeStaff().forEach(s=>S.sel.delete(s.id));S.selBase='none';render();refocus('[data-c="selBox"]')},
+  // clicking a name or option text: show only them. selBase 'none' so the master checkbox then offers Select all
+  selOnly:ds=>{const sc=document.querySelector('.plist')?.scrollTop||0;S.sel=new Set([ds.id]);S.selBase='none';render();const l=document.querySelector('.plist');if(l)l.scrollTop=sc;refocus(`[data-a="selOnly"][data-id="${ds.id}"]`)},
+  fltOnly:ds=>{const [gid,oid]=ds.v.split(':'),g=fGroups().find(x=>x.id===gid);S.sel=new Set(members(g.o.find(o=>o[0]===oid)).map(s=>s.id));S.selBase='none';render();refocus(`[data-a="fltOnly"][data-v="${ds.v}"]`)},
   selInv:()=>{rangeStaff().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus(document.querySelector('[data-a="selInv"]')?'[data-a="selInv"]':'[data-c="selBox"]')},
   fSec:ds=>{S.fcol.has(ds.v)?S.fcol.delete(ds.v):S.fcol.add(ds.v);render();refocus(`[data-a="fSec"][data-v="${ds.v}"]`)},
   fToggle:()=>{S.fopen=!S.fopen;render();const b=document.querySelector(S.fopen?'#fpop input':'[data-a="fToggle"]');if(b)b.focus()},
@@ -1504,6 +1564,7 @@ const ACT={
   calNav:ds=>{S.cal.anchor+=(+ds.v)*calLen();calMoved()},
   calHome:()=>{S.cal.anchor=WK0;calMoved()},
   calPick:ds=>{S.cal.pick=+ds.n;render()},
+  lwk:ds=>{S.lwk=+ds.v;render()},
   ppRow:ds=>{const i=+ds.i;S.pp.sel[i]=!S.pp.sel[i];S.pp.err='';render()},
   ppSel:ds=>{const P=S.pp;P.sel=PERIODS.map(p=>ds.v==='all'||(ds.v==='reg'&&isAvail(P.sid,P.d,p.id)));render()},
   ppPos:ds=>{const P=S.pp,id=ds.v;if(P.pos.includes(id)){P.pos=P.pos.filter(x=>x!==id);delete P.det[id]}else P.pos.push(id);P.err='';render()},
