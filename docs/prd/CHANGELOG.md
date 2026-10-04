@@ -3,6 +3,12 @@
 Mỗi dòng ứng với một commit áp dụng patch từ phiên chat với Claude. Chi tiết
 từng thay đổi xem trong nội dung commit hoặc lịch sử chat.
 
+## v1.8 — 2026-10-04
+- Sửa FR-O24: màn Đi trễ mở được **các tuần trước** (trong giới hạn lưu trữ §4.11), chỉ xem: giờ đến đã ghi, phân loại (FR-O25) và tóm tắt tuần, kèm thông báo tuần đó chỉ để xem lại. Prototype đã có từ 03/10
+- §5 (mục resolved mới) và §5.3 cập nhật tương ứng
+- Chỉ là hiển thị, không có quy tắc nghiệp vụ mới, nên không đưa vào danh sách *pending confirmation*
+- Backlog: thêm S-4.17 (FR-O47, 5 md) và S-7.9 (FR-O24, 2 md), S-4.2 từ 6 lên 8 md; Phase 1 từ 200 lên **209 md**. Roadmap cập nhật sprint S4, S8 và công theo vai trò (~174 md)
+
 ## v1.7 — 2026-10-04
 - Theo review prototype calendar ngày 03/10 (prototype trên branch `feature/calendar-day-3day-week-views`)
 - Thêm FR-O47 (Phase 1): calendar xem theo **Ngày / 3 ngày / Tuần** (tuần từ Thứ Hai đến Chủ Nhật). Trước/sau dịch đúng độ dài chế độ xem và giữ nguyên chế độ xem; 3 ngày có thể vắt qua hai tuần. Xem lại được các tuần trước (đã công bố, chỉ xem, trong giới hạn lưu trữ §4.11); không đi quá tuần đang xếp

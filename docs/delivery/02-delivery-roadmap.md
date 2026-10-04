@@ -70,11 +70,11 @@ Two-week sprints. Capacity assumption: 2 developers + Tony part-time as BA/PM/QA
 | **S1** | 1–2 | E1 core: auth, staff accounts CRUD with nickname, roles, deactivation, audit log, i18n scaffold, PWA shell. ENABLER-1. | The Owner creates a staff account; that staff member signs in on their phone. |
 | **S2** | 3–4 | E1 remainder: password from the record, default rate per position, Superadmin log, "include former staff", configuration of shift periods, registration window, positions with sub-positions, skip reasons (S-1.12–S-1.14). | The Owner renames a sub-position and changes a default rate without a release. |
 | **S3** | 5–6 | E2 complete: registration grid, select-all, edit/delete, warnings, own-overlap block, auto-lock, on phone and desktop (S-16.6). ENABLER-4. | A staff member registers a full week on a phone; it locks at the cutoff. |
-| **S4** | 7–8 | Staffing needs per position; the weekly calendar read view with nickname pills, registered vs. counted-as-free, placed-of-needed per cell, hover/tap; staff list with master checkbox and spreadsheet Filters; phone one-day view (S-4.1, S-4.2, S-3.1, S-3.4, S-3.5, S-16.5 read part). | **The Owner sees who registered for the whole week, on desktop and phone.** |
+| **S4** | 7–8 | Staffing needs per position; the weekly calendar read view with nickname pills, registered vs. counted-as-free, placed-of-needed per cell, hover/tap; staff list with master checkbox and spreadsheet Filters scoped to the dates in view; Day / 3 Days / Week views with earlier weeks read-only; phone one-day view (S-4.1, S-4.2, S-4.17, S-3.1, S-3.4, S-3.5, S-16.5 read part). | **The Owner sees who registered, by day, three days or the whole week, on desktop and phone.** |
 | **S5** | 9–10 | Placing: side panel / bottom sheet, place without position, join/split of neighbouring periods, cell Add, double-booking block, out-of-availability flag, day roster (S-4.3, S-4.5, S-4.12–S-4.16). | The Owner places people for a full week. |
 | **S6** | 11–12 | Positions: give positions with sub-positions and attributes, multi-position with primary, qualification flag, coverage per position with full-period and partial counts and the shared marker, coverage cards on a phone (S-3.2, S-3.3, S-3.6–S-3.8, S-4.4, S-4.6, S-16.7). | A full draft week with positions and coverage. |
 | **S7** | 13–14 | E5 and post-publication changes: publish gate (no shift, no position), skip-with-reason, publish, My shifts, edit in place, swap, cancel, shorten + cover with the 30-minute rule, notes, on a phone too (S-4.7–S-4.11, S-5.x, S-16.3). | **The whole scheduling loop works end to end.** |
-| **S8** | 15–16 | E7 complete: manual arrival, rules engine (ENABLER-5), deductions in minutes, anomaly and resolution with the no-show effect, staff view, bonus preview, pay estimate, recording from a phone (S-7.x, S-16.2). | **The Owner records a lateness from their phone, on the floor, and sees it classified; each staff member sees their own pay estimate.** |
+| **S8** | 15–16 | E7 complete: manual arrival, rules engine (ENABLER-5), deductions in minutes, anomaly and resolution with the no-show effect, staff view, bonus preview, pay estimate, earlier weeks read-only, recording from a phone (S-7.x, S-16.2). | **The Owner records a lateness from their phone, on the floor, and sees it classified; each staff member sees their own pay estimate.** |
 | **S9** | 17–18 | Hardening: both layouts on real devices for every surface (S-16.8), NFR-2 negative testing, performance at 40 staff on a phone, staff data import, Vietnamese copy review, training materials. | Release candidate. |
 | **Pilot** | 19–20 | Pilot with 8–10 staff for one full cycle, in parallel with Zalo. Fix, then full rollout. | **Go-live.** |
 
@@ -120,17 +120,17 @@ Starts only after Phase 1 has run for **at least 3 clean weeks in production**. 
 
 ## 7. Team and capacity
 
-Re-estimated 2026-09-29. Phase 1 stories went from 136 md to 200 md (backlog §3 shows the breakdown); team effort is scaled with the same ratio used in the first version (113 team md for 136 story md).
+Re-estimated 2026-09-29, revised 2026-10-04. Phase 1 stories went from 136 md to 200 md, then to 209 md with the calendar views and earlier weeks (PRD v1.7–v1.8; backlog §3 shows the breakdown); team effort is scaled with the same ratio used in the first version (113 team md for 136 story md).
 
 | Role | Phase 1 | Phase 2 | Phase 3 | Notes |
 |---|---|---|---|---|
-| BA / PM / tech lead / QA lead (Tony) | ~47 md | ~29 md | ~10 md | Part-time alongside a full-time role — this is the hard capacity constraint. Phase 1 carries twice the device testing now that every surface has two layouts |
-| Senior full-stack developer | ~59 md | ~40 md | ~21 md | Owns the weekly calendar and the rules engine |
-| Mid full-stack developer | ~46 md | ~30 md | ~13 md | |
-| UI/UX designer | ~14 md | ~15 md | ~4 md | The prototype settles Phase 1 layouts; the work is visual polish and the phone views. Phase 2 needs Wireframe v1 reconciled |
-| **Total** | **~166 md** (was ~113) | **~114 md** (was ~120) | **~48 md** | Phase 1 is now the larger phase |
+| BA / PM / tech lead / QA lead (Tony) | ~49 md | ~29 md | ~10 md | Part-time alongside a full-time role — this is the hard capacity constraint. Phase 1 carries twice the device testing now that every surface has two layouts |
+| Senior full-stack developer | ~62 md | ~40 md | ~21 md | Owns the weekly calendar and the rules engine |
+| Mid full-stack developer | ~48 md | ~30 md | ~13 md | |
+| UI/UX designer | ~15 md | ~15 md | ~4 md | The prototype settles Phase 1 layouts; the work is visual polish and the phone views. Phase 2 needs Wireframe v1 reconciled |
+| **Total** | **~174 md** (was ~166, and ~113 before that) | **~114 md** (was ~120) | **~48 md** | Phase 1 is now the larger phase |
 
-**Capacity reality check:** 166 md in 18 weeks is ~1.85 people full-time. Tony cannot absorb a meaningful share of that alongside a full-time QA job. Either the two developers are real and paid, or the calendar stretches to roughly double. Pick one deliberately rather than discovering it in Sprint 3.
+**Capacity reality check:** 174 md in 18 weeks is ~1.9 people full-time. Tony cannot absorb a meaningful share of that alongside a full-time QA job. Either the two developers are real and paid, or the calendar stretches to roughly double. Pick one deliberately rather than discovering it in Sprint 3.
 
 ---
 
