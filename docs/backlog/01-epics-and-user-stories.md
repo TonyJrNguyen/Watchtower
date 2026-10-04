@@ -1,7 +1,7 @@
 # Shift Scheduling & People Management — Epic & Story Breakdown
 
-**Source:** `shift-scheduling-solution-requirements.md` v1.6 (2026-09-28) and the approved Phase 1 prototype `prototypes/phase1-demo.html`
-**Status:** Draft for internal review. Revised 2026-09-29 — see §0. Story IDs are stable once agreed; requirement IDs map back to the PRD.
+**Source:** `shift-scheduling-solution-requirements.md` v1.8 (2026-10-04) and the approved Phase 1 prototype `prototypes/phase1-demo.html`
+**Status:** Draft for internal review. Revised 2026-09-29 and 2026-10-04 — see §0. Story IDs are stable once agreed; requirement IDs map back to the PRD.
 **Convention:** Mike Cohn use case + Gherkin acceptance criteria. Every story is a vertical slice (UI + API + data), never a technical layer.
 
 ---
@@ -19,6 +19,13 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
   5. **Phase 0 is still ahead, reduced** to what the prototype has not already delivered (see the roadmap).
 - **Re-estimated:** Phase 1 goes from 136 md to **200 md** of stories. Phase 2 goes from 41 md of moved stories to 35 md.
 
+**Revision 2026-10-04 (PRD v1.7–v1.8):**
+
+- **New S-4.17** — Day, 3 Days and Week views of the calendar, earlier weeks read-only, staff scoped to the dates in view (FR-O47). 5 md.
+- **S-4.2 reworked** — filters and the master checkbox scoped to the dates in view, staff not in those dates listed apart and disabled, click a name to show only them (FR-O11 as of v1.7). 6 → 8 md.
+- **New S-7.9** — the Lateness screen opens earlier weeks, read-only (FR-O24 as of v1.8). 2 md.
+- **Phase 1 goes from 200 md to 209 md** of stories. Decided 2026-10-04 to build all three in Phase 1.
+
 ---
 
 ## 1. Epic map
@@ -28,7 +35,7 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 | **E1** | Foundation, Access & Configuration | 1 | FR-A1–A11, FR-O16, FR-O28, FR-O40, NFR-1, NFR-2, NFR-6, NFR-7, NFR-11 | XL | Accounts with nickname, roles, sign-in, audit log, VI/EN, configuration of shift periods, window, positions, default rates and skip reasons |
 | **E2** | Weekly Availability Registration | 1 | FR-S1, S2, S3, S5, S12, S14, S19 | M | Staff register CA 1–CA 5 inside the window |
 | **E3** | Staffing Needs, Positions & Coverage | 1 | FR-O1, O4, O22, O23, O30, O38, O45 | M | Needs defined per position, sub-positions and attributes, coverage visible before and after assignment |
-| **E4** | Weekly Calendar & Shift Assignment | 1 | FR-O2, O3, O8, O10, O11, O12, O14, O15, O20, O21, O29, O32, O39, O41–O44, O46 | XL | One calendar: see who registered → place people → give positions; day roster below it |
+| **E4** | Weekly Calendar & Shift Assignment | 1 | FR-O2, O3, O8, O10, O11, O12, O14, O15, O20, O21, O29, O32, O39, O41–O44, O46, O47 | XL | One calendar, by day, three days or week: see who registered → place people → give positions; day roster below it |
 | **E5** | Draft, Publish & My Schedule | 1 | FR-O31, O33, FR-S4, S11 | M | Publish gate (no shift, no position), skip-with-reason, staff read-only schedule |
 | **E6** | Notifications & Push | **2** | FR-N1–N9, N13, NFR-4, NFR-9, NFR-10 | L | Web push + in-app inbox + install onboarding (S-1.9) |
 | **E7** | Attendance & Lateness (manual) | 1 | FR-O24, O25, O26, FR-S9, S17, S18, FR-T18, FR-B1, FR-B17; pay estimate *(not yet in PRD)* | M | Lateness rules applied to manual input, in minutes and status; bonus preview; pay estimate |
@@ -586,7 +593,22 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I untick the master checkbox under the staff search and then tick "Qualified for: Bếp" in Filters
 - **Then** exactly the staff qualified for Bếp are ticked and on the calendar; every other filter option shows ticked, "–" or empty according to how many of the staff it describes are now selected; and the coverage figures still reflect the full week rather than the selection.
 
-**Requirements:** FR-O11 · **Effort:** 6 md *(above the Ready limit; split at planning into staff list with master checkbox, and Filters panel)*
+**AC — Scenario: click a name to show only them**
+- **Given** any selection
+- **When** I click a staff member's name, or the name of a filter option
+- **Then** only that person, or only the staff that option describes, is selected and on the calendar, and the master checkbox shows "–" offering Select all; **and when** I tick a checkbox instead, that person or group is added to the selection as before.
+
+**AC — Scenario: scoped to the dates in view**
+- **Given** the calendar shows Wednesday only (S-4.17) and staff A registered Monday and Thursday only
+- **When** I look at the staff list and the Filters panel
+- **Then** staff A is listed under "Not in these dates", dimmed, with an empty, disabled checkbox and a name I cannot click; filter options and their counts describe only the staff in range; placing and placed-as options read Wednesday's assignments while "Free all week" and short hours read the whole week; an option describing no one stays listed, unticked and disabled; **and when** I move to Thursday, staff A is back in the main list, ticked or not as I left them.
+
+**AC — Scenario: Select all means all**
+- **Given** the calendar shows Wednesday only and staff A is not in range
+- **When** I use Deselect all, Select all or Invert selection
+- **Then** staff A's selection changes too, though their row stays disabled until they are back in range.
+
+**Requirements:** FR-O11, FR-O47 · **Effort:** 8 md *(above the Ready limit; split at planning into staff list with master checkbox and the out-of-range section, and Filters panel)*
 **Note:** the ticked staff list is the only selection state — no chips, no clear action, no OR/AND logic. The selection is a view setting and is not logged.
 
 ---
@@ -808,7 +830,37 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-O39 *(proposed pending client confirmation — keep it configurable)* · **Effort:** 2 md
 
-**E4 subtotal: 66 md**
+---
+
+#### S-4.17 — Administrator views the calendar by day, three days or week, and looks back at earlier weeks
+- **As an** Administrator
+- **I want to** switch the calendar between one day, three days and the whole week, move backwards and forwards, and open earlier weeks
+- **so that** I can focus on a busy day without losing the week, and check what was scheduled before.
+
+**AC — Scenario: views and navigation**
+- **Given** the calendar opens on the Week view of the week being scheduled, Monday to Sunday
+- **When** I choose 3 Days and press next twice
+- **Then** the calendar shows three days at a time, moving three days on each press and staying in 3 Days; a range crossing into the next week shows each day with its own week's data; switching to Week moves to the Monday of the first day shown; next stops at the end of the week being scheduled; **and** a single action returns me to the week being scheduled.
+
+**AC — Scenario: earlier weeks are read-only**
+- **Given** I go back to a published earlier week
+- **When** I open a cell or a staff member's side panel there
+- **Then** I see who registered and what they held, the day is marked as published, there is no Add action, the side panel offers no changes, and a notice says the week is only there to look at; weeks whose data has been purged under the retention rule are not reachable.
+
+**AC — Scenario: only staff with something on these dates**
+- **Given** the Day view on Wednesday, staff A registered Monday and Thursday only, staff B registered nothing for the week, and staff C holds an assignment on Wednesday outside their availability
+- **When** the calendar renders
+- **Then** staff A is not on the calendar, staff B is (counted as free), and staff C is; **and** if no one is in range the calendar says that no one registered for these dates.
+
+**AC — Scenario: phone**
+- **Given** a phone and the 3 Days or Week view
+- **When** the calendar renders
+- **Then** it shows one day at a time with a tab for each day in view; in the Day view, previous and next replace the tabs.
+
+**Requirements:** FR-O47, FR-O10, FR-O42, FR-O43, NFR-5 · **Effort:** 5 md
+**Note:** reads registrations and assignments by date range rather than by one week; the side panel's previous/next day steps through the days in view. The prototype is the reference layout.
+
+**E4 subtotal: 73 md**
 
 ---
 
@@ -1122,7 +1174,21 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **Requirements:** *not yet in the PRD — decision 2026-09-29, needs a PRD patch*; reads FR-C1, FR-C12, FR-C13, NFR-2 · **Effort:** 3 md
 **Note:** a no-show (S-7.5) counts as zero hours. The estimate is display only; the weekly close and payment are Phase 2 (E9).
 
-**E7 subtotal: 21 md**
+---
+
+#### S-7.9 — Administrator looks back at an earlier week's lateness
+- **As an** Administrator
+- **I want to** open an earlier week on the Lateness screen
+- **so that** I can see who was late, how it was classified and what I decided, without searching the activity log.
+
+**AC — Scenario: earlier week, read-only**
+- **Given** last week had three late arrivals, one of them held and then resolved as a no-show with a reason
+- **When** I choose last week on the Lateness screen
+- **Then** each day lists its shifts with the recorded arrival and classification in minutes and status, the week's summary shows penalties per staff member and the bonus preview, there is no Record, Change, Clear or Review action, and a notice says the week can only be looked at; the reasons remain in the activity log.
+
+**Requirements:** FR-O24, FR-O25, FR-B17 *(proposed pending client confirmation)* · **Effort:** 2 md
+
+**E7 subtotal: 23 md**
 
 ---
 
@@ -1281,7 +1347,7 @@ The distinction that matters: the Administrator working from a phone mid-service
 
 ---
 
-**Phase 1 story total, re-estimated 2026-09-29: 200 md** (E1 37 · E2 14 · E3 23 · E4 66 · E5 15 · E7 21 · E16 24). It was 136 md on 2026-09-08. Where the extra 64 md comes from:
+**Phase 1 story total, revised 2026-10-04: 209 md** (E1 37 · E2 14 · E3 23 · E4 73 · E5 15 · E7 23 · E16 24). It was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
 
 | Change | md | Source |
 |---|---|---|
