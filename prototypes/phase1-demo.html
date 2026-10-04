@@ -166,6 +166,9 @@ small{font-size:.78rem;color:var(--muted)}
 .plist{list-style:none;margin:0;padding:.3rem;overflow-y:auto}
 .plist label,.plist .prow{display:flex;align-items:center;gap:.1rem;padding:.3rem .4rem;border-radius:var(--r-s);cursor:pointer;font-size:.87rem;flex-wrap:wrap}
 .plist label:hover,.plist .prow:hover{background:var(--sunk)}
+.plist .prow.off{color:var(--muted)}
+.plist .prow.off:hover{background:none}
+.plist .psec{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:.7rem .4rem .25rem;border-top:1px solid var(--line);margin-top:.3rem}
 .plist input{margin:0 .45rem 0 0}
 .plist .nm{flex:1;min-width:0}
 .tgrid-wrap{overflow-x:auto;border-radius:var(--r-l);border:1px solid var(--line)}
@@ -994,7 +997,9 @@ function filterPop(){
     ${h}
     <div class="fpop-foot"><small class="muted grow">${L(`${calStaff().length} of ${a.length} staff on the calendar`,`${calStaff().length}/${a.length} nhân viên đang hiện trên lịch`)}</small><button class="btn xs" data-a="fToggle">${L('Done','Xong')}</button></div></div>`;
 }
-// The staff list holds only staff in range for the visible dates. Ticks of the others are kept, so they come back as they were.
+// The staff list holds everyone: staff in range for the visible dates first, then the others under their own heading,
+// dimmed, with an empty, disabled checkbox — they can't be on the calendar for these dates. Their tick is kept underneath,
+// so back in range they show as they were left.
 function statusTagVis(sid){
   const any=f=>anyVis(()=>f());
   if(any(()=>regStatus(sid)==='all'))return tag('ok',L('Free all week','Rảnh cả tuần'));
@@ -1003,7 +1008,8 @@ function statusTagVis(sid){
   return '';
 }
 function picker(){
-  const a=rangeStaff(),vis=calStaff().length,out=act().length-a.length;
+  const a=rangeStaff(),vis=calStaff().length,ids=new Set(a.map(s=>s.id)),out=act().filter(s=>!ids.has(s.id));
+  const key=s=>esc(fold(s.name+' '+s.nick));
   return `${S.narrow?`<details class="panel mfold" ${S.fopen||S.mfold?'open':''}><summary>${L('Choose staff to show','Chọn nhân viên để hiện')} (${vis}/${a.length})</summary>`:''}
     <aside class="panel picker">
       <div class="picker-head">
@@ -1012,8 +1018,7 @@ function picker(){
           ${S.fopen?filterPop():''}</div>
         <div class="selrow" id="selrow">${selRow()}</div>
       </div>
-      <ul class="plist">${a.map(s=>`<li data-name="${esc(fold(s.name+' '+s.nick))}"><div class="prow"><input type="checkbox" data-c="sel" value="${s.id}" aria-label="${esc(s.name)}" ${S.sel.has(s.id)?'checked':''}><button type="button" class="nm only" data-a="selOnly" data-id="${s.id}" title="${esc(L(`Show only ${s.name}`,`Chỉ hiện ${s.name}`))}">${esc(s.name)}</button>${statusTagVis(s.id)}</div></li>`).join('')}</ul>
-      ${out?`<p class="hint" style="margin:.2rem .7rem .6rem">${L(`${out} not shown: nothing registered and no shift in these dates.`,`${out} người không hiện: không đăng ký và không có ca trong những ngày này.`)}</p>`:''}
+      <ul class="plist">${a.map(s=>`<li data-name="${key(s)}"><div class="prow"><input type="checkbox" data-c="sel" value="${s.id}" aria-label="${esc(s.name)}" ${S.sel.has(s.id)?'checked':''}><button type="button" class="nm only" data-a="selOnly" data-id="${s.id}" title="${esc(L(`Show only ${s.name}`,`Chỉ hiện ${s.name}`))}">${esc(s.name)}</button>${statusTagVis(s.id)}</div></li>`).join('')}${out.length?`<li class="psec" data-name="${out.map(key).join(' ')}">${L(`Not in these dates (${out.length})`,`Không có trong những ngày này (${out.length})`)}</li>`+out.map(s=>`<li data-name="${key(s)}"><div class="prow off"><input type="checkbox" aria-label="${esc(s.name)}" disabled><button type="button" class="nm only" disabled>${esc(s.name)}</button></div></li>`).join(''):''}</ul>
     </aside>${S.narrow?'</details>':''}`;
 }
 function flowSteps(){
@@ -1533,12 +1538,13 @@ const ACT={
   view:ds=>{S.view=ds.v;S.pp=null;render();window.scrollTo(0,0)},
   sview:ds=>{S.sview=ds.v;render()},
   day:ds=>{S[ds.k]=+ds.d;render()},
-  selAll:()=>{rangeStaff().forEach(s=>S.sel.add(s.id));S.selBase='all';render();refocus('[data-c="selBox"]')},
-  selNone:()=>{rangeStaff().forEach(s=>S.sel.delete(s.id));S.selBase='none';render();refocus('[data-c="selBox"]')},
+  // Select all / Deselect all / Invert: every active staff member, including those not in these dates
+  selAll:()=>{act().forEach(s=>S.sel.add(s.id));S.selBase='all';render();refocus('[data-c="selBox"]')},
+  selNone:()=>{act().forEach(s=>S.sel.delete(s.id));S.selBase='none';render();refocus('[data-c="selBox"]')},
   // clicking a name or option text: show only them. selBase 'none' so the master checkbox then offers Select all
   selOnly:ds=>{const sc=document.querySelector('.plist')?.scrollTop||0;S.sel=new Set([ds.id]);S.selBase='none';render();const l=document.querySelector('.plist');if(l)l.scrollTop=sc;refocus(`[data-a="selOnly"][data-id="${ds.id}"]`)},
   fltOnly:ds=>{const [gid,oid]=ds.v.split(':'),g=fGroups().find(x=>x.id===gid);S.sel=new Set(members(g.o.find(o=>o[0]===oid)).map(s=>s.id));S.selBase='none';render();refocus(`[data-a="fltOnly"][data-v="${ds.v}"]`)},
-  selInv:()=>{rangeStaff().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus(document.querySelector('[data-a="selInv"]')?'[data-a="selInv"]':'[data-c="selBox"]')},
+  selInv:()=>{act().forEach(s=>S.sel.has(s.id)?S.sel.delete(s.id):S.sel.add(s.id));render();refocus(document.querySelector('[data-a="selInv"]')?'[data-a="selInv"]':'[data-c="selBox"]')},
   fSec:ds=>{S.fcol.has(ds.v)?S.fcol.delete(ds.v):S.fcol.add(ds.v);render();refocus(`[data-a="fSec"][data-v="${ds.v}"]`)},
   fToggle:()=>{S.fopen=!S.fopen;render();const b=document.querySelector(S.fopen?'#fpop input':'[data-a="fToggle"]');if(b)b.focus()},
   sample:()=>{sampleDraft();render();toast(L('Sample draft created. Staff can’t see it yet.','Đã tạo bản nháp mẫu. Nhân viên chưa thấy.'))},
