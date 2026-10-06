@@ -92,11 +92,9 @@ PRD §4.13 has the exact boundaries between phases.
 
 ## Contributing
 
-- Documents are written in English. Documents that started in Vietnamese keep
-  their Vietnamese original, with an English version next to it
-  (`<name>.en.md`, or `-EN.md` for files whose original ends in `-VI.md`).
-  The Vietnamese original is the copy in force; when one changes, update the
-  other to match.
+- Documents are written in English. A few also have a Vietnamese version
+  next to them, named `<name>.vi.md`. The English file is the main copy;
+  when one changes, update the other to match.
 - Work happens on a branch and is merged to `main` through a pull request.
 - Issues are tracked in GitHub Issues for
   [`TonyJrNguyen/Watchtower`](https://github.com/TonyJrNguyen/Watchtower/issues).

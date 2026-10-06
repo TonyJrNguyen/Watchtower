@@ -1,58 +1,58 @@
-# Nhật ký thay đổi PRD
+# PRD changelog
 
-Mỗi dòng ứng với một commit áp dụng patch từ phiên chat với Claude. Chi tiết
-từng thay đổi xem trong nội dung commit hoặc lịch sử chat.
+Each entry matches a commit that applies a patch from a chat session with
+Claude. For the details of each change, see the commit or the chat history.
 
 ## v1.8 — 2026-10-04
-- Sửa FR-O24: màn Đi trễ mở được **các tuần trước** (trong giới hạn lưu trữ §4.11), chỉ xem: giờ đến đã ghi, phân loại (FR-O25) và tóm tắt tuần, kèm thông báo tuần đó chỉ để xem lại. Prototype đã có từ 03/10
-- §5 (mục resolved mới) và §5.3 cập nhật tương ứng
-- Chỉ là hiển thị, không có quy tắc nghiệp vụ mới, nên không đưa vào danh sách *pending confirmation*
-- Backlog: thêm S-4.17 (FR-O47, 5 md) và S-7.9 (FR-O24, 2 md), S-4.2 từ 6 lên 8 md; Phase 1 từ 200 lên **209 md**. Roadmap cập nhật sprint S4, S8 và công theo vai trò (~174 md)
+- Amended FR-O24: the Lateness screen can open **earlier weeks** (within the §4.11 retention limit), view only: recorded arrival times, classification (FR-O25) and the week summary, with a notice that the week is for review only. In the prototype since 2026-10-03
+- §5 (new resolved item) and §5.3 updated accordingly
+- Display only, no new business rule, so not added to the *pending confirmation* list
+- Backlog: added S-4.17 (FR-O47, 5 md) and S-7.9 (FR-O24, 2 md), S-4.2 from 6 to 8 md; Phase 1 from 200 to **209 md**. Roadmap updated for sprints S4 and S8 and effort by role (~174 md)
 
 ## v1.7 — 2026-10-04
-- Theo review prototype calendar ngày 03/10 (prototype trên branch `feature/calendar-day-3day-week-views`)
-- Thêm FR-O47 (Phase 1): calendar xem theo **Ngày / 3 ngày / Tuần** (tuần từ Thứ Hai đến Chủ Nhật). Trước/sau dịch đúng độ dài chế độ xem và giữ nguyên chế độ xem; 3 ngày có thể vắt qua hai tuần. Xem lại được các tuần trước (đã công bố, chỉ xem, trong giới hạn lưu trữ §4.11); không đi quá tuần đang xếp
-- Nhân viên hiện trên calendar chỉ tính theo những ngày đang xem: rảnh ít nhất một ca trong những ngày đó (đã đăng ký, hoặc chưa đăng ký nên tính là rảnh theo FR-S19) hoặc có ca trong những ngày đó. Người không trong phạm vi không hiện trên calendar, nhưng **vẫn nằm trong danh sách nhân viên**, ở mục "Không có trong những ngày này (N)" cuối danh sách: chữ mờ, ô tick trống và bị khoá, không bấm tên được. Khi họ trở lại phạm vi thì giữ trạng thái tick như trước khi rời phạm vi
-- Sửa FR-O11: Bộ lọc và checkbox tổng chỉ mô tả người trong phạm vi; Chọn tất cả / Bỏ chọn tất cả / Đảo lựa chọn tác động lên **mọi** nhân viên, kể cả người không trong phạm vi. Xếp lịch, Vị trí được xếp và hai cảnh báo xếp ca đọc theo các ngày đang xem; nhóm Đăng ký ("Rảnh cả tuần") và Thiếu giờ giữ nghĩa theo cả tuần. Lựa chọn không có ai vẫn hiện, không tick, bị vô hiệu. **Bấm vào tên** nhân viên hoặc tên lựa chọn thì chỉ hiện người đó/nhóm đó; tick checkbox vẫn thêm/bớt như cũ
-- Sửa FR-O10, FR-O42 (ngày đang xem, tab theo ngày trên điện thoại, không có nút Thêm ở tuần trước), FR-O43 (trước/sau theo các ngày đang xem, chỉ xem ở tuần trước)
-- §3.5, §5 (mục resolved mới), §5.0 (calendar một tuần chuyển sang *Superseded*) và §5.3 cập nhật tương ứng
-- Chỉ là hiển thị/thao tác, không có quy tắc nghiệp vụ mới, nên không đưa vào danh sách *pending confirmation*
+- Following the calendar prototype review on 2026-10-03 (prototype on branch `feature/calendar-day-3day-week-views`)
+- Added FR-O47 (Phase 1): the calendar can be viewed by **Day / 3 Days / Week** (weeks run Monday to Sunday). Previous/next moves by exactly the length of the view and keeps the view; 3 Days may span two weeks. Earlier weeks can be reviewed (published, view only, within the §4.11 retention limit); navigation never goes past the week being scheduled
+- Which staff appear on the calendar depends only on the dates in view: available for at least one shift on those dates (registered, or unregistered and therefore counted as available under FR-S19) or holding a shift on those dates. People out of scope do not appear on the calendar but **stay in the staff list**, in a "Not in these dates (N)" section at the end of the list: dimmed text, an empty and locked checkbox, and the name cannot be clicked. When they come back into scope, they keep the checked state they had before leaving scope
+- Amended FR-O11: the Filter and the master checkbox describe only people in scope; Select all / Deselect all / Invert selection act on **every** staff member, including those out of scope. Scheduling, Assigned position and the two scheduling warnings read the dates in view; the Registration group ("Available all week") and Short of hours keep their whole-week meaning. An option that describes nobody still shows, unchecked and disabled. **Clicking the name** of a staff member or an option shows only that person or group; ticking a checkbox still adds/removes as before
+- Amended FR-O10, FR-O42 (dates in view, per-day tabs on phone, no Add button in earlier weeks), FR-O43 (previous/next by the dates in view, view only in earlier weeks)
+- §3.5, §5 (new resolved item), §5.0 (the single-week calendar moved to *Superseded*) and §5.3 updated accordingly
+- Display/interaction only, no new business rule, so not added to the *pending confirmation* list
 
 ## v1.6 — 2026-09-28
-- Theo feedback trên prototype Bộ lọc v1.5 cùng ngày (prototype đã cập nhật ở commit bed078a)
-- Viết lại FR-O11: **danh sách nhân viên được tick là trạng thái duy nhất**. Mỗi lựa chọn trong Bộ lọc phản chiếu lựa chọn đó như bộ lọc bảng tính — tick khi mọi người nó mô tả đều đang chọn, "–" khi một phần, trống khi không ai; tick thì chọn hết, bỏ tick thì bỏ chọn họ. Thêm lựa chọn "không" cho các nhóm (Chưa có vị trí, Chưa có kinh nghiệm, Không có gì cần chú ý) để ai cũng được mô tả trong mọi nhóm. Bỏ logic OR/AND, chip bộ lọc và nút Xóa bộ lọc
-- Chọn tất cả / Bỏ chọn tất cả / Đảo lựa chọn chuyển thành **checkbox tổng** dưới ô tìm nhân viên, tác động lên toàn bộ nhân viên đang làm
-- §3.5, §5 (mục resolved mới), §5.0 (hành vi Bộ lọc v1.5 chuyển sang *Superseded*) và §5.3 cập nhật tương ứng
-- Chỉ là hiển thị/thao tác, không có quy tắc nghiệp vụ mới, nên không đưa vào danh sách *pending confirmation*
+- Following feedback on the Filter prototype v1.5 the same day (prototype updated in commit bed078a)
+- Rewrote FR-O11: **the checked staff list is the only state**. Each Filter option mirrors that selection like a spreadsheet filter — checked when everyone it describes is selected, "–" when some are, empty when none are; checking selects them all, unchecking deselects them. Added a "none" option to the groups (No position, No experience, Nothing needing attention) so everyone is described in every group. Removed the OR/AND logic, the filter chips and the Clear filters button
+- Select all / Deselect all / Invert selection became a **master checkbox** under the staff search box, acting on all active staff
+- §3.5, §5 (new resolved item), §5.0 (the v1.5 Filter behaviour moved to *Superseded*) and §5.3 updated accordingly
+- Display/interaction only, no new business rule, so not added to the *pending confirmation* list
 
 ## v1.5 — 2026-09-28
-- Theo feedback trên prototype calendar v1.4 cùng ngày
-- Thêm FR-O46 (Phase 1): nút **Thêm** trong mỗi ô ca của calendar để xếp người không đăng ký ca đó. Mặc định danh sách chỉ có những người không đăng ký ca này (không kèm tag "Không đăng ký ca này"); tìm theo tên thì hiện thêm người đã đăng ký, người chưa đăng ký tuần (tính là rảnh) và người đã xếp ca này, kèm tag. Chọn người thì mở side panel với ca đó đã chọn; ca bị đánh dấu ngoài lịch rảnh như FR-O12
-- Viết lại FR-O11: bỏ các nút chọn nhanh, thay bằng một nút **Bộ lọc** gồm mọi thuộc tính hiện trên calendar (Đăng ký, Xếp lịch, Vị trí được xếp, Có kinh nghiệm, Cần chú ý). Chọn nhiều cùng lúc: OR trong nhóm, AND giữa các nhóm; mỗi lựa chọn có số người khớp, cập nhật theo các nhóm khác; từng nhóm thu gọn được; chip bộ lọc đang bật. Chọn tất cả / Bỏ chọn tất cả / Đảo lựa chọn nằm trong Bộ lọc và chỉ tác động lên người đang được liệt kê
-- §3.5, §5 (mục resolved mới) và §5.3 cập nhật tương ứng
-- Chỉ là hiển thị/thao tác trên dữ liệu có sẵn, không có quy tắc nghiệp vụ mới, nên không đưa vào danh sách *pending confirmation*
+- Following feedback on calendar prototype v1.4 the same day
+- Added FR-O46 (Phase 1): an **Add** button in each shift cell of the calendar to place someone who did not register for that shift. By default the list contains only people who did not register for this shift (without the "Did not register for this shift" tag); searching by name also shows people who registered, people who have not registered for the week (counted as available) and people already placed in this shift, with tags. Choosing a person opens the side panel with that shift selected; the shift is flagged as outside availability, as in FR-O12
+- Rewrote FR-O11: removed the quick-select buttons, replaced by one **Filter** button covering every attribute shown on the calendar (Registration, Scheduling, Assigned position, Experienced, Needs attention). Multiple selection: OR within a group, AND across groups; each option shows the number of matching people, updated by the other groups; each group can be collapsed; active filter chips. Select all / Deselect all / Invert selection sit in the Filter and act only on the people currently listed
+- §3.5, §5 (new resolved item) and §5.3 updated accordingly
+- Display/interaction on existing data only, no new business rule, so not added to the *pending confirmation* list
 
 ## v1.4 — 2026-09-28
-- Theo feedback của khách ngày 27/09 và các câu trả lời ngày 28/09 (`docs/feedback/2026-09-27-client-feedback.md`)
-- §3.3: danh mục vị trí từ 6 lên **7 vị trí** (thêm QC). Thêm vị trí con: QC Trong/Ngoài; Pha chế Trà sữa/Matcha/Trà/Bồn. Thêm thuộc tính Phục vụ – Bưng bàn. Headcount, lương và năng lực chỉ tính ở cấp vị trí. Nhãn hiển thị "Vị trí - con/thuộc tính", màu theo vị trí. Thu Ngân Online/Offline vẫn là hai vị trí riêng
-- §3.5: gộp Lịch rảnh và Xếp lịch thành **một calendar tuần**, làm theo 3 bước trước khi công bố: xem ai đăng ký, xếp người, gán vị trí. Chỉ xếp được sau khi đăng ký khóa
-- Thêm FR-A11 (Biệt danh, không trùng giữa nhân viên đang làm), FR-O42 (calendar hiện từng người theo biệt danh, màu theo vị trí, hover/chạm), FR-O43 (side panel: một người, một ngày, nhiều ca), FR-O44 (ca liền nhau cùng vị trí gộp thành một assignment, khác vị trí thì tách), FR-O45 (vị trí con/thuộc tính chỉ để mô tả)
-- Sửa FR-A1, FR-O1, FR-O4, FR-O10, FR-O11, FR-O23, FR-O28, FR-O29 (assignment nháp được chưa có vị trí), FR-O31/FR-O33 (chặn công bố khi còn ca chưa có vị trí), FR-O41 (roster thành section dưới calendar), NFR-5, §4.10
-- §5: ghi các quyết định ngày 28/09; danh mục 6 vị trí, hai màn tách rời và "assignment luôn có vị trí" chuyển sang §5.0 *Superseded*
-- Một mục mới *proposed pending client confirmation*: nhân viên thấy vị trí con/thuộc tính trong "Lịch của tôi" (FR-O45). Các quyết định còn lại đã được khách chốt
+- Following the client feedback of 2026-09-27 and the answers of 2026-09-28 (`docs/feedback/2026-09-27-client-feedback.md`)
+- §3.3: the position catalogue went from 6 to **7 positions** (added QC). Added sub-positions: QC Inside/Outside; Barista Milk tea/Matcha/Tea/Bồn. Added the Server attribute Table running. Headcount, rate and qualification are held at position level only. Display label "Position - sub-position/attribute", colour by position. Cashier Online/In-store remain two separate positions
+- §3.5: merged Availability and Scheduling into **one weekly calendar**, used in 3 steps before publishing: see who registered, place people, assign positions. Scheduling is only possible after registration locks
+- Added FR-A11 (Nickname, unique among active staff), FR-O42 (the calendar shows each person by nickname, coloured by position, hover/tap), FR-O43 (side panel: one person, one day, several shifts), FR-O44 (neighbouring shifts with the same position join into one assignment; different positions split), FR-O45 (sub-positions/attributes are descriptive only)
+- Amended FR-A1, FR-O1, FR-O4, FR-O10, FR-O11, FR-O23, FR-O28, FR-O29 (draft assignments may have no position), FR-O31/FR-O33 (publishing is blocked while any shift has no position), FR-O41 (the roster becomes a section below the calendar), NFR-5, §4.10
+- §5: recorded the 2026-09-28 decisions; the 6-position catalogue, the two separate screens and "an assignment always has a position" moved to §5.0 *Superseded*
+- One new *proposed pending client confirmation* item: staff see sub-positions/attributes in "My Schedule" (FR-O45). All other decisions were confirmed by the client
 
 ## v1.3 — 2026-09-27
-- Thêm FR-O41 (Phase 1): màn Xếp lịch có chế độ **Ai đăng ký** — xem theo từng ngày ai đăng ký ca nào, ai chưa đăng ký (tính là rảnh), ai không làm được ngày đó, và ai đã có ca, trước khi bắt đầu gán vị trí. Theo yêu cầu của Chủ quán. Có sắp xếp: sáng tới tối (mặc định), nhiều/ít ca, nhiều/ít giờ — hoà thì xếp sáng tới tối
-- §3.5 thêm bước xem day roster trước khi xếp ca; §5.3 ghi nhận demo đã có màn này
-- Không phải quy tắc nghiệp vụ mới (chỉ hiển thị dữ liệu có sẵn), nên không đưa vào danh sách *pending confirmation*
+- Added FR-O41 (Phase 1): the Scheduling screen has a **Who registered** mode — see day by day who registered for which shift, who has not registered (counted as available), who cannot work that day, and who already has a shift, before starting to assign positions. Requested by the Owner. Sorting: morning to evening (default), most/fewest shifts, most/fewest hours — ties sort morning to evening
+- §3.5 adds the step of reviewing the day roster before scheduling; §5.3 records that the demo has this screen
+- Not a new business rule (only displays existing data), so not added to the *pending confirmation* list
 
 ## v1.2 — 2026-09-18
-- Restate Phase 1 scope theo bản thu hẹp 08/09 (notifications, control centre → Phase 2)
-- NFR-5 (responsive parity) kéo trở lại Phase 1 sau khi demo cho thấy chi phí thấp hơn dự kiến
-- Thêm FR-O38 (coverage đếm theo full-period), FR-O39 (chặn double-booking assignment)
-- Bổ sung hiệu ứng cho FR-O20 (bắt buộc người thay khi về sớm > 30 phút) và FR-T18 (no-show = 0 giờ)
-- Thêm FR-B17 (bonus preview ở màn lateness), FR-A7 bổ sung (mật khẩu là field trong hồ sơ), FR-O40 (lương mặc định theo vị trí sửa được trong app)
-- Tất cả sáu mục mới/bổ sung ở trên đánh dấu *proposed pending client confirmation* — xem `docs/decisions/pending-confirmation.md`
+- Restated Phase 1 scope per the 2026-09-08 narrowing (notifications, control centre → Phase 2)
+- NFR-5 (responsive parity) pulled back into Phase 1 after the demo showed it costs less than expected
+- Added FR-O38 (coverage counted by full period), FR-O39 (block double-booked assignments)
+- Added effects to FR-O20 (replacement required when leaving more than 30 minutes early) and FR-T18 (no-show = 0 hours)
+- Added FR-B17 (bonus preview on the lateness screen), an FR-A7 addition (the password is a field in the profile), FR-O40 (default rate per position editable in the app)
+- All six new/amended items above are marked *proposed pending client confirmation* — see `docs/decisions/pending-confirmation.md`
 
 ## v1.1 — 2026-09-07
-- Bản PRD do khách duyệt trước khi bắt đầu demo Phase 1 (baseline)
+- The PRD approved by the client before the Phase 1 demo started (baseline)

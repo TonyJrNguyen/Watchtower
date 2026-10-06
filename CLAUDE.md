@@ -1,63 +1,69 @@
 # Watchtower — shift scheduling & people management
 
-Nguồn chân lý duy nhất cho requirement là:
+The single source of truth for requirements is:
 **`docs/prd/shift-scheduling-solution-requirements.md`**
 
-Trước khi code bất kỳ tính năng nào, đọc file đó. Nếu một hành vi không rõ
-trong PRD, kiểm tra `docs/decisions/pending-confirmation.md` — nếu nó nằm ở
-đó nghĩa là quy tắc chưa được khách chốt, hãy làm cho **cấu hình được**
-thay vì hardcode.
+Read that file before coding any feature. If a behaviour is unclear in the
+PRD, check `docs/decisions/pending-confirmation.md`. If the rule is listed
+there, the client has not signed it off yet, so make it **configurable**
+instead of hardcoding it.
 
-## Phạm vi Phase 1 (đang build)
+## Phase 1 scope (in build)
 
-Chỉ build bốn nhóm sau. Đừng động vào bất kỳ thứ gì thuộc Phase 2/3 trừ khi
-được yêu cầu rõ ràng — xem §4.13 trong PRD để biết ranh giới chính xác.
+Build only these four groups. Do not touch anything in Phase 2/3 unless
+explicitly asked. See PRD §4.13 for the exact boundaries.
 
 1. Account Management (FR-A1–FR-A10)
-2. Availability Registration, whole-period, cửa sổ Thứ Năm 00:00 – Thứ Bảy 15:00 (FR-S1–FR-S19)
-3. Shift Assignment: draft/publish, publish gate, early-departure, swap (FR-O1–FR-O41, trừ FR-O34–FR-O37 là Phase 2)
-4. Manual lateness recording + mọi rule tính từ đó: grace 10 phút, late penalty từ phút 11, trừ lương gấp đôi từ phút 16, anomaly khi khoản trừ ≥ ca (FR-O24–FR-O26, FR-S9, FR-S17, FR-S18, FR-T18, FR-B1, FR-B17)
+2. Availability Registration, whole-period, window Thursday 00:00 – Saturday 15:00 (FR-S1–FR-S19)
+3. Shift Assignment: draft/publish, publish gate, early departure, swap (FR-O1–FR-O41, except FR-O34–FR-O37, which are Phase 2)
+4. Manual lateness recording and every rule computed from it: 10-minute grace, late penalty from minute 11, double pay deduction from minute 16, anomaly when the deduction ≥ the shift (FR-O24–FR-O26, FR-S9, FR-S17, FR-S18, FR-T18, FR-B1, FR-B17)
 
-**Không build ở Phase 1:** thông báo/push (§4.8, toàn bộ FR-N*), control centre
-(FR-O34–FR-O37), chốt lương tuần + bonus engine + performance dashboard (§3.9–3.13,
-FR-C*, FR-B1–FR-B16 trừ FR-B17, FR-P*). Time clock tự động (§4.4, toàn bộ FR-T*
-trừ FR-T18) là Phase 3, đang chờ quyết định G51.
+**Not built in Phase 1:** notifications/push (§4.8, all of FR-N*), the control
+centre (FR-O34–FR-O37), weekly payroll close + bonus engine + performance
+dashboard (§3.9–3.13, FR-C*, FR-B1–FR-B16 except FR-B17, FR-P*). The automated
+time clock (§4.4, all of FR-T* except FR-T18) is Phase 3, waiting on decision
+G51.
 
-**Đã build ở Phase 1** (khác với bản thu hẹp gốc): responsive đầy đủ hai chiều
-cho cả Chủ quán lẫn Nhân viên (NFR-5) — xem `prototypes/phase1-demo.html` để
-biết layout mobile cho từng màn (calendar tuần theo từng ngày, side panel thành
-bottom sheet, thẻ độ phủ theo ca và thẻ từng nhân viên cho "Ai đăng ký" (FR-O41),
-thẻ cho danh sách nhân viên/nhật ký).
+**Built in Phase 1** (unlike the original narrowed scope): full two-way
+responsive support for both the Owner and Staff (NFR-5). See
+`prototypes/phase1-demo.html` for the mobile layout of each screen (the weekly
+calendar shown one day at a time, the side panel as a bottom sheet, coverage
+cards per shift and a card per staff member for "Who registered" (FR-O41),
+cards for the staff list and the audit log).
 
-Từ v1.4, Lịch rảnh và Xếp lịch là **một màn calendar tuần** (FR-O10, FR-O42–FR-O44):
-xem ai đăng ký → xếp người → gán vị trí, tất cả trước khi công bố. Màu là **vị trí**,
-nhân viên phân biệt bằng **Biệt danh** duy nhất (FR-A11). Biệt danh chỉ hiện ở
-calendar hoặc chỗ cần dạng biểu diễn thu gọn; chỗ nào hiện được họ tên đầy đủ
-thì chỉ hiện họ tên, không kèm biệt danh. Khách nói "role" nghĩa là
-*position/vị trí* — trong code luôn dùng position, "role" chỉ dành cho phân quyền.
+Since v1.4, Availability and Scheduling are **one weekly calendar screen**
+(FR-O10, FR-O42–FR-O44): see who registered → place people → assign positions,
+all before publishing. Colour means **position**; staff are told apart by a
+unique **Nickname** (Biệt danh, FR-A11). Nicknames appear only on the calendar
+or wherever a compact representation is needed; wherever the full name fits,
+show only the full name, without the nickname. When the client says "role"
+they mean *position (vị trí)*. In code always use position; "role" is reserved
+for access control.
 
-## Luật xuyên suốt, áp dụng cho mọi màn
+## Rules that apply to every screen
 
-- Song ngữ VI/EN, chọn theo từng người dùng (NFR-7) — không hardcode chuỗi
-- Múi giờ **Asia/Ho_Chi_Minh (UTC+7)** cố định cho v1, dù lưu timestamp kèm
-  timezone để sau này đổi không cần migrate dữ liệu (NFR-11)
-- Tiền luôn là VND, không có cắc lẻ
-- Đọc quyền phải chặn ở **server-side**, không chỉ ẩn ở UI (NFR-2) — nhân viên
-  không được thấy lịch/lương người khác dù gọi thẳng API
-- Mọi Create/Update/Delete phải ghi audit log: actor, timestamp, giá trị cũ/mới,
-  lý do nếu có (NFR-1) — vì hệ thống không có approval workflow, log này là
-  bằng chứng duy nhất cho lý do một thay đổi xảy ra
+- Bilingual VI/EN, chosen per user (NFR-7). No hardcoded strings
+- Time zone **Asia/Ho_Chi_Minh (UTC+7)**, fixed for v1, while timestamps are
+  stored with their time zone so it can change later without a data migration
+  (NFR-11)
+- Money is always VND, with no fractional units
+- Read access must be enforced **server-side**, not just hidden in the UI
+  (NFR-2). Staff must not see another person's schedule or pay, even by
+  calling the API directly
+- Every Create/Update/Delete must write an audit log entry: actor, timestamp,
+  old/new values, reason if given (NFR-1). Because the system has no approval
+  workflow, this log is the only evidence of why a change happened
 
-## Tham khảo hành vi UI
+## UI behaviour reference
 
-`prototypes/phase1-demo.html` là bản demo tương tác đã duyệt với khách cho
-các màn Phase 1 (PRD §5.3 coi đây là bản tham chiếu, thay thế Wireframe v1
-cho các màn này). Khi có mâu thuẫn giữa demo và PRD, PRD thắng — demo chỉ là
-minh hoạ hành vi, một số quy tắc trong đó còn đang *proposed pending
-confirmation* (xem file quyết định ở trên).
+`prototypes/phase1-demo.html` is the interactive demo approved with the client
+for the Phase 1 screens (PRD §5.3 treats it as the reference, replacing
+Wireframe v1 for these screens). When the demo and the PRD conflict, the PRD
+wins. The demo only illustrates behaviour, and some of its rules are still
+*proposed pending confirmation* (see the decisions file above).
 
-## Quy trình cập nhật PRD
+## PRD update process
 
-PRD được bàn và chốt trong chat với Claude (claude.ai), không phải ở đây.
-Sau mỗi lần chốt thay đổi, patch được dán vào đây và áp dụng thủ công hoặc
-qua Claude Code, rồi commit — xem `docs/prd/CHANGELOG.md`.
+The PRD is discussed and agreed in a chat with Claude (claude.ai), not here.
+After each agreed change, the patch is pasted here and applied by hand or with
+Claude Code, then committed. See `docs/prd/CHANGELOG.md`.

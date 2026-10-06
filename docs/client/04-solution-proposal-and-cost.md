@@ -1,9 +1,9 @@
 # SHIFT SCHEDULING & PEOPLE MANAGEMENT SYSTEM
 ## Solution Proposal, Delivery Roadmap and Investment Cost
 
-> English version of [`04-de-xuat-giai-phap-va-chi-phi-VI.md`](04-de-xuat-giai-phap-va-chi-phi-VI.md),
-> the proposal sent to the client. The Vietnamese original is the copy the
-> client receives and the one in force. When one changes, update the other to
+> Vietnamese version, the one sent to the client:
+> [`04-solution-proposal-and-cost.vi.md`](04-solution-proposal-and-cost.vi.md).
+> This English file is the main copy. When one changes, update the other to
 > match.
 
 ---
