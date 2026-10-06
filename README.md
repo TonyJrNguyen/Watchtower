@@ -92,7 +92,11 @@ PRD §4.13 has the exact boundaries between phases.
 
 ## Contributing
 
-- Every document in this repository is written in English.
+- Documents are written in English. Documents that started in Vietnamese keep
+  their Vietnamese original, with an English version next to it
+  (`<name>.en.md`, or `-EN.md` for files whose original ends in `-VI.md`).
+  The Vietnamese original is the copy in force; when one changes, update the
+  other to match.
 - Work happens on a branch and is merged to `main` through a pull request.
 - Issues are tracked in GitHub Issues for
   [`TonyJrNguyen/Watchtower`](https://github.com/TonyJrNguyen/Watchtower/issues).
