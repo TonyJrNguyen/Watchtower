@@ -67,3 +67,17 @@ wins. The demo only illustrates behaviour, and some of its rules are still
 The PRD is discussed and agreed in a chat with Claude (claude.ai), not here.
 After each agreed change, the patch is pasted here and applied by hand or with
 Claude Code, then committed. See `docs/prd/CHANGELOG.md`.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues for `TonyJrNguyen/Watchtower`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
