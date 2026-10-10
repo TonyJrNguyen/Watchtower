@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Wireframe Phase 1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3/dist/index.global.js"></script>
+    <style>
+      /* ===== KHỐI ĐỔI THƯƠNG HIỆU, chép từ references/tokens.css (nền sáng) ===== */
+      :root {
+        color-scheme: light;
+        --app-font: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+        /* MÀU NHẤN: đổi theo nhóm Nhấn của thanh wireframe (data-nhan trên :root) */
+        --primary: #4f46e5;
+        --primary-foreground: #ffffff;
+
+        --background: #f4f4f6;
+        --surface: #ffffff;
+        --foreground: #2c2c2c;
+        --muted: #707070;
+        --border: #f7f7f8;
+        --border-strong: #eaeaea;
+        --surface-overlay: #ffffff;
+        --elevation-popover: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --elevation-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --item-hover: #f4f4f6;
+        --secondary: #e7e8ec;
+        --secondary-hover: #dbdce2;
+        --background-hover: #e7e7ea;
+        --surface-hover: #f8f8fa;
+        --button-hover-surface: #f1f1f3;
+        --button-hover-page: #e4e4e7;
+        --button-hover: var(--button-hover-page);
+        --shadow-segment-track: inset 0 0 0 1px rgb(0 0 0 / 0.05), inset 0 1px 2px rgb(0 0 0 / 0.04);
+        --shadow-segment-thumb: 0 0 0 1px rgb(0 0 0 / 0.04), 0 1px 2px rgb(0 0 0 / 0.06), 0 2px 6px -2px rgb(0 0 0 / 0.08);
+
+        /* Màu mang nghĩa (M7, M30). Gom thành token để nấc Xám tắt được cùng lúc. */
+        --ok-bg: #ecfdf5;   --ok: #007a55;
+        --warn-bg: #fffbeb; --warn: #bb4d00; --warn-dot: #f59e0b;
+        --err-bg: #fef2f2;  --err: #c10007;  --err-text: #e7000b; --err-dot: #ef4444;
+        --neutral-bg: #f4f4f5; --neutral: #52525c;
+        /* Sao vàng: đăng ký đủ mọi ca trong tuần. Viền đỏ phát sáng: ngày đăng ký thiếu giờ. */
+        --star: #eab308; --glow: #ef4444;
+        --danger: #c70036; --danger-bg: rgb(255 32 86 / 0.1); --danger-bg-hover: rgb(255 32 86 / 0.15);
+
+        /* Màu VỊ TRÍ (M8: màu mã hoá dữ liệu, pastel, một vị trí một màu cố định).
+           Không dùng xanh lá, hổ phách, đỏ: ba màu đó là trạng thái. */
+        --p1-bg: #e0f2fe; --p1-bd: #7dd3fc; --p1-tx: #075985; --p1-dot: #0ea5e9; /* QC: sky */
+        --p2-bg: #ede9fe; --p2-bd: #c4b5fd; --p2-tx: #5b21b6; --p2-dot: #8b5cf6; /* Thu Ngân Offline: violet */
+        --p3-bg: #fce7f3; --p3-bd: #f9a8d4; --p3-tx: #9d174d; --p3-dot: #ec4899; /* Thu Ngân Online: pink */
+        --p4-bg: #ccfbf1; --p4-bd: #5eead4; --p4-tx: #115e59; --p4-dot: #14b8a6; /* Pha chế: teal */
+        --p5-bg: #ffedd5; --p5-bd: #fdba74; --p5-tx: #9a3412; --p5-dot: #f97316; /* Phục vụ: orange */
+        --p6-bg: #ecfccb; --p6-bd: #bef264; --p6-tx: #3f6212; --p6-dot: #84cc16; /* Kiểm tra đơn: lime */
+        --p7-bg: #fef9c3; --p7-bd: #fde047; --p7-tx: #854d0e; --p7-dot: #eab308; /* Bếp: yellow */
+
+        --radius: 0.75rem;
+      }
+      /* ===== HẾT KHỐI ĐỔI THƯƠNG HIỆU ===== */
+
+      /* Nhóm Nhấn của wireframe (trên :root, kéo theo token suy ra) */
+      :root:not([data-mau="xam"])[data-nhan="cham"] { --primary: #4f46e5; }
+      :root:not([data-mau="xam"])[data-nhan="duong"] { --primary: #2563eb; }
+      :root:not([data-mau="xam"])[data-nhan="cam"] { --primary: #ea580c; }
+      /* Nấc Xám: bỏ màu nhấn, màu trạng thái, màu vị trí. Nền, viền, chữ, bo, bóng giữ nguyên. */
+      :root[data-mau="xam"] {
+        --primary: #2c2c2c;
+        --ok-bg: #f4f4f5; --ok: #52525c; --warn-bg: #f4f4f5; --warn: #3f3f46; --warn-dot: #71717a;
+        --err-bg: #f4f4f5; --err: #3f3f46; --err-text: #3f3f46; --err-dot: #52525b;
+        --star: #71717a; --glow: #52525b;
+        --danger: #3f3f46; --danger-bg: rgb(0 0 0 / 0.05); --danger-bg-hover: rgb(0 0 0 / 0.11);
+        --p1-bg: #f1f1f2; --p1-bd: #d4d4d8; --p1-tx: #3f3f46; --p1-dot: #a1a1aa;
+        --p2-bg: #f1f1f2; --p2-bd: #d4d4d8; --p2-tx: #3f3f46; --p2-dot: #a1a1aa;
+        --p3-bg: #f1f1f2; --p3-bd: #d4d4d8; --p3-tx: #3f3f46; --p3-dot: #a1a1aa;
+        --p4-bg: #f1f1f2; --p4-bd: #d4d4d8; --p4-tx: #3f3f46; --p4-dot: #a1a1aa;
+        --p5-bg: #f1f1f2; --p5-bd: #d4d4d8; --p5-tx: #3f3f46; --p5-dot: #a1a1aa;
+        --p6-bg: #f1f1f2; --p6-bd: #d4d4d8; --p6-tx: #3f3f46; --p6-dot: #a1a1aa;
+        --p7-bg: #f1f1f2; --p7-bd: #d4d4d8; --p7-tx: #3f3f46; --p7-dot: #a1a1aa;
+      }
+      :root {
+        --primary-hover: color-mix(in oklab, var(--primary) 85%, var(--background));
+        --primary-light: color-mix(in srgb, var(--primary) 8%, transparent);
+        --ring-focus: color-mix(in srgb, var(--primary) 12%, transparent);
+        --border-focus: var(--primary);
+      }
+
+      /* Thanh cuộn tự ẩn (I18) */
+      * { --scrollbar-thumb: transparent; }
+      *:hover { --scrollbar-thumb: color-mix(in srgb, var(--foreground) 16%, transparent); }
+      ::-webkit-scrollbar { width: 4px; height: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 9999px; }
+      .scrollbar-clean { scrollbar-width: none; }
+      .scrollbar-clean::-webkit-scrollbar { display: none; }
+      body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+      .bg-surface *, .bg-surface-overlay * { --button-hover: var(--button-hover-surface); }
+
+      /* Chuyển động khối nổi (overlay.md): panel trượt 500ms vào, cùng một đường cong */
+      .wt-sheet { transition: translate 500ms cubic-bezier(0.32, 0.72, 0, 1); }
+      .wt-fade { animation: wt-fade 150ms ease-out; }
+      .wt-glow { border-color: var(--glow); box-shadow: 0 0 0 1px var(--glow), 0 0 16px 2px color-mix(in srgb, var(--glow) 30%, transparent); }
+      @keyframes wt-fade { from { opacity: 0; transform: translateY(-4px); } }
+      @media (prefers-reduced-motion: reduce) { .wt-sheet, .wt-fade { transition: none; animation: none; } }
+    </style>
+
+    <style type="text/tailwindcss">
+      @theme inline {
+        --font-sans: var(--app-font);
+        --color-primary: var(--primary);
+        --color-primary-hover: var(--primary-hover);
+        --color-primary-foreground: var(--primary-foreground);
+        --color-primary-light: var(--primary-light);
+        --color-background: var(--background);
+        --color-background-hover: var(--background-hover);
+        --color-surface: var(--surface);
+        --color-surface-hover: var(--surface-hover);
+        --color-surface-overlay: var(--surface-overlay);
+        --color-item-hover: var(--item-hover);
+        --color-foreground: var(--foreground);
+        --color-muted: var(--muted);
+        --color-border: var(--border);
+        --color-border-strong: var(--border-strong);
+        --color-secondary: var(--secondary);
+        --color-secondary-hover: var(--secondary-hover);
+        --color-button-hover: var(--button-hover);
+        --border-color-focus: var(--border-focus);
+        --ring-color-focus: var(--ring-focus);
+        --shadow-popover: var(--elevation-popover);
+        --shadow-modal: var(--elevation-modal);
+
+        --color-ok: var(--ok); --color-ok-bg: var(--ok-bg);
+        --color-warn: var(--warn); --color-warn-bg: var(--warn-bg); --color-warn-dot: var(--warn-dot);
+        --color-err: var(--err); --color-err-bg: var(--err-bg); --color-err-text: var(--err-text); --color-err-dot: var(--err-dot);
+        --color-neutral: var(--neutral); --color-neutral-bg: var(--neutral-bg);
+        --color-danger: var(--danger); --color-danger-bg: var(--danger-bg); --color-danger-bg-hover: var(--danger-bg-hover);
+
+        --color-p1-bg: var(--p1-bg); --color-p1-bd: var(--p1-bd); --color-p1-tx: var(--p1-tx); --color-p1-dot: var(--p1-dot);
+        --color-p2-bg: var(--p2-bg); --color-p2-bd: var(--p2-bd); --color-p2-tx: var(--p2-tx); --color-p2-dot: var(--p2-dot);
+        --color-p3-bg: var(--p3-bg); --color-p3-bd: var(--p3-bd); --color-p3-tx: var(--p3-tx); --color-p3-dot: var(--p3-dot);
+        --color-p4-bg: var(--p4-bg); --color-p4-bd: var(--p4-bd); --color-p4-tx: var(--p4-tx); --color-p4-dot: var(--p4-dot);
+        --color-p5-bg: var(--p5-bg); --color-p5-bd: var(--p5-bd); --color-p5-tx: var(--p5-tx); --color-p5-dot: var(--p5-dot);
+        --color-p6-bg: var(--p6-bg); --color-p6-bd: var(--p6-bd); --color-p6-tx: var(--p6-tx); --color-p6-dot: var(--p6-dot);
+        --color-p7-bg: var(--p7-bg); --color-p7-bd: var(--p7-bd); --color-p7-tx: var(--p7-tx); --color-p7-dot: var(--p7-dot);
+      }
+    </style>
+
+    <!-- Khung wireframe (thanh công cụ, khung lý do, số khối): nằm ngoài bản thiết kế -->
+    <style>
+      .wf-bar { position: relative; z-index: 50; display: flex; align-items: center; gap: 14px; height: 56px;
+        padding: 0 16px; overflow-x: auto; white-space: nowrap; background: #fff; border-bottom: 1px solid #e5e5e5;
+        color: #737373; font: 14px/1 system-ui, -apple-system, sans-serif; scrollbar-width: none; }
+      .wf-bar::-webkit-scrollbar { display: none; }
+      .wf-bar *, .wf-reason * { box-sizing: border-box; }
+      .wf-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+      .wf-set { display: flex; align-items: center; gap: 2px; flex-shrink: 0; padding: 3px; border-radius: 10px; background: #f4f4f5; }
+      .wf-set a { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 9px;
+        border-radius: 7px; color: #737373; text-decoration: none; }
+      .wf-set a:hover { color: #171717; }
+      .wf-set a[aria-current="page"] { background: #fff; color: #171717; font-weight: 500;
+        box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 0 0 1px rgb(0 0 0 / .04); }
+      .wf-switch { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; color: #737373; text-decoration: none; }
+      .wf-switch i { position: relative; width: 36px; height: 20px; border-radius: 10px; background: #e4e4e7; transition: background .15s; }
+      .wf-switch i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+        background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .2); transition: translate .15s; }
+      .wf-switch[aria-checked="true"] i { background: #171717; }
+      .wf-switch[aria-checked="true"] i::after { translate: 16px 0; }
+      .wf-bar svg { width: 16px; height: 16px; flex-shrink: 0; }
+      [data-wf-param="v"] a { justify-content: center; min-width: 30px; padding: 0 9px; }
+      [data-wf-param="v"] a[data-recommended]::after { content: ""; position: absolute; top: 5px; right: 4px;
+        width: 5px; height: 5px; border-radius: 50%; background: #4f46e5; }
+      [data-wf-param="nhan"] a { padding: 0 8px; }
+      [data-wf-param="nhan"] i { width: 14px; height: 14px; border-radius: 50%; background: currentColor; }
+      [data-wf-param="nhan"] a[data-value="cham"] { color: #4f46e5; } [data-wf-param="nhan"] a[data-value="duong"] { color: #2563eb; }
+      [data-wf-param="nhan"] a[data-value="cam"] { color: #ea580c; }
+      [data-wf-param="logo"] a { padding: 0 7px; }
+      [data-wf-param="logo"] span.wf-logo { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px; background: #2c2c2c; color: #fff; }
+      [data-wf-param="logo"] span.wf-logo svg { width: 14px; height: 14px; }
+      .wf-menu { flex-shrink: 0; }
+      .wf-menu summary { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px; border-radius: 8px; cursor: pointer; list-style: none; }
+      .wf-menu summary::-webkit-details-marker { display: none; }
+      .wf-menu summary:hover, .wf-menu[open] summary { background: #f4f4f5; }
+      .wf-menu b { color: #171717; font-weight: 500; }
+      .wf-popover { position: fixed; z-index: 60; display: grid; gap: 2px; min-width: 180px; padding: 4px; background: #fff;
+        border: 1px solid #e5e5e5; border-radius: 10px; box-shadow: 0 8px 24px rgb(0 0 0 / .08); }
+      .wf-popover a { display: flex; align-items: center; height: 34px; padding: 0 10px; border-radius: 6px; color: #404040; text-decoration: none; }
+      .wf-popover a:hover, .wf-popover a[aria-current="page"] { background: #f4f4f5; color: #171717; }
+      .wf-popover a[aria-current="page"] { font-weight: 500; }
+      .wf-popover .wf-sep { height: 1px; margin: 4px 0; background: #ebebeb; }
+      .wf-popover .wf-cap { padding: 6px 10px 2px; font-size: 12px; color: #8a8a8a; }
+      .wf-reason { border-bottom: 1px solid #e5e5e5; background: #fafafa; color: #404040; font: 13px/1.5 system-ui, -apple-system, sans-serif; }
+      .wf-reason summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 44px; padding: 8px 16px; cursor: pointer; list-style: none; }
+      .wf-reason summary::-webkit-details-marker { display: none; }
+      .wf-reason-name { min-width: 0; overflow: hidden; color: #171717; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+      .wf-reason-tag { flex-shrink: 0; height: 20px; padding: 0 8px; border-radius: 10px; background: #eef2ff; color: #4338ca; font-size: 12px; font-weight: 500; line-height: 20px; }
+      .wf-reason-why { flex: 1; min-width: 0; overflow: hidden; color: #525252; text-overflow: ellipsis; white-space: nowrap; }
+      .wf-reason[open] .wf-reason-why { white-space: normal; }
+      .wf-reason-toggle { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; height: 28px; margin-left: auto; padding: 0 8px; border-radius: 6px; color: #171717; font-weight: 500; }
+      .wf-reason summary:hover .wf-reason-toggle { background: #f0f0f0; }
+      .wf-reason-toggle svg { width: 16px; height: 16px; transition: rotate .15s; }
+      .wf-reason[open] .wf-reason-toggle svg { rotate: 180deg; }
+      .wf-reason-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 4px 16px 16px; }
+      .wf-reason-cols { display: grid; max-width: 1120px; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 16px 32px; }
+      .wf-reason h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; color: #171717; font-size: 12px; font-weight: 600; }
+      .wf-reason h3 i { width: 6px; height: 6px; border-radius: 50%; background: #a3a3a3; }
+      .wf-reason h3 i[data-tone="uu"] { background: #16a34a; }
+      .wf-reason h3 i[data-tone="nhuoc"] { background: #d97706; }
+      .wf-reason ul { display: grid; gap: 2px; margin: 0; padding-left: 16px; }
+      .wf-reason li::marker { color: #a3a3a3; }
+      .wf-reason p { margin: 0; }
+      .wf-reason-tips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid #ebebeb; }
+      .wf-reason-tips h3 { margin: 0 4px 0 0; }
+      .wf-reason-tips button { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid #e5e5e5;
+        border-radius: 8px; background: #fff; color: #262626; font: inherit; white-space: nowrap; cursor: pointer; }
+      .wf-reason-tips button:hover { border-color: #d4d4d4; background: #f5f5f5; }
+      .wf-reason-tips button svg { width: 14px; height: 14px; color: #737373; }
+      .wf-reason-tips button [data-icon="da-chep"], .wf-reason-tips button[data-copied] [data-icon="chep"] { display: none; }
+      .wf-reason-tips button[data-copied] [data-icon="da-chep"] { display: block; color: #16a34a; }
+      .wf-reason :focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+      @media (max-width: 767px) {
+        .wf-reason-why { order: 1; flex-basis: 100%; }
+        .wf-reason-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+        .wf-reason-tips h3 { flex-basis: 100%; }
+      }
+      @layer base { [data-wf-block] { position: relative; } }
+      [data-wf-block]::before { content: attr(data-wf-block); position: absolute; top: 4px; left: 4px; z-index: 5;
+        display: grid; place-items: center; width: 18px; height: 18px; border-radius: 9px; background: #1f1f1f; color: #fff;
+        font: 500 11px/1 system-ui, sans-serif; pointer-events: none; }
+      [data-wf-block][data-wf-block-out]::before { top: auto; bottom: 100%; }
+      body[data-frame] .wf-bar, body[data-frame] .wf-reason { display: none; }
+      body:not([data-kho="mobile"]) [data-wf-only="mobile"] { display: none; }
+    </style>
+  </head>
+
+  <body class="bg-background font-sans text-foreground antialiased">
+    <nav class="wf-bar" aria-label="Wireframe" id="wf-bar"></nav>
+    <details class="wf-reason" id="wf-reason" data-wf-reason></details>
+    <main id="wf-design"></main>
+    <div id="wt-layer"></div>
+    <div id="wt-tip" role="tooltip" class="pointer-events-none fixed z-[70] hidden max-w-64 rounded-xl border border-border bg-surface-overlay px-3 py-2 text-xs shadow-popover"></div>
+
+    <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+    <script src="wf-data.js?v=20261011-6"></script>
+    <script src="wf-app.js?v=20261011-6"></script>
+  </body>
+</html>

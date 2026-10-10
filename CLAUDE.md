@@ -14,8 +14,8 @@ Build only these four groups. Do not touch anything in Phase 2/3 unless
 explicitly asked. See PRD §4.13 for the exact boundaries.
 
 1. Account Management (FR-A1–FR-A10)
-2. Availability Registration, whole-period, window Thursday 00:00 – Saturday 15:00 (FR-S1–FR-S19)
-3. Shift Assignment: draft/publish, publish gate, early departure, swap (FR-O1–FR-O41, except FR-O34–FR-O37, which are Phase 2)
+2. Availability Registration: whole periods with optional custom times inside a period, a draft until Save, window Thursday 00:00 – Saturday 15:00 (FR-S1–FR-S22)
+3. Shift Assignment: draft/publish, publish gate, early departure, swap (FR-O1–FR-O50, except FR-O34–FR-O37, which are Phase 2, and the retired FR-O41)
 4. Manual lateness recording and every rule computed from it: 10-minute grace, late penalty from minute 11, double pay deduction from minute 16, anomaly when the deduction ≥ the shift (FR-O24–FR-O26, FR-S9, FR-S17, FR-S18, FR-T18, FR-B1, FR-B17)
 
 **Not built in Phase 1:** notifications/push (§4.8, all of FR-N*), the control
@@ -28,8 +28,10 @@ G51.
 responsive support for both the Owner and Staff (NFR-5). See
 `prototypes/phase1-demo.html` for the mobile layout of each screen (the weekly
 calendar shown one day at a time, the side panel as a bottom sheet, coverage
-cards per shift and a card per staff member for "Who registered" (FR-O41),
-cards for the staff list and the audit log).
+cards per shift, cards for the staff list and the audit log). Since PRD v1.9
+the "Who registered" day roster (FR-O41) is gone and registration is a draft
+until saved; the Phase 1 wireframe in `prototypes/phase1-wireframe/`, not the
+demo, is the reference for every v1.9 change (PRD §5.3).
 
 Since v1.4, Availability and Scheduling are **one weekly calendar screen**
 (FR-O10, FR-O42–FR-O44): see who registered → place people → assign positions,
