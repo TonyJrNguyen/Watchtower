@@ -3,6 +3,18 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.9 — 2026-10-11
+- Following the client feedback on the Phase 1 wireframe of 2026-10-10 and the answers of 2026-10-10 and 2026-10-11 (`docs/feedback/2026-10-10-client-feedback.md`)
+- Wireframe layouts chosen: weekly calendar B, every other Phase 1 screen A, bottom bar on phones (§5)
+- **Registration:** Draft and Registered states with an explicit Save; edits after a save open a new draft and the Administrator keeps seeing the last saved version; an unsaved draft is saved automatically at the cutoff and marked to the staff member only (FR-S20, FR-S5, FR-S12). Optional day note (FR-S22). **Custom times** per period, within the period only (late start, early leave), with the client's editor behaviour (FR-S21). Amended FR-S1, FR-S3 (days below 8 hours marked prominently; a day with the whole of CA 5 not warned), §3.4
+- **CA 5:** a day with the whole of CA 5 meets the daily expectation and is a qualifying bonus day; the whole of CA 5 is paid until 24:00 (7 hours); CA 5 on custom times is paid by its own times and is non-standard. Added FR-C14; amended §3.3, §3.9, §3.10, FR-S3, FR-O18, FR-O22, FR-B1, FR-B2, FR-B17
+- **Weekly calendar:** staff who registered nothing are left out of the selection by default, still counted as free (FR-O11); star for staff who registered every period (FR-O23); marker icons, warning dots, Draft yellow / Published green (FR-O42); Save and Take off always available, nothing selected removes the person from the day after a confirmation, collapsible panel sections (FR-O43); navigation oldest · previous · date picker · next · week being scheduled (FR-O47). Added FR-O48 (undo/redo in draft), FR-O49 (marker order down the day), FR-O50 (custom-time requests: clock, undecided = warning, placed by their times or the standard ones, no approval state)
+- **Day roster removed:** FR-O41 retired (FR-A11 and FR-O43 references removed); a **Staffing** section below the calendar sets needs per position × period × day with copy-from-last-week and shows assigned against needed (FR-O1, FR-O4, §3.5)
+- NFR-5: on a phone the Staffing section scrolls sideways with the position column fixed, as in the wireframe, instead of per-period coverage cards
+- §4.10 Availability, §4.13 Phase 1, §5 (new resolved item), §5.0 (five rows moved to *Superseded*, including ~~G30~~) and §5.3 (the Phase 1 wireframe, now in `prototypes/phase1-wireframe/`, is the reference for v1.9) updated accordingly
+- Requested or agreed by the client, so not added to the *pending confirmation* list
+- Backlog: new S-2.7–S-2.9 and S-4.18–S-4.20, S-4.15 removed, eight stories re-sized; Phase 1 from 209 to **233 md** (backlog §0). Roadmap: Phase 1 from 9 to **10 sprints**, team effort from ~174 to **~194 md**
+
 ## v1.8 — 2026-10-04
 - Amended FR-O24: the Lateness screen can open **earlier weeks** (within the §4.11 retention limit), view only: recorded arrival times, classification (FR-O25) and the week summary, with a notice that the week is for review only. In the prototype since 2026-10-03
 - §5 (new resolved item) and §5.3 updated accordingly

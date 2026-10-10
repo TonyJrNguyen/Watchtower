@@ -39,7 +39,7 @@ _Avoid_: Alias, display name, short name
 ### Shift structure
 
 **Shift period** (Ca, CA 1–CA 5):
-One of the five fixed blocks a day is divided into, from 07:00 to 23:00. Staff register in shift periods. Assignments don't have to align with them.
+One of the five fixed blocks a day is divided into, from 07:00 to 23:00. Staff register in shift periods, optionally with custom times inside a period. Assignments don't have to align with them. CA 5 is shown as 17:00–23:00, but worked in full it's paid until 24:00.
 _Avoid_: Slot, time block, and a bare "shift" when the period is meant
 
 **Week**:
@@ -75,8 +75,18 @@ _Avoid_: Demand, requirement, quota
 ### Registration
 
 **Registration** (Đăng ký):
-A staff member's statement of which shift periods they can work in the week being scheduled. It records constraints and is not a commitment to work.
+A staff member's statement of which shift periods they can work in the week being scheduled. It records constraints and is not a commitment to work. The Administrator only sees the version the staff member last saved.
 _Avoid_: Shift request, booking, sign-up
+
+**Registration draft** (Nháp):
+A staff member's unsaved changes to their registration. When the window closes, an unsaved draft is saved automatically.
+
+**Custom times** (Giờ riêng):
+A later start, an earlier end or both, set by a staff member on a registered period and always inside that period. It's a request that the Administrator answers by placing them by those times or the standard ones. A shift on custom times is non-standard.
+_Avoid_: Custom shift (in code), adjusted period, flexible hours
+
+**Day note** (Ghi chú):
+An optional note a staff member adds to one day of their registration, shown to the Administrator beside them on the calendar.
 
 **Registration window**:
 Thursday 00:00 to Saturday 15:00, when staff can change their registration for the following week.
@@ -90,7 +100,7 @@ The state of a staff member who registered nothing for the week, who is then ava
 _Avoid_: Unregistered (on its own), missing, default availability
 
 **Contract expectation**:
-At least 5 days of 8 hours in a week. Registering below it raises a warning and never blocks anything.
+At least 5 days of 8 hours in a week. A day with the whole of CA 5 counts as meeting the daily part. Registering below it raises a warning and never blocks anything.
 _Avoid_: Minimum hours rule, quota
 
 ### Scheduling
@@ -140,9 +150,9 @@ A flag on an assignment to a position outside the staff member's qualified posit
 How the people placed in a shift period compare with its staffing needs: filled, understaffed or overstaffed.
 _Avoid_: Staffing level, fill rate
 
-**Day roster**:
-The section under the weekly calendar that lists, for one day, every active staff member against the five shift periods.
-_Avoid_: Ai đăng ký (as a separate screen)
+**Staffing section** (Phân công):
+The section under the weekly calendar where the Administrator sets each position's headcount for every period and day, and sees how many staff already hold that position.
+_Avoid_: Coverage by position (Độ phủ theo vị trí), the old tab name; day roster and Ai đăng ký, which were removed in PRD v1.9
 
 **In range**:
 Describes a staff member who, on a date in view, can work at least one period or holds an assignment. Only in-range staff appear on the calendar.
@@ -192,7 +202,7 @@ A time-clock event, such as a missing or failed clock-in, raised for review. Pha
 ### Pay and bonus
 
 **Assigned hours**:
-The hours of a staff member's assignments, which pay and the 8-hour bonus test are computed from. Clocked time never changes them.
+The hours of a staff member's assignments, which pay and the 8-hour bonus test are computed from. Clocked time never changes them. The whole of CA 5 counts as 7 hours, because it's paid until 24:00.
 _Avoid_: Worked hours, clocked hours, actual hours
 
 **Rate**:
@@ -210,8 +220,11 @@ _Avoid_: Payroll cycle, month
 Pay from assigned hours × rate. It's released at the weekly close without waiting on any review.
 
 **Weekly bonus**:
-100,000 VND for a week with at least 5 days of 8 or more assigned hours and no late penalty on any day.
+100,000 VND for a week with at least 5 qualifying days and no late penalty on any day.
 _Avoid_: Attendance bonus, incentive
+
+**Qualifying day**:
+A day with 8 or more assigned hours, or with the whole of CA 5. A CA 5 on custom times doesn't qualify a day by itself.
 
 **Streak**:
 A count of consecutive weeks in which the weekly bonus was earned. It resets to zero when a week misses the bonus or when a streak bonus pays out.

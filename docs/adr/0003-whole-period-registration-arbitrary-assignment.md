@@ -1,5 +1,7 @@
 # Registration is in whole shift periods; assignments are arbitrary time ranges
 
+> Amended on 2026-10-11 by [ADR 0018](0018-custom-times-within-a-period.md): staff may set custom times inside a registered period.
+
 Staff register only whole shift periods (CA 1–CA 5) and can't adjust the start or end times, so registration answers one question: "can you work this period?" Finer arrangements, such as "free from 16:00", are agreed on Zalo and expressed in the **assignment**, which may be any time range on a date.
 
 ## Consequences
