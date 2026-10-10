@@ -1,25 +1,26 @@
 # Rules proposed pending client confirmation
 
-Tám quy tắc dưới đây được quyết định trong lúc làm bản demo Phase 1, **không**
-có trong PRD gốc do khách duyệt. Mỗi quy tắc đã được viết vào PRD (đánh dấu
-*proposed pending client confirmation* ngay trong bảng requirement tương ứng),
-và liệt kê lại ở đây làm danh sách chờ ký duyệt (§5.1, mục O3).
+The eight rules below were decided while building the Phase 1 demo and are
+**not** in the original PRD the client approved. Each rule has been written
+into the PRD (marked *proposed pending client confirmation* in the relevant
+requirement table) and is listed again here as the sign-off list (§5.1,
+item O3).
 
-Khi implement, coi các mục này là **cấu hình được / có thể đổi**, không
-hardcode cứng — vì khách có thể chỉnh khi ký duyệt.
+When implementing, treat these items as **configurable / changeable**, not
+hardcoded, because the client may adjust them at sign-off.
 
-| ID | Quy tắc | Vì sao chưa chắc | Ảnh hưởng nếu đổi |
+| ID | Rule | Why it is uncertain | Impact if changed |
 |---|---|---|---|
-| FR-O38 | Một assignment chỉ tính là "đủ" cho một CA nếu nó phủ trọn khung giờ CA đó; phủ một phần thì tính riêng | PRD chỉ nói assignment là khung giờ tự do, không nói cách đếm coverage | Thay đổi cách tính số liệu độ phủ (FR-O4) |
-| FR-O39 | Chặn cứng, không cho một nhân viên có hai assignment trùng giờ trong ngày | PRD chỉ cấm overlap ở bước *đăng ký* (FR-S2), không nói gì ở bước *xếp ca* | Nếu bỏ, cần đổi thành cảnh báo thay vì chặn |
-| FR-O20 (bổ sung) | Về sớm hơn 30 phút bắt buộc phải có người thay mới lưu được | §3.8 mô tả đây là quy trình, không nói hệ thống có ép hay không | Nếu bỏ, Chủ quán có thể lưu ca rút ngắn mà không cần người thay ngay |
-| FR-T18 (bổ sung) | Xếp loại "không đi làm" = 0 giờ cho lương và cho phép tính 8 tiếng/ngày, không tính late penalty | PRD liệt kê "no-show" là một lựa chọn xử lý anomaly nhưng không nói nó đổi gì | Ảnh hưởng trực tiếp tới lương, cần khách xác nhận rõ |
-| FR-B17 | Màn đi trễ hiển thị trước ảnh hưởng lên bonus tuần (chỉ xem, chưa xác nhận) | Không có trong PRD gốc, là bổ sung để hệ thống dễ hiểu hơn | Không ảnh hưởng tính toán, chỉ ảnh hưởng UI — một trong hai mục rủi ro thấp nhất |
-| FR-A7 (bổ sung) | Đặt/đổi mật khẩu là một field trong hồ sơ nhân viên, không phải nút bấm sinh mật khẩu rời | Theo góp ý demo ngày 18/09 | Không ảnh hưởng logic nghiệp vụ, chỉ ảnh hưởng UI |
-| FR-O40 | Lương mặc định theo từng vị trí sửa được trong app, không cố định trong code | FR-O28 gốc để cả bảng vị trí lẫn lương mặc định cố định trong code | Nếu bỏ, mỗi lần đổi lương vị trí phải deploy lại |
-| FR-O45 (bổ sung) | Nhân viên thấy vị trí con/thuộc tính trong "Lịch của tôi", cùng định dạng "Pha chế - Matcha" | Khách chỉ chốt cách hiển thị cho chủ quán (28/09), chưa nói nhân viên có thấy không | Chỉ ảnh hưởng UI phía nhân viên. Nhân viên chỉ thấy ca của chính mình (NFR-2), nên không có rủi ro lộ dữ liệu |
+| FR-O38 | An assignment counts as "filling" a shift period only if it covers the whole period; partial coverage is counted separately | The PRD only says an assignment is a free-form time range, not how coverage is counted | Changes how coverage figures are computed (FR-O4) |
+| FR-O39 | Hard block: a staff member cannot have two overlapping assignments on the same day | The PRD only forbids overlap at *registration* (FR-S2), and says nothing about *assignment* | If dropped, it must become a warning instead of a block |
+| FR-O20 (addition) | Leaving more than 30 minutes early can only be saved once a replacement is set | §3.8 describes this as a procedure, without saying whether the system enforces it | If dropped, the Owner can save a shortened shift without a replacement in place |
+| FR-T18 (addition) | Classifying as "did not work" means 0 hours for pay and for the 8-hours-per-day count, with no late penalty | The PRD lists "no-show" as an anomaly resolution option but does not say what it changes | Directly affects pay; needs explicit client confirmation |
+| FR-B17 | The lateness screen previews the effect on the weekly bonus (view only, not confirmed) | Not in the original PRD; added to make the system easier to understand | No effect on calculations, UI only. One of the two lowest-risk items |
+| FR-A7 (addition) | Setting/changing a password is a field in the staff profile, not a separate generate-password button | From the demo feedback on 2026-09-18 | No effect on business logic, UI only |
+| FR-O40 | The default rate per position is editable in the app, not fixed in code | The original FR-O28 fixed both the position table and the default rates in code | If dropped, every change to a position rate needs a redeploy |
+| FR-O45 (addition) | Staff see sub-positions/attributes in "My Schedule", in the same format, e.g. "Pha chế - Matcha" | The client only confirmed how they are shown to the Owner (2026-09-28), not whether staff see them | Affects the staff-side UI only. Staff only see their own shifts (NFR-2), so there is no data-exposure risk |
 
-**Quy trình đóng mục:** khi khách xác nhận một mục, xoá dòng *proposed pending
-client confirmation* khỏi PRD, xoá dòng tương ứng trong bảng trên, và ghi lại
-quyết định vào phần Resolved của §5 trong PRD (theo đúng cách các mục G-series
-cũ đã được resolve).
+**Closing an item:** when the client confirms an item, remove the *proposed
+pending client confirmation* marker from the PRD, remove the matching row from
+the table above, and record the decision in the Resolved part of PRD §5 (the
+same way the earlier G-series items were resolved).
