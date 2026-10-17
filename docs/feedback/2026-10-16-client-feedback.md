@@ -4,7 +4,7 @@
 > This English file is the main copy. When one changes, update the other to
 > match. "Role" in the client's wording means *position* (PRD §3.3).
 
-Status: **decided 2026-10-17 and applied** to PRD v1.10 and the Phase 1 wireframe, except the items in 0.6. Section 0 holds the decisions; section 1 summarises what the client asked for, kept for traceability. Where they differ, section 0 applies.
+Status: **decided 2026-10-17 and applied** to PRD v1.10 and the Phase 1 wireframe; the wireframe itself was approved the same day (0.6). Section 0 holds the decisions; section 1 summarises what the client asked for, kept for traceability. Where they differ, section 0 applies.
 
 ---
 
@@ -63,12 +63,14 @@ Status: **decided 2026-10-17 and applied** to PRD v1.10 and the Phase 1 wirefram
 | A4 | Positions worked (Vị trí đã làm) | The Owner sees each position's hours on the chips in the staff account; the staff member sees every position they have worked, with hours, on their own page, in a section directly below the pay estimate. Shifts that have ended, whole history, never reset (FR-A14) |
 | A5 | Rename | "Ca của tôi" / My shifts becomes **"Hồ sơ của tôi" / My profile**, since it holds the staff member's personal data (FR-A14) |
 
-### 0.6 Still open (wireframe only, no PRD effect)
+### 0.6 Wireframe (approved by Tony on 2026-10-17)
 
-- Approval of the Oct 16–17 wireframe as a whole.
-- The side panel sits beside the calendar from 1280 px; narrower, it's a bottom sheet.
-- Bếp recoloured brown so it doesn't clash with gold Phụ trách (the client saw it yellow before).
-- Whether lead markers come first in each period cell (would change the Oct 10 order rule). Default: no.
+| # | Topic | Decision | PRD |
+|---|---|---|---|
+| D1 | The Oct 16–17 wireframe | Approved as a whole | §5.3 |
+| D2 | Side panel | Beside the calendar from 1280 px wide; narrower, including phones, a bottom sheet | FR-O43 |
+| D3 | Bếp colour | Brown, so it doesn't clash with gold Phụ trách (the client saw it yellow before) | — |
+| D4 | Phụ trách markers first in a cell | No: the Oct 10 order rule stays (warnings, then A–Z, then manually added) | FR-O49 |
 
 ---
 

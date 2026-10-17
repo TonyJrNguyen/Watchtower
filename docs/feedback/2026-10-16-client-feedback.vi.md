@@ -4,7 +4,7 @@
 > Bản chính là bản tiếng Anh. Khi sửa một bản, cập nhật bản còn lại cho khớp.
 > "Role" trong lời khách nghĩa là *vị trí* (PRD §3.3).
 
-Trạng thái: **đã chốt (17/10) và đã áp dụng** vào PRD v1.10 và wireframe Phase 1, trừ các mục ở 0.6. Mục 0 là các quyết định; mục 1 tóm tắt những gì đã được yêu cầu, giữ lại để truy vết. Nếu hai mục khác nhau thì theo mục 0.
+Trạng thái: **đã chốt (17/10) và đã áp dụng** vào PRD v1.10 và wireframe Phase 1; chính wireframe được duyệt cùng ngày (0.6). Mục 0 là các quyết định; mục 1 tóm tắt những gì đã được yêu cầu, giữ lại để truy vết. Nếu hai mục khác nhau thì theo mục 0.
 
 ---
 
@@ -63,12 +63,14 @@ Trạng thái: **đã chốt (17/10) và đã áp dụng** vào PRD v1.10 và wi
 | A4 | Vị trí đã làm | Chủ xem giờ của từng vị trí trên chip ở hồ sơ nhân viên; nhân viên xem mọi vị trí đã làm, kèm giờ, ở trang của mình, trong một thẻ ngay dưới phần lương. Ca đã kết thúc, toàn bộ lịch sử, không reset (FR-A14) |
 | A5 | Đổi tên | "Ca của tôi" thành **"Hồ sơ của tôi"** / My profile, vì đây là nơi chứa dữ liệu cá nhân của nhân viên (FR-A14) |
 
-### 0.6 Còn mở (chỉ wireframe, không ảnh hưởng PRD)
+### 0.6 Wireframe (Tony duyệt ngày 17/10)
 
-- Duyệt toàn bộ wireframe ngày 16–17/10.
-- Panel nằm bên cạnh lịch từ 1280 px; hẹp hơn thì thành bottom sheet.
-- Bếp đổi sang màu nâu để không lẫn với Phụ trách màu vàng gold (khách đã thấy Bếp màu vàng).
-- Chip Phụ trách có xếp đầu mỗi ô ca không (sẽ đổi quy tắc thứ tự ngày 10/10). Mặc định: không.
+| # | Chủ đề | Quyết định | PRD |
+|---|---|---|---|
+| D1 | Wireframe ngày 16–17/10 | Duyệt toàn bộ | §5.3 |
+| D2 | Panel bên | Nằm cạnh lịch từ 1280 px; hẹp hơn, kể cả điện thoại, thì thành bottom sheet | FR-O43 |
+| D3 | Màu Bếp | Nâu, để không lẫn với Phụ trách màu vàng gold (khách đã thấy Bếp màu vàng) | — |
+| D4 | Chip Phụ trách đứng đầu ô | Không: giữ quy tắc thứ tự ngày 10/10 (cảnh báo, rồi A–Z, rồi người thêm thủ công) | FR-O49 |
 
 ---
 
