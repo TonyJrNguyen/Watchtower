@@ -13,6 +13,7 @@ Claude. For the details of each change, see the commit or the chat history.
 - The Oct 16–17 wireframe was approved. FR-O43: the side panel sits beside the calendar from 1280 px wide and is a bottom sheet on narrower screens
 - §4.10 (Staff, Position, Assignment, new PositionHours, AuditLog's System actor), §4.11 (PositionHours kept after the assignment purge), §4.13 Phase 1, §5 (new resolved item, three earlier lines rewritten), §5.0 (four rows moved to *Superseded*), §5.1 O3 and §5.3 updated accordingly
 - Usual positions and the experience flag (FR-A12, FR-O32) were confirmed by the client on 2026-10-17, and every other change was requested or confirmed by the client, so nothing is added to the *pending confirmation* list. FR-O40 leaves the list, being retired (seven rules remain)
+- Backlog: new S-1.15–S-1.17 and S-4.21; S-1.12, S-3.6 and S-4.4 removed; S-3.7, S-4.6 and S-4.12 re-sized. Phase 1 from 233 to **238 md** (backlog §0). Roadmap: still **10 sprints**, team effort from ~194 to **~198 md**
 
 ## v1.9 — 2026-10-11
 - Following the client feedback on the Phase 1 wireframe of 2026-10-10 and the answers of 2026-10-10 and 2026-10-11 (`docs/feedback/2026-10-10-client-feedback.md`)
