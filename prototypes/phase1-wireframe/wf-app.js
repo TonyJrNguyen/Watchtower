@@ -16,7 +16,7 @@ const SCREENS = {
   lich: { vi: "Lịch tuần", role: "owner", options: ["a", "b", "c", "d", "e"], rec: "b", states: ["du-lieu", "chua-vi-tri", "mo-dk", "cong-bo", "dang-tai", "rong", "loi"] },
   tre: { vi: "Đi trễ", role: "owner", options: ["a", "b"], rec: "a", states: ["du-lieu", "tuan-truoc", "dang-tai", "rong", "loi"] },
   ranh: { vi: "Lịch rảnh", role: "staff", options: ["a", "b"], rec: "a", states: ["du-lieu", "nhap", "chua-dk", "khoa", "khoa-quen", "dang-tai", "loi"] },
-  ca: { vi: "Ca của tôi", role: "staff", options: ["a"], rec: "a", states: ["du-lieu", "chua-cong-bo", "dang-tai", "rong", "loi"] },
+  ca: { vi: "Hồ sơ của tôi", role: "staff", options: ["a"], rec: "a", states: ["du-lieu", "chua-cong-bo", "dang-tai", "rong", "loi"] },
   nv: { vi: "Nhân viên", role: "owner", options: ["a"], rec: "a", states: ["du-lieu", "dang-tai", "rong", "loi"] },
   nk: { vi: "Nhật ký", role: "owner", options: ["a"], rec: "a", states: ["du-lieu", "dang-tai", "rong", "loi"] },
   dn: { vi: "Đăng nhập", role: "none", options: ["a"], rec: "a", states: ["du-lieu", "loi"] },
@@ -95,6 +95,24 @@ function posLabel(pos, sub = []) {
   if (!pos || !pos.length) return L("Chưa có vị trí", "No position yet");
   return pos.map((p, i) => { const subs = sub.filter((s) => POS[p].subs.some((x) => x[0] === s)).map((s) => subName(p, s)); return posName(p) + (subs.length ? " - " + subs.join(", ") : ""); }).join(" + ");
 }
+// Lương theo người (góp ý 16/10): giờ làm ở vị trí phụ trách tính lương phụ trách của người đó (một ca chỉ một vị trí),
+// mọi vị trí khác tính lương cơ bản. Góp ý 17/10: chỉ người được bật "Phụ trách" trong hồ sơ mới xếp được vào vị trí
+// này (chặn thật, khác các vị trí khác chỉ gợi ý), và bật thì bắt buộc có lương phụ trách.
+const isLead = (pid) => !!POS[pid]?.lead;
+const canLeadShift = (s) => s.q.some(isLead);
+const rateFor = (s, pid) => (isLead(pid) && s.lead ? s.lead : s.base);
+// PRD v1.10 (chờ khách ký): s.q là vị trí thường đảm nhiệm, tối đa hai (hệ thống tự học từ lịch đã công bố, chủ sửa tay được),
+// cộng "pt" khi bật công tắc Phụ trách. Cảnh báo và bộ lọc không đọc s.q mà đọc vị trí có kinh nghiệm: trên 50 giờ đã công bố
+// trong toàn bộ lịch sử, hoặc chủ tick tay (s.exp; dữ liệu mẫu không có thì lấy s.q). Phụ trách đi theo công tắc, không theo kinh nghiệm.
+const USUAL_MAX = 2;
+const expOf = (s) => s.exp || s.q.filter((x) => !isLead(x));
+const lacksExp = (s, pid) => !isLead(pid) && !expOf(s).includes(pid);
+const leadOff = (s, a) => a.pos.some(isLead) && !canLeadShift(s);
+const flagPos = (s, a) => a.pos.some((x) => lacksExp(s, x)) || leadOff(s, a);
+// Giờ đã làm theo vị trí (FR-A14), chỉ để xem: không reset khi chủ bỏ một vị trí thường đảm nhiệm
+const hrsAt = (s, pid) => (s.id && HOURS[s.id]?.[pid]) || 0;
+const hoursOf = (s) => Object.entries((s.id && HOURS[s.id]) || {}).filter(([, h]) => h > 0).sort((a, b) => b[1] - a[1]);
+const hrsTag = (h) => (h ? `<span class="text-xs font-normal tabular-nums text-muted">${h}h</span>` : "");
 const posDot = (pid, c = "size-2") => `<span class="${c} shrink-0 rounded-full bg-p${pn(pid)}-dot" aria-hidden="true"></span>`;
 const dayShort = (d) => L(WEEK[d].vi, WEEK[d].en);
 const dayFull = (d) => `${dayShort(d)} ${WEEK[d].date}/10`;
@@ -113,7 +131,7 @@ const brand = (withName = true) => `<span class="flex min-w-0 items-center gap-2
 const ui = {
   view: "week", start: 0, weekOff: 0, panel: null, sel: new Set(), q: "", pop: null, dialog: null,
   rosterDay: 2, mDay: 2, sheet: null, posPick: [], subPick: [], skipped: new Map(),
-  lateDay: 2, lateEdit: null, lateVal: "", staffEdit: null, nvTab: "list", drawer: false, shiftTab: "time",
+  lateDay: 2, lateEdit: null, lateVal: "", staffEdit: null, drawer: false, shiftTab: "time",
   // Lịch tuần: undo/redo chỉ trong phiên (hist/fut), người thêm thủ công theo thứ tự thêm (manual), mục panel đang thu (secClosed)
   hist: [], fut: [], manual: new Map(), seq: 0, secClosed: new Set(), saveAs: "reg", panelMsg: "", needCopied: false,
   // Lịch rảnh: bản nháp (ranh, custom, notes) và bản đã Lưu (…Saved). Chủ quán chỉ thấy bản đã Lưu.
@@ -278,7 +296,7 @@ const REASONS = {
       tips: ["Ô to hơn", "Thêm giờ vào từng ô"] },
   },
   ca: { a: { name: "A · Ca theo ngày", rec: true, why: "Một màn duy nhất bố cục mặc định: tuần này theo ngày, ca hôm nay đánh dấu, tổng giờ và lương ước tính trên cùng.", pros: ["Đọc trong năm giây"], cons: ["Không xem được tuần trước quá một tuần"], fit: "Nhân viên mở xem nhanh.", tips: ["Bỏ lương ước tính"] } },
-  nv: { a: { name: "A · Bảng nhân viên + panel hồ sơ", rec: true, why: "Bố cục mặc định của bảng quản lý: tìm, bảng, bấm một dòng mở hồ sơ trượt từ phải.", pros: ["Mật khẩu là một ô trong hồ sơ (FR-A7)", "Lương theo vị trí ở tab riêng"], cons: ["Bảng rộng, dưới 1024px thành dòng"], fit: "Quản lý khoảng 40 tài khoản.", tips: ["Thêm cột biệt danh"] } },
+  nv: { a: { name: "A · Bảng nhân viên + panel hồ sơ", rec: true, why: "Bố cục mặc định của bảng quản lý: tìm, bảng, bấm một dòng mở hồ sơ trượt từ phải.", pros: ["Mật khẩu là một ô trong hồ sơ (FR-A7)", "Lương cơ bản và lương phụ trách đặt theo từng người, thấy ngay trên bảng"], cons: ["Bảng rộng, dưới 1024px thành dòng"], fit: "Quản lý khoảng 40 tài khoản.", tips: ["Thêm cột biệt danh"] } },
   nk: { a: { name: "A · Bảng nhật ký", rec: true, why: "Bố cục mặc định: lọc theo người và loại việc, mỗi dòng ai, lúc nào, trước → sau, lý do.", pros: ["Trả lời được vì sao một ca đã đổi"], cons: ["Dòng dài, mobile thành thẻ"], fit: "Tra lại khi có thắc mắc.", tips: ["Nhóm theo ngày"] } },
   dn: { a: { name: "A · Đăng nhập một cột", rec: true, why: "Bố cục mặc định của màn xác thực: logo, tên đăng nhập, mật khẩu. Không có quên mật khẩu tự phục vụ (FR-A7).", pros: ["Đủ và ít chữ"], cons: [], fit: "Mọi người dùng.", tips: ["Thêm chọn ngôn ngữ ở giữa"] } },
 };
@@ -300,7 +318,7 @@ function buildReason() {
 // Khung app
 // ===================================================================
 const OWNER_NAV = () => [["lich", "calendar-days", L("Lịch tuần", "Schedule")], ["tre", "alarm-clock", L("Đi trễ", "Lateness")], ["nv", "users", L("Nhân viên", "Staff")], ["nk", "history", L("Nhật ký", "Activity log")]];
-const STAFF_NAV = () => [["ranh", "calendar-check", L("Lịch rảnh", "Availability")], ["ca", "calendar-clock", L("Ca của tôi", "My shifts")]];
+const STAFF_NAV = () => [["ranh", "calendar-check", L("Lịch rảnh", "Availability")], ["ca", "circle-user-round", L("Hồ sơ của tôi", "My profile")]];
 const ME = () => (SC.role === "owner" ? { name: "Trương Hữu Phúc", user: "phuc.owner", init: "P" } : { name: "Huỳnh Ngọc Trâm", user: "tram.huynh", init: "T" });
 function appShell(content, title) {
   const nav = SC.role === "owner" ? OWNER_NAV() : STAFF_NAV();
@@ -349,7 +367,8 @@ function tipFor(s, d, p) {
     const t = runTime(runAt(s, d, p));
     lines.push(`<span class="tabular-nums">${t.from}–${t.to}</span> · ${esc(posLabel(a.pos, a.sub))}`);
     if (k === "no" && !s.left) lines.push(`<span class="text-warn">${L("Xếp ngoài lịch rảnh", "Placed outside availability")}</span>`);
-    if (a.pos.some((x) => !s.q.includes(x))) lines.push(`<span class="text-warn">${L("Chưa có kinh nghiệm vị trí này", "No experience in this position")}</span>`);
+    if (leadOff(s, a)) lines.push(`<span class="text-warn">${L("Đã tắt Phụ trách, cần đổi người phụ trách", "Shift lead turned off, needs another lead")}</span>`);
+    else if (a.pos.some((x) => lacksExp(s, x))) lines.push(`<span class="text-warn">${L("Chưa có kinh nghiệm vị trí này", "No experience in this position")}</span>`);
     if (s.left) lines.push(`<span class="text-err">${L("Đã nghỉ, cần người thay", "Left, needs someone")}</span>`);
   } else lines.push(k === "reg" ? L("Đã đăng ký, chưa xếp", "Registered, not placed") : L("Chưa đăng ký, tính là rảnh", "Didn’t register, counted as free"));
   if (customPending(s, d, p)) lines.push(`<span class="text-warn tabular-nums">${L(`Đăng ký giờ riêng ${cu.from}–${cu.to}, chưa quyết`, `Asked for own times ${cu.from}–${cu.to}, not decided`)}</span>`);
@@ -361,23 +380,22 @@ function marker(s, d, p) {
   let style = "", inline = "";
   if (a) {
     if (!a.pos.length) style = "border-foreground/40 bg-foreground/10 text-foreground";
-    else if (a.pos.length === 1) style = `border-p${pn(a.pos[0])}-bd bg-p${pn(a.pos[0])}-bg text-p${pn(a.pos[0])}-tx`;
-    else { const n1 = pn(a.pos[0]), n2 = pn(a.pos[1]); style = `border-p${n1}-bd text-p${n1}-tx`; inline = `background:linear-gradient(90deg,var(--p${n1}-bg) 50%,var(--p${n2}-bg) 50%)`; }
+    else style = `border-p${pn(a.pos[0])}-bd bg-p${pn(a.pos[0])}-bg text-p${pn(a.pos[0])}-tx`;
   } else if (k === "reg") style = "border-foreground/25 bg-surface text-foreground/80";
   // Không đăng ký gì: nét đứt và mờ hẳn, để tách khỏi người đã đăng ký (góp ý 10/10)
   else style = "border-dashed border-foreground/35 bg-surface text-muted opacity-55";
-  const flag = s.left ? "err" : (a && (k === "no" || a.pos.some((x) => !s.q.includes(x)))) || customPending(s, d, p) ? "warn" : "";
+  const flag = s.left ? "err" : (a && (k === "no" || flagPos(s, a))) || customPending(s, d, p) ? "warn" : "";
   const selected = ui.panel && ui.panel.sid === s.id && ui.panel.d === d;
   // Ghi chú theo ngày: biểu tượng chỉ ở chip đầu tiên của người đó trong ngày, không lặp ở mọi ca
   const noteHere = noteAt(s, d) && PERIODS.find((pp) => shownIn(d, pp.i).includes(s))?.i === p;
-  return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="openPanel('${s.id}',${d},${p})" class="${cx("relative inline-flex h-6 max-w-full cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && "ring-2 ring-primary ring-offset-1 ring-offset-surface", s.left && "line-through")}" style="${inline}">${typeOf(s) === "all" ? `<svg viewBox="0 0 24 24" class="size-3 shrink-0 fill-(--star) text-(--star)" aria-label="${L("Đăng ký mọi ca", "Every shift")}"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>` : ""}<span class="truncate">${esc(s.nick)}</span>${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${flag ? `<span class="absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2 ring-surface bg-${flag}-dot"></span>` : ""}</button>`;
+  return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="openPanel('${s.id}',${d},${p})" class="${cx("relative inline-flex h-6 max-w-full cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && "ring-2 ring-primary ring-offset-1 ring-offset-surface", s.left && "line-through")}" style="${inline}">${typeOf(s) === "all" ? `<svg viewBox="0 0 24 24" class="${a?.pos.some(isLead) ? "size-3 shrink-0 fill-current" : "size-3 shrink-0 fill-(--star) text-(--star)"}" aria-label="${L("Đăng ký mọi ca", "Every shift")}"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>` : ""}<span class="truncate">${esc(s.nick)}</span>${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${flag ? `<span class="absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2 ring-surface bg-${flag}-dot"></span>` : ""}</button>`;
 }
 // --- Thứ tự chip trong một ngày (góp ý 10/10) ---
 // CA1: có cảnh báo lên đầu → còn lại A–Z theo biệt danh → người thêm thủ công xuống cuối, theo thứ tự thêm.
 // CA2–CA5 kế thừa thứ tự của ca ngay trên trong cùng ngày: tên còn lại giữ thứ tự, tên mới xếp A–Z sau nhóm kế thừa.
 // "Xếp ngoài lịch rảnh" không tính là cảnh báo khi xếp thứ tự, nên người thêm thủ công vẫn ở cuối.
 function shownIn(d, p) { return STAFF.filter((s) => (s.left ? !!asgAt(s, d, p) : ui.sel.has(s.id) && (canWork(s, d, p) || asgAt(s, d, p)))); }
-const orderWarn = (s, d, p) => { const a = asgAt(s, d, p); return !!s.left || !!(a && a.pos.some((x) => !s.q.includes(x))) || customPending(s, d, p); };
+const orderWarn = (s, d, p) => { const a = asgAt(s, d, p); return !!s.left || !!(a && flagPos(s, a)) || customPending(s, d, p); };
 const isManual = (s, d, p) => !!asgAt(s, d, p) && regKind(s, d, p) === "no";
 function dayOrder(d) {
   const az = (a, b) => a.nick.localeCompare(b.nick, "vi");
@@ -438,9 +456,9 @@ function staffList(compact, inPop) {
   const all = inR.length && k === inR.length, none = k === 0;
   const row = (s, off) => {
     const rh = regHours(s).h;
-    return `<li class="${cx("group flex h-9 items-center gap-2.5 rounded-lg px-2", off && "opacity-50")}">
-      ${cb({ checked: !off && ui.sel.has(s.id), disabled: off, attrs: `aria-label="${esc(s.name)}" onchange="toggleStaff('${s.id}')"` })}
-      <button type="button" ${off ? "disabled" : ""} onclick="onlyStaff('${s.id}')" class="${cx("min-w-0 flex-1 truncate text-left text-sm outline-hidden", off ? "cursor-default" : "cursor-pointer")}" title="${off ? "" : L("Chỉ hiện người này", "Show only this person")}">${esc(s.name)}</button>
+    return `<li class="${cx("group flex h-11 items-center gap-2.5 rounded-lg px-2 lg:h-9", off && "opacity-50")}">
+      <label class="-mx-2 flex shrink-0 cursor-pointer items-center self-stretch px-2">${cb({ checked: !off && ui.sel.has(s.id), disabled: off, attrs: `aria-label="${esc(s.name)}" onchange="toggleStaff('${s.id}')"` })}</label>
+      <button type="button" ${off ? "disabled" : ""} onclick="onlyStaff('${s.id}')" class="${cx("min-w-0 flex-1 self-stretch truncate text-left text-sm outline-hidden", off ? "cursor-default" : "cursor-pointer")}" title="${off ? "" : L("Chỉ hiện người này", "Show only this person")}">${esc(s.name)}</button>
       ${!off && isShort(s) ? `<span title="${L("Thiếu giờ: đăng ký dưới 5 ngày đủ 8 tiếng", "Short hours: under 5 days of 8h")}" class="text-warn">${ic("triangle-alert", "size-3.5")}</span>` : ""}
       ${!off && F.listHours && (!compact || inPop) ? `<span class="text-xs tabular-nums text-muted" title="${rh == null ? L("Chưa đăng ký, tính là rảnh cả tuần", "Didn’t register, free all week") : L("Giờ đã đăng ký tuần này", "Hours registered this week")}">${rh == null ? "—" : fmtH(rh) + "h"}</span>` : ""}
     </li>`;
@@ -462,10 +480,10 @@ function masterRow(px) {
   const inR = ACTIVE.filter((s) => inRange(s, visibleDays()));
   const k = inR.filter((s) => ui.sel.has(s.id)).length;
   const all = inR.length && k === inR.length, none = k === 0;
-  return `<div class="flex h-9 items-center gap-2.5 ${px}">
-      ${cb({ checked: !!all, indet: !all && !none, attrs: `aria-label="${L("Chọn tất cả", "Select all")}" onchange="masterToggle()"` })}
-      <button type="button" onclick="masterToggle()" class="cursor-pointer text-sm font-medium outline-hidden">${all ? L("Bỏ chọn tất cả", "Deselect all") : L("Chọn tất cả", "Select all")}</button>
-      ${!all && !none ? `<button type="button" onclick="invertSel()" class="ml-auto cursor-pointer text-sm text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${L("Đảo lựa chọn", "Invert")}</button>` : ""}
+  return `<div class="flex h-11 items-center gap-2.5 lg:h-9 ${px}">
+      <label class="-mx-2 flex shrink-0 cursor-pointer items-center self-stretch px-2">${cb({ checked: !!all, indet: !all && !none, attrs: `aria-label="${L("Chọn tất cả", "Select all")}" onchange="masterToggle()"` })}</label>
+      <button type="button" onclick="masterToggle()" class="cursor-pointer self-stretch text-sm font-medium outline-hidden">${all ? L("Bỏ chọn tất cả", "Deselect all") : L("Chọn tất cả", "Select all")}</button>
+      ${!all && !none ? `<button type="button" onclick="invertSel()" class="ml-auto cursor-pointer self-stretch text-sm text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${L("Đảo lựa chọn", "Invert")}</button>` : ""}
     </div>`;
 }
 function filterGroups() {
@@ -482,16 +500,16 @@ function filterGroups() {
     g.push({ vi: "Xếp lịch", en: "Placing", opts: [
       ["Chưa có ca", "No shift yet", inR.filter((s) => !any(s, (a) => a))],
       ["Đã xếp, chưa có vị trí", "Placed, no position", inR.filter((s) => any(s, (a) => a && !a.pos.length))],
-      ["Đã xếp, có vị trí", "Placed with a position", inR.filter((s) => any(s, (a) => a && a.pos.length))],
-      ["Kiêm hai vị trí", "Covers two positions", inR.filter((s) => any(s, (a) => a && a.pos.length > 1))]] });
+      ["Đã xếp, có vị trí", "Placed with a position", inR.filter((s) => any(s, (a) => a && a.pos.length))]] });
     g.push({ vi: "Xếp vào vị trí", en: "Placed as", opts: [...POSITIONS.map((p) => [p.vi, p.en, inR.filter((s) => any(s, (a) => a && a.pos.includes(p.id))), p.id]), ["Chưa có vị trí", "No position yet", inR.filter((s) => any(s, (a) => a && !a.pos.length))]] });
   }
-  g.push({ vi: "Có kinh nghiệm", en: "Qualified for", opts: [...POSITIONS.map((p) => [p.vi, p.en, inR.filter((s) => s.q.includes(p.id)), p.id]), ["Chưa có kinh nghiệm", "No experience listed", inR.filter((s) => !s.q.length)]] });
+  g.push({ vi: "Có kinh nghiệm", en: "Experienced in", opts: [...POSITIONS.map((p) => [p.vi, p.en, inR.filter((s) => (p.lead ? canLeadShift(s) : expOf(s).includes(p.id))), p.id]), ["Chưa có kinh nghiệm", "No experience yet", inR.filter((s) => !expOf(s).length && !canLeadShift(s))]] });
   const attn = [
     ["Thiếu giờ", "Short hours", inR.filter(isShort)],
     ["Đăng ký giờ riêng", "Asked for own times", inR.filter((s) => days.some((d) => customAt(s, d) && Object.keys(customAt(s, d)).length))],
     ...(S.tt !== "mo-dk" ? [["Xếp ngoài lịch rảnh", "Placed outside availability", inR.filter((s) => any(s, (a, d, p) => a && regKind(s, d, p) === "no"))],
-      ["Xếp vị trí chưa có kinh nghiệm", "Placed without experience", inR.filter((s) => any(s, (a) => a && a.pos.some((x) => !s.q.includes(x))))]] : []),
+      ["Xếp vị trí chưa có kinh nghiệm", "Placed without experience", inR.filter((s) => any(s, (a) => a && a.pos.some((x) => lacksExp(s, x))))],
+      ["Đã tắt Phụ trách", "Shift lead turned off", inR.filter((s) => any(s, (a) => a && leadOff(s, a)))]] : []),
   ];
   const flagged = new Set(attn.flatMap((o) => o[2].map((s) => s.id)));
   attn.push(["Không có gì cần chú ý", "Nothing to look at", inR.filter((s) => !flagged.has(s.id))]);
@@ -547,18 +565,19 @@ function panelBody(mobile) {
     return `<section><div class="flex items-center gap-2"><button type="button" aria-expanded="${open}" onclick="toggleSec('${key}')" class="-ml-2 flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-left text-sm font-semibold outline-hidden hover:bg-item-hover">${ic("chevron-down", cx("size-4 text-muted transition-transform", !open && "-rotate-90"))}${title}</button>${open ? extra : ""}</div>${open ? `<div class="mt-1">${body}</div>` : ""}</section>`;
   };
   const cuSel = [...sel].sort().filter((p) => regKind(s, d, p) === "reg" && cu?.[p]);
-  const posChips = POSITIONS.map((p) => {
-    const on = ui.posPick.includes(p.id), first = ui.posPick[0] === p.id;
-    return `<button type="button" aria-pressed="${on}" onclick="pickPos('${p.id}')" title="${s.q.includes(p.id) ? "" : L("Chưa có kinh nghiệm", "No experience")}" class="${cx("relative inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors", on ? "bg-foreground/10 text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${first && ui.posPick.length > 1 ? `<span class="text-xs font-normal text-muted">${L("chính", "primary")}</span>` : ""}${s.q.includes(p.id) ? "" : `<span class="size-1.5 rounded-full bg-warn-dot"></span>`}</button>`;
+  const posChips = POSITIONS.filter((p) => !p.lead || canLeadShift(s)).map((p) => {
+    const on = ui.posPick.includes(p.id);
+    return `<button type="button" role="radio" aria-checked="${on}" onclick="pickPos('${p.id}')" title="${lacksExp(s, p.id) ? L("Chưa có kinh nghiệm", "No experience") : ""}" class="${cx("relative inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${lacksExp(s, p.id) ? `<span class="size-1.5 rounded-full bg-warn-dot"></span>` : ""}</button>`;
   }).join("");
-  const subRows = ui.posPick.filter((pid) => POS[pid].subs.length).map((pid) => `<div class="flex flex-wrap items-center gap-1.5"><span class="mr-1 text-xs text-muted">${posName(pid)}:</span>${POS[pid].subs.map(([id, vi, en]) => { const on = ui.subPick.includes(id); return `<button type="button" aria-pressed="${on}" onclick="pickSub('${id}')" class="${cx("inline-flex h-7 cursor-pointer items-center rounded-full px-2.5 text-xs font-medium outline-hidden", on ? "bg-foreground/10 text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${L(vi, en)}</button>`; }).join("")}</div>`).join("");
+  const subRows = ui.posPick.filter((pid) => POS[pid].subs.length).map((pid) => `<div class="flex flex-wrap items-center gap-1.5"><span class="mr-1 text-xs text-muted">${posName(pid)}:</span>${POS[pid].subs.map(([id, vi, en]) => { const on = ui.subPick.includes(id); return `<button type="button" aria-pressed="${on}" onclick="pickSub('${id}')" class="${cx("inline-flex h-7 cursor-pointer items-center rounded-full px-2.5 text-xs font-medium outline-hidden", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${L(vi, en)}</button>`; }).join("")}</div>`).join("");
   const dayIdx = days.indexOf(d);
   const nothing = sel.size === 0;
-  const quick = ro ? "" : `<span class="flex gap-3 text-xs">${[["reg", L("Ca đăng ký", "Registered")], ["all", L("Tất cả", "All")], ["none", L("Bỏ chọn", "None")]].map(([k, t]) => `<button type="button" onclick="quickSel('${k}')" class="cursor-pointer text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${t}</button>`).join("")}</span>`;
+  const quick = ro ? "" : `<span class="-mr-1.5 flex text-xs">${[["reg", L("Ca đăng ký", "Registered")], ["all", L("Tất cả", "All")], ["none", L("Bỏ chọn", "None")]].map(([k, t]) => `<button type="button" onclick="quickSel('${k}')" class="inline-flex h-8 cursor-pointer items-center px-1.5 text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${t}</button>`).join("")}</span>`;
   const shiftsBody = `<div class="flex flex-col gap-0.5">${PERIODS.map(periodRow).join("")}</div>
     ${!ro && nothing ? `<p class="px-2 pt-1.5 text-xs text-muted">${L("Không chọn ca nào: Lưu hay Bỏ khỏi ca đều là bỏ khỏi mọi ca trong ngày.", "No shift selected: Save or Take off removes them from every shift this day.")}</p>` : ""}
     ${!ro && cuSel.length ? `<div class="mt-3 space-y-1.5 px-2"><p class="text-xs text-muted">${L("Xếp theo", "Place by")} · <span class="tabular-nums">${cuSel.map((p) => `${PERIODS[p].code} ${cu[p].from}–${cu[p].to}`).join(", ")}</span></p>${segmented([["reg", L("Giờ đăng ký", "Their times")], ["std", L("Giờ ca gốc", "Standard times")]], ui.saveAs, "setSaveAs", L("Xếp theo", "Place by"))}</div>` : ""}`;
-  const posBody = `<div class="space-y-2.5"><div class="flex flex-wrap gap-1.5">${posChips}</div>${subRows}
+  const posBody = `<div class="space-y-2.5"><div role="radiogroup" aria-label="${L("Vị trí", "Position")}" class="flex flex-wrap gap-1.5">${posChips}</div>${subRows}
+        ${missingSub().length ? `<p class="text-xs text-muted">${L(`${POS[missingSub()[0]].vi}: chọn ${POS[missingSub()[0]].subs.map((x) => x[1]).join(" hoặc ")}.`, `${POS[missingSub()[0]].en}: choose ${POS[missingSub()[0]].subs.map((x) => x[2]).join(" or ")}.`)}</p>` : ""}
         ${ui.posPick.length ? "" : pub ? `<p class="flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${L("Ca đã công bố phải có vị trí.", "A published shift needs a position.")}</p>` : `<p class="text-xs text-muted">${L("Không chọn vị trí: Lưu là xếp vào ca, chưa có vị trí.", "No position: Save places them without one.")}</p>`}</div>`;
   const reasonBody = `<label class="block"><span class="sr-only">${L("Lý do", "Reason")}</span><input class="${INPUT}" placeholder="${L("VD: đã thống nhất qua Zalo", "e.g. agreed on Zalo")}" /></label>`;
   return `
@@ -578,7 +597,7 @@ function panelBody(mobile) {
         <div class="rounded-xl bg-background px-3 py-2.5"><dt class="text-xs text-muted">${L("Đăng ký tuần", "Registered")}</dt><dd class="mt-0.5 text-sm font-semibold tabular-nums">${typeOf(s) === "none" ? L("Rảnh cả tuần", "Free all week") : typeOf(s) === "all" ? L("Mọi ca", "Every shift") : `${rg.days} ${L("ngày", "days")} · ${fmtH(rg.h)}h`}</dd></div>
         <div class="rounded-xl bg-background px-3 py-2.5"><dt class="text-xs text-muted">${L("Đã xếp", "Placed")}</dt><dd class="mt-0.5 text-sm font-semibold tabular-nums">${st.shifts} ${L("ca", "shifts")} · ${fmtH(st.h)}h</dd></div>
       </dl>` : `<p class="text-sm text-muted tabular-nums">${L("Đã xếp", "Placed")} ${st.shifts} ${L("ca", "shifts")} · ${fmtH(st.h)}h</p>`}
-      <div class="flex flex-wrap items-center gap-1.5 text-sm"><span class="text-muted">${L("Kinh nghiệm", "Experience")}</span>${s.q.length ? s.q.map((q) => `<span class="inline-flex items-center gap-1.5 rounded-full bg-foreground/5 px-2.5 py-0.5 text-xs font-medium">${posDot(q)}${posName(q)}</span>`).join("") : `<span class="text-muted">—</span>`}</div>
+      <div class="flex flex-wrap items-center gap-1.5 text-sm"><span class="text-muted">${L("Vị trí thường đảm nhiệm", "Usual positions")}</span>${s.q.length ? s.q.map((q) => `<span class="inline-flex items-center gap-1.5 rounded-full bg-foreground/5 px-2.5 py-0.5 text-xs font-medium">${posDot(q)}${posName(q)}</span>`).join("") : `<span class="text-muted">—</span>`}</div>
       ${note ? `<div class="rounded-xl border border-border bg-background px-3 py-2.5"><p class="flex items-center gap-1.5 text-xs text-muted">${ic("message-square-text", "size-3.5")}${L("Ghi chú của nhân viên ngày này", "Their note for this day")}</p><p class="mt-1 text-sm text-pretty">${esc(note)}</p></div>` : ""}
       ${sec("shifts", L("Ca trong ngày", "Shifts this day"), shiftsBody, `<span class="ml-auto">${quick}</span>`)}
       ${ro ? `<p class="rounded-xl bg-background px-3 py-2.5 text-sm text-muted">${S.tt === "mo-dk" ? L("Xếp được sau 15:00 T7 10/10, khi đăng ký khoá.", "Placing opens at 15:00 Sat 10 Oct, when registration locks.") : L("Tuần đã qua, chỉ xem.", "Past week, view only.")}</p>` : `
@@ -605,8 +624,8 @@ function assignSection(mobile) {
   const numIn = (p, pid, n) => `<input type="number" min="0" max="20" inputmode="numeric" value="${n}" aria-label="${esc(`${posName(pid)} ${PERIODS[p].code} ${dayFull(d)}`)}" onchange="setNeed(${d},${p},'${pid}',this.value)" class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />`;
   const rows = POSITIONS.map((pos) => `<tr class="border-t border-border"><th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap"><span class="inline-flex items-center gap-2">${posDot(pos.id)}${L(pos.vi, pos.en)}</span></th>${PERIODS.map((p) => {
     const list = STAFF.filter((s) => asgAt(s, d, p.i)?.pos.includes(pos.id));
-    const n = need[d][p.i][pos.id], shared = list.filter((s) => asgAt(s, d, p.i).pos.length > 1).length;
-    return `<td class="px-2 py-1.5 text-right whitespace-nowrap"><span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"><span class="${tone(list.length, n)}">${list.length}</span><span class="text-muted">/</span>${ro ? `<span class="w-6">${n}</span>` : numIn(p.i, pos.id, n)}</span>${shared ? `<span class="block text-xs text-muted">${L("kiêm", "shared")} ${shared}</span>` : ""}</td>`;
+    const n = need[d][p.i][pos.id];
+    return `<td class="px-2 py-1.5 text-right whitespace-nowrap"><span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"><span class="${tone(list.length, n)}">${list.length}</span><span class="text-muted">/</span>${ro ? `<span class="w-6">${n}</span>` : numIn(p.i, pos.id, n)}</span></td>`;
   }).join("")}</tr>`).join("");
   const total = `<tr class="border-t border-border bg-background/60"><th scope="row" class="sticky left-0 z-[1] bg-background px-4 py-2.5 text-left text-sm font-medium">${L("Tổng số người", "Total people")}</th>${PERIODS.map((p) => { const n = Object.values(need[d][p.i]).reduce((a, b) => a + b, 0), placed = placedCount(d, p.i); return `<td class="px-2 py-2.5 text-right text-sm font-medium tabular-nums whitespace-nowrap"><span class="${tone(placed, n)}">${placed}</span><span class="text-muted">/</span><span class="${ro ? "w-6" : "inline-block w-11 pr-2"}">${n}</span></td>`; }).join("")}</tr>`;
   const head = `<div class="flex flex-col items-start gap-x-4 gap-y-3 px-4 pt-4 pb-3 sm:flex-row"><div class="min-w-0 flex-1"><h2 class="text-base font-semibold">${L("Phân công", "Staffing")}</h2><p class="mt-0.5 text-sm text-pretty text-muted">${ro ? L("Số đã giao / số người cần theo vị trí.", "Assigned / needed per position.") : L("Số đã giao / số người cần theo vị trí. Sửa ô số để đặt số người cần.", "Assigned / needed per position. Edit a number to set the need.")}</p></div>
@@ -680,7 +699,7 @@ function screenLich() {
       <div class="flex items-start gap-5">
         ${OPT === "b" ? "" : `<aside class="w-60 shrink-0" data-wf-block="3">${loading ? `<div class="space-y-3">${skel("w-full", "h-10")}${Array.from({ length: 10 }, (_, i) => skel(["w-3/4", "w-2/3", "w-4/5"][i % 3], "h-4")).join("")}</div>` : staffList(OPT === "d" || OPT === "e")}</aside>`}
         <div class="min-w-0 flex-1 space-y-5">${grid}${loading || err ? "" : assignSection(false)}</div>
-        ${panelOpen ? `<aside class="sticky top-20 flex max-h-[calc(100vh-6rem)] w-[22rem] shrink-0 flex-col rounded-2xl border border-border bg-surface" data-wf-block="5">${panelBody(false)}</aside>` : ""}
+        ${panelOpen ? `<aside class="sticky top-20 hidden max-h-[calc(100vh-6rem)] w-[22rem] shrink-0 flex-col xl:flex rounded-2xl border border-border bg-surface" data-wf-block="5">${panelBody(false)}</aside>` : ""}
       </div>
     </div>`;
   const mobile = `
@@ -714,8 +733,8 @@ function screenTre() {
   const rules = iconBtn("circle-help", L("Quy tắc đi trễ", "Lateness rules"), `onclick="openPop(event,'rules')"`, "size-10 rounded-xl");
   const head = `<div class="flex flex-wrap items-center gap-x-4 gap-y-3" data-wf-block="2">
     <h1 class="text-xl font-semibold tabular-nums">${L("Đi trễ", "Lateness")} · ${range}</h1>
-    <div class="flex items-center gap-1">${iconBtn("chevron-left", L("Tuần trước", "Previous week"), "", "size-10 rounded-xl")}${btn("outline", L("Tuần này", "This week"), { extra: "whitespace-nowrap" })}${iconBtn("chevron-right", L("Tuần sau", "Next week"), "disabled", "size-10 rounded-xl")}</div>
-    <span class="ml-auto">${rules}</span></div>`;
+    <div class="flex flex-1 items-center gap-1">${iconBtn("chevron-left", L("Tuần trước", "Previous week"), "", "size-10 rounded-xl")}${btn("outline", L("Tuần này", "This week"), { extra: "whitespace-nowrap" })}${iconBtn("chevron-right", L("Tuần sau", "Next week"), "disabled", "size-10 rounded-xl")}
+    <span class="ml-auto">${rules}</span></div></div>`;
   const shifts = ui.lateDay === 2 && !empty ? TODAY_SHIFTS : ui.lateDay === 0 && !empty ? LATE_EARLIER.map((x) => ({ ...x, sub: null })) : [];
   const editRow = (sh, i) => {
     const tier = lateTier(sh, /^\d{1,2}:\d{2}$/.test(ui.lateVal) ? ui.lateVal.padStart(5, "0") : null);
@@ -727,7 +746,7 @@ function screenTre() {
   const row = (sh, i) => {
     const s = ST[sh.sid]; const tier = lateTier(sh, sh.arrive);
     const status = tier ? `<span class="flex flex-col items-end gap-1"><span class="text-xs tabular-nums text-muted">${L("Đến", "Arrived")} ${sh.arrive} · ${L(`trễ ${tier.late}′`, `${tier.late}′ late`)}</span>${badge(tier.tone, tier.t, tier.icon)}</span>` : sh.future ? `<span class="text-sm text-muted">${L("Chưa tới giờ", "Not started")}</span>` : `<span class="text-sm text-muted">${L("Đúng giờ", "On time")}</span>`;
-    const action = ro ? "" : tier?.anomaly ? btn("outline", L("Xem xét", "Review"), { attrs: `onclick="openDialog('anomaly',${i})"`, extra: "h-9 min-h-9 rounded-lg px-3" }) : tier ? iconBtn("pencil", L("Sửa", "Change"), `onclick="editLate(${i})"`) : btn("ghost", L("Ghi giờ đến", "Record arrival"), { attrs: `onclick="editLate(${i})"`, extra: "h-9 min-h-9 rounded-lg px-3 text-foreground/70" });
+    const action = ro ? "" : tier?.anomaly ? btn("outline", L("Xem xét", "Review"), { attrs: `onclick="openDialog('anomaly',${i})"`, extra: "h-9 min-h-9 rounded-lg px-3" }) : tier ? iconBtn("pencil", L("Sửa", "Change"), `onclick="editLate(${i})"`) : btn("ghost", L("Ghi giờ đến", "Record arrival"), { attrs: `onclick="editLate(${i})"`, extra: "h-9 min-h-9 whitespace-nowrap rounded-lg px-3 text-foreground/70" });
     return `<li class="px-4 py-3 sm:px-5"><div class="flex items-center gap-3 sm:gap-4">
       <span class="w-12 shrink-0 text-sm tabular-nums text-foreground/80 sm:w-24"><span class="block sm:inline">${sh.from}</span><span class="hidden sm:inline">–</span><span class="block text-xs text-muted sm:inline sm:text-sm sm:text-foreground/80">${sh.to}</span></span>
       <span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(s.name)}</span><span class="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted">${posDot(sh.pos, "size-1.5")}${esc(posLabel([sh.pos], sh.sub ? [sh.sub] : []))}</span></span>
@@ -821,7 +840,7 @@ function screenRanh() {
     const errTxt = customErr(d, ed.p, ed.from, ed.to);
     const opts = (k) => TIMES.filter((t) => (k === "from" ? hm(t) >= hm(P.from) && hm(t) < hm(P.to) : hm(t) > hm(P.from) && hm(t) <= hm(P.to)));
     const tIn = (k, label) => `<label class="block space-y-1"><span class="block text-xs text-muted">${label}</span><select onchange="setCEdit('${k}',this.value)" class="${cx(INPUT, "w-28 cursor-pointer tabular-nums", errTxt && "border-err-text")}">${opts(k).map((t) => `<option ${t === ed[k] ? "selected" : ""}>${t}</option>`).join("")}</select></label>`;
-    const pills = (reg[d] || []).map((q) => { const on = q === ed.p, has = !!ui.custom[d]?.[q]; return `<button type="button" aria-pressed="${on}" onclick="pickCustomP(${d},${q})" class="${cx("inline-flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-xs font-medium outline-hidden transition-colors", on ? "bg-foreground/10 text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${has ? ic("clock", "size-3.5") : ""}${PERIODS[q].code}</button>`; }).join("");
+    const pills = (reg[d] || []).map((q) => { const on = q === ed.p, has = !!ui.custom[d]?.[q]; return `<button type="button" aria-pressed="${on}" onclick="pickCustomP(${d},${q})" class="${cx("inline-flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-xs font-medium outline-hidden transition-colors", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${has ? ic("clock", "size-3.5") : ""}${PERIODS[q].code}</button>`; }).join("");
     const actions = dirty
       ? `${btn("ghost", L("Huỷ", "Cancel"), { attrs: `onclick="cancelCustom()"`, extra: "min-h-9 h-9 px-3" })}${btn("primary", L("Lưu", "Save"), { attrs: `onclick="saveCustom()"`, extra: "min-h-9 h-9 px-4" })}`
       : saved ? `<button type="button" onclick="deleteCustom()" class="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-xl px-3 text-sm font-medium text-danger outline-hidden hover:bg-danger-bg">${ic("trash-2", "size-4")}${L("Xoá giờ riêng", "Remove own times")}</button>` : "";
@@ -857,7 +876,7 @@ function screenRanh() {
       const msg = ui.dayMsg && ui.dayMsg.d === d ? `<p role="status" class="mt-2 flex items-center gap-1.5 text-xs font-medium text-warn">${ic("info", "size-3.5")}${ui.dayMsg.t}</p>` : "";
       return `<li class="${cx("rounded-2xl border bg-surface p-4", under(d) ? "wt-glow" : "border-border")}">
         <div class="mb-3 flex items-center gap-3"><div class="min-w-0"><p class="text-sm font-semibold whitespace-nowrap">${L(w.viL, w.enL)} <span class="font-normal tabular-nums text-muted">${w.date}/10</span></p>${hoursLine(d)}</div>
-          ${locked ? "" : `<button type="button" aria-pressed="${!!all}" onclick="toggleAllDay(${d})" class="${cx("ml-auto inline-flex h-8 shrink-0 cursor-pointer items-center rounded-full px-3 text-xs font-medium whitespace-nowrap outline-hidden transition-colors", all ? "bg-foreground/10 text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${L("Chọn tất cả ca", "Select all shifts")}</button>`}</div>
+          ${locked ? "" : `<button type="button" aria-pressed="${!!all}" onclick="toggleAllDay(${d})" class="${cx("ml-auto inline-flex h-8 shrink-0 cursor-pointer items-center rounded-full px-3 text-xs font-medium whitespace-nowrap outline-hidden transition-colors", all ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${L("Chọn tất cả ca", "Select all shifts")}</button>`}</div>
         <div class="grid grid-cols-5 gap-2">${PERIODS.map((p) => chip(d, p)).join("")}</div>
         ${customBox(d)}${msg}
         ${noteBox(d)}
@@ -881,73 +900,104 @@ function screenRanh() {
 function screenCa() {
   const loading = S.tt === "dang-tai", err = S.tt === "loi", empty = S.tt === "rong", notPub = S.tt === "chua-cong-bo";
   const tabs = segmented([["now", L("Tuần này", "This week")], ["next", L("Tuần sau", "Next week")]], notPub ? "next" : "now", "noop", L("Tuần", "Week"));
-  const hours = MY_SHIFTS.reduce((a, s) => a + paidH(s.from, s.to), 0);
+  // Một ca có thể đổi vị trí giữa chừng (parts): mỗi đoạn tính theo lương của vị trí đoạn đó
+  const me = ST.s7, segs = MY_SHIFTS.flatMap((x) => x.parts || [x]);
+  const segH = (x) => paidH(x.from, x.to);
+  const hours = segs.reduce((a, x) => a + segH(x), 0);
+  const leadH = segs.filter((x) => isLead(x.pos)).reduce((a, x) => a + segH(x), 0);
+  const pay = segs.reduce((a, x) => a + segH(x) * rateFor(me, x.pos), 0);
   let body;
   if (loading) body = `<div aria-busy="true" class="space-y-3">${Array.from({ length: 5 }, () => `<div class="rounded-2xl border border-border bg-surface p-4 space-y-2">${skel("w-1/4")}${skel("w-1/2", "h-5")}</div>`).join("")}</div>`;
   else if (err) body = `<div class="rounded-2xl border border-border bg-surface">${errorBlock(L("Không tải được ca làm", "Couldn’t load your shifts"), L("Mất kết nối mạng", "Network connection lost"))}</div>`;
   else if (notPub) body = `<div class="rounded-2xl border border-border bg-surface px-5 py-8 text-center"><p class="text-sm font-medium">${L("Lịch tuần 12–18/10 chưa công bố", "Week 12–18 Oct isn’t published yet")}</p><p class="mt-1 text-sm text-muted">${L("Chủ quán công bố xong là ca hiện ở đây.", "Your shifts appear here once the owner publishes.")}</p></div>`;
   else if (empty) body = `<div class="rounded-2xl border border-border bg-surface">${emptyLine(L("Tuần này bạn không có ca nào.", "You have no shifts this week."))}</div>`;
-  else body = `<ul class="overflow-hidden rounded-2xl border border-border bg-surface divide-y divide-border" data-wf-block="4">${LATE_WEEK.map((w, d) => {
+  else body = `<ul class="overflow-hidden rounded-2xl border border-border bg-surface divide-y divide-border" data-wf-block="5">${LATE_WEEK.map((w, d) => {
     const list = MY_SHIFTS.filter((x) => x.d === d); const today = d === 2;
     return `<li class="flex gap-4 px-5 py-4"><div class="w-14 shrink-0"><p class="${cx("text-xs", today ? "font-semibold text-primary" : "text-muted")}">${today ? L("Hôm nay", "Today") : L(w.vi, w.en)}</p><p class="text-lg font-semibold tabular-nums">${w.date}</p></div>
-      <div class="min-w-0 flex-1 space-y-2 pt-0.5">${list.length ? list.map((x) => { const t = lateTier(x, x.arrive); const paid = paidH(x.from, x.to), clock = (toMin(x.to) - toMin(x.from)) / 60; return `<div><p class="text-sm font-semibold tabular-nums">${x.from} – ${x.to}${paid !== clock ? ` <span class="text-xs font-normal text-muted">· ${L(`tính ${fmtH(paid)} giờ`, `paid ${fmtH(paid)}h`)}</span>` : ""}</p><p class="mt-0.5 flex items-center gap-1.5 text-sm text-foreground/80">${posDot(x.pos)}${esc(posLabel([x.pos], [x.sub]))}</p>${t ? `<p class="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted"><span class="tabular-nums">${L(`Đến ${x.arrive} · trễ ${t.late} phút`, `Arrived ${x.arrive} · ${t.late} min late`)}</span>${badge(t.tone, t.t, t.icon)}</p>` : ""}</div>`; }).join("") : `<p class="pt-1 text-sm text-muted">${L("Nghỉ", "Off")}</p>`}</div></li>`;
+      <div class="min-w-0 flex-1 space-y-2 pt-0.5">${list.length ? list.map((x) => { const t = lateTier(x, x.arrive); const paid = paidH(x.from, x.to), clock = (toMin(x.to) - toMin(x.from)) / 60; return `<div><p class="text-sm font-semibold tabular-nums">${x.from} – ${x.to}${paid !== clock ? ` <span class="text-xs font-normal text-muted">· ${L(`tính ${fmtH(paid)} giờ`, `paid ${fmtH(paid)}h`)}</span>` : ""}</p>${(x.parts || [x]).map((y) => `<p class="mt-0.5 flex items-center gap-1.5 text-sm text-foreground/80">${posDot(y.pos)}${x.parts ? `<span class="tabular-nums text-muted">${y.from}–${y.to}</span>` : ""}<span class="min-w-0">${esc(posLabel([y.pos], [y.sub]))}</span></p>`).join("")}${t ? `<p class="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted"><span class="tabular-nums">${L(`Đến ${x.arrive} · trễ ${t.late} phút`, `Arrived ${x.arrive} · ${t.late} min late`)}</span>${badge(t.tone, t.t, t.icon)}</p>` : ""}</div>`; }).join("") : `<p class="pt-1 text-sm text-muted">${L("Nghỉ", "Off")}</p>`}</div></li>`;
   }).join("")}</ul>`;
   const sum = loading || err || notPub || empty ? "" : `<div class="grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-surface" data-wf-block="3">
-    ${[[L("Ca", "Shifts"), MY_SHIFTS.length], [L("Giờ", "Hours"), fmtH(hours)], [L("Lương ước tính", "Est. pay"), vnd(hours * 26000)]].map(([k, v]) => `<div class="px-4 py-3"><p class="text-xs text-muted">${k}</p><p class="mt-0.5 text-base font-semibold tabular-nums">${v}</p></div>`).join("")}</div>
-    <p class="-mt-2 px-1 text-xs text-muted">${L("Ước tính theo giờ được xếp, chưa trừ đi trễ, chưa có thưởng. Trọn Ca 5 tính tới 24:00.", "Based on assigned hours, before lateness and bonus. A full CA5 is paid to 24:00.")}</p>`;
-  return appShell(`<div class="mx-auto w-full max-w-2xl space-y-4 p-4 sm:p-6"><div class="flex flex-wrap items-center gap-3" data-wf-block="2"><h1 class="text-xl font-semibold max-lg:sr-only">${L("Ca của tôi", "My shifts")}</h1><span class="ml-auto">${tabs}</span></div>${sum}${body}</div>`, L("Ca của tôi", "My shifts"));
+    ${[[L("Ca", "Shifts"), MY_SHIFTS.length], [L("Giờ", "Hours"), fmtH(hours)], [L("Lương ước tính", "Est. pay"), vnd(pay)]].map(([k, v]) => `<div class="px-4 py-3"><p class="text-xs text-muted">${k}</p><p class="mt-0.5 text-base font-semibold tabular-nums">${v}</p></div>`).join("")}</div>
+    <p class="-mt-2 px-1 text-xs text-pretty text-muted">${leadH ? L(`Gồm ${fmtH(leadH)} giờ phụ trách × ${vnd(me.lead || me.base)} và ${fmtH(hours - leadH)} giờ × ${vnd(me.base)}. `, `${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)} and ${fmtH(hours - leadH)}h × ${vnd(me.base)}. `) : ""}${L("Ước tính theo giờ được xếp, chưa trừ đi trễ, chưa có thưởng. Trọn Ca 5 tính tới 24:00.", "Based on assigned hours, before lateness and bonus. A full CA5 is paid to 24:00.")}</p>`;
+  // Vị trí đã làm (FR-A14): mọi vị trí đã làm kèm giờ, nhiều giờ nhất trước, ngay dưới phần lương; không theo tuần nên hiện cả khi tuần chưa công bố
+  const mine = hoursOf(me);
+  const posCard = loading || err ? "" : `<section class="rounded-2xl border border-border bg-surface" data-wf-block="4"><header class="px-5 pt-4 pb-2"><h2 class="text-base font-semibold">${L("Vị trí đã làm", "Positions worked")}</h2><p class="mt-0.5 text-xs text-pretty text-muted">${L("Các ca bạn đã làm, từ khi dùng hệ thống.", "Shifts you’ve worked since the app started.")}</p></header><div class="flex flex-wrap gap-1.5 px-5 pb-4">${mine.length ? mine.map(([pid, h]) => `<span class="inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/5 px-3 text-sm font-medium">${posDot(pid)}${posName(pid)}${hrsTag(h)}</span>`).join("") : `<p class="text-sm text-muted">${L("Chưa có ca nào đã làm.", "No shifts worked yet.")}</p>`}</div></section>`;
+  return appShell(`<div class="mx-auto w-full max-w-2xl space-y-4 p-4 sm:p-6"><div class="flex flex-wrap items-center gap-3" data-wf-block="2"><h1 class="text-xl font-semibold max-lg:sr-only">${L("Hồ sơ của tôi", "My profile")}</h1><span class="ml-auto">${tabs}</span></div>${sum}${posCard}${body}</div>`, L("Hồ sơ của tôi", "My profile"));
 }
 
 // ===================================================================
-// MÀN 5 · NHÂN VIÊN (FR-A1–A11, FR-O40)
+// MÀN 5 · NHÂN VIÊN (FR-A1–A11; lương cơ bản + lương phụ trách theo người, góp ý 16/10)
 // ===================================================================
 function screenNv() {
   const loading = S.tt === "dang-tai", err = S.tt === "loi", empty = S.tt === "rong";
   const list = empty ? [] : STAFF.filter((s) => !s.left || ui.showLeft);
-  const tabs = underlineTabs([["list", L("Nhân viên", "Staff"), ACTIVE.length], ["rates", L("Lương theo vị trí", "Rates by position")]], ui.nvTab, "setNvTab", L("Mục", "Section"));
-  const tools = `<div class="flex flex-wrap items-center gap-3" data-wf-block="3">
-    <label class="relative block w-full sm:w-72"><span class="sr-only">${L("Tìm nhân viên", "Find staff")}</span><i data-lucide="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"></i><input type="search" placeholder="${L("Tìm theo tên, số điện thoại", "Search name or phone")}" class="${INPUT} pl-10" /></label>
-    <label class="inline-flex min-h-11 cursor-pointer items-center gap-2.5 text-sm">${cb({ small: false, checked: !!ui.showLeft, attrs: `onchange="ui.showLeft=!ui.showLeft;render()"` })}${L("Hiện cả người đã nghỉ", "Include former staff")}</label>
-    <span class="ml-auto">${btn("primary", L("Thêm nhân viên", "Add staff"), { icon: "plus", attrs: `onclick="ui.staffEdit='new';render()"` })}</span></div>`;
+  const head = `<div class="flex items-baseline gap-2" data-wf-block="2"><h1 class="text-xl font-semibold max-lg:sr-only">${L("Nhân viên", "Staff")}</h1></div>`;
+  // Số nhân viên nằm ngay dưới ô tìm, hiện cả trên điện thoại; bật "Hiện cả người đã nghỉ" thì nói rõ bao nhiêu người đã nghỉ
+  const leftN = list.filter((s) => s.left).length;
+  const count = loading || err ? "" : `<p class="px-1 text-sm tabular-nums text-muted">${L(`${list.length} nhân viên`, `${list.length} staff`)}${leftN ? L(` · ${leftN} đã nghỉ`, ` · ${leftN} former`) : ""}</p>`;
+  const leadCell = (s) => canLeadShift(s) && s.lead ? vnd(s.lead) : `<span class="text-muted">—</span>`;
+  const tools = `<div class="flex flex-wrap items-start gap-3" data-wf-block="3">
+    <div class="w-full space-y-1.5 sm:w-72"><label class="relative block"><span class="sr-only">${L("Tìm nhân viên", "Find staff")}</span><i data-lucide="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"></i><input type="search" placeholder="${L("Tìm theo tên, số điện thoại", "Search name or phone")}" class="${INPUT} pl-10" /></label>${count}</div>
+    <div class="flex flex-1 flex-wrap items-center gap-3"><label class="inline-flex min-h-11 md:min-h-10 cursor-pointer items-center gap-2.5 text-sm">${cb({ small: false, checked: !!ui.showLeft, attrs: `onchange="ui.showLeft=!ui.showLeft;render()"` })}${L("Hiện cả người đã nghỉ", "Include former staff")}</label>
+    <span class="ml-auto">${btn("primary", L("Thêm nhân viên", "Add staff"), { icon: "plus", attrs: `onclick="ui.staffEdit='new';render()"` })}</span></div></div>`;
   let table;
-  if (ui.nvTab === "rates") {
-    table = `<section class="max-w-xl rounded-2xl border border-border bg-surface p-5" data-wf-block="4"><h2 class="text-base font-semibold">${L("Lương giờ mặc định theo vị trí", "Default hourly rate by position")}</h2><p class="mt-1 text-sm text-muted">${L("Dùng khi nhân viên không có lương riêng. Tính theo vị trí chính của ca.", "Used when a person has no own rate. Taken from the shift’s primary position.")}</p>
-      <ul class="mt-4 divide-y divide-border border-y border-border">${POSITIONS.map((p) => `<li class="flex items-center gap-3 py-2.5">${posDot(p.id)}<span class="min-w-0 flex-1 text-sm">${L(p.vi, p.en)}</span><label class="relative w-40"><span class="sr-only">${L(p.vi, p.en)}</span><input value="${RATE_DEFAULT[p.id].toLocaleString("vi-VN")}" class="${INPUT} pr-16 text-right tabular-nums" /><span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted">đ/${L("giờ", "h")}</span></label></li>`).join("")}</ul>
-      <div class="mt-4 flex justify-end">${btn("primary", L("Lưu", "Save"), { extra: "min-h-11 md:min-h-10" })}</div></section>`;
-  } else if (loading) table = `<div class="rounded-2xl border border-border bg-surface"><ul aria-busy="true" class="divide-y divide-border">${Array.from({ length: 8 }, (_, i) => `<li class="flex items-center gap-4 px-5 py-3.5"><div class="flex-1 space-y-2">${skel(["w-1/4", "w-1/3", "w-1/5"][i % 3])}</div>${skel("w-24")}${skel("w-20")}</li>`).join("")}</ul></div>`;
+  if (loading) table = `<div class="rounded-2xl border border-border bg-surface"><ul aria-busy="true" class="divide-y divide-border">${Array.from({ length: 8 }, (_, i) => `<li class="flex items-center gap-4 px-5 py-3.5"><div class="flex-1 space-y-2">${skel(["w-1/4", "w-1/3", "w-1/5"][i % 3])}</div>${skel("w-24")}${skel("w-20")}</li>`).join("")}</ul></div>`;
   else if (err) table = `<div class="rounded-2xl border border-border bg-surface">${errorBlock(L("Không tải được danh sách nhân viên", "Couldn’t load staff"), L("Mất kết nối mạng", "Network connection lost"))}</div>`;
   else if (!list.length) table = `<div class="rounded-2xl border border-border bg-surface">${emptyLine(L("Chưa có nhân viên nào. Bấm Thêm nhân viên để tạo tài khoản đầu tiên.", "No staff yet. Use Add staff to create the first account."))}</div>`;
   else table = `<section class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4">
-    <table class="hidden w-full md:table"><thead><tr class="border-b border-border"><th class="px-5 py-3 text-left text-xs font-medium text-muted">${L("Họ tên", "Name")}</th><th class="px-4 py-3 text-left text-xs font-medium text-muted">${L("Kinh nghiệm", "Experience")}</th><th class="px-4 py-3 text-left text-xs font-medium text-muted">${L("Đăng nhập", "Sign-in")}</th><th class="px-5 py-3 text-right text-xs font-medium text-muted">${L("Lương giờ", "Hourly rate")}</th></tr></thead>
+    <table class="hidden w-full md:table"><thead><tr class="border-b border-border"><th class="px-5 py-3 text-left text-xs font-medium text-muted">${L("Họ tên", "Name")}</th><th class="px-4 py-3 text-left text-xs font-medium text-muted">${L("Vị trí thường đảm nhiệm", "Usual positions")}</th><th class="px-4 py-3 text-left text-xs font-medium text-muted">${L("Đăng nhập", "Sign-in")}</th><th class="px-4 py-3 text-right text-xs font-medium text-muted">${L("Lương cơ bản", "Base rate")}</th><th class="px-5 py-3 text-right text-xs font-medium text-muted">${L("Lương phụ trách", "Lead rate")}</th></tr></thead>
     <tbody class="divide-y divide-border">${list.map((s) => `<tr onclick="ui.staffEdit='${s.id}';render()" class="${cx("cursor-pointer hover:bg-surface-hover", ui.staffEdit === s.id && "bg-surface-hover")}"><td class="px-5 py-3"><span class="flex items-center gap-2"><span class="truncate text-sm font-medium">${esc(s.name)}</span>${s.left ? badge("neutral", L("Đã nghỉ", "Left")) : ""}</span><span class="mt-0.5 block text-xs tabular-nums text-muted">${s.phone}</span></td>
       <td class="px-4 py-3"><span class="flex flex-wrap gap-1.5">${s.q.length ? s.q.map((q) => `<span class="inline-flex items-center gap-1.5 text-xs">${posDot(q)}${posName(q)}</span>`).join('<span class="text-muted">·</span>') : '<span class="text-sm text-muted">—</span>'}</span></td>
       <td class="px-4 py-3 text-sm">${s.user ? `<span class="font-mono text-xs">${s.user}</span>` : `<span class="text-xs font-medium text-warn">${L("Chưa có mật khẩu", "No password yet")}</span>`}</td>
-      <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">${s.rate ? vnd(s.rate) : `<span class="text-muted">${L("Theo vị trí", "Position default")}</span>`}</td></tr>`).join("")}</tbody></table>
-    <ul class="divide-y divide-border md:hidden">${list.map((s) => `<li onclick="ui.staffEdit='${s.id}';render()" class="cursor-pointer px-4 py-3 hover:bg-surface-hover"><p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">${esc(s.name)}</span>${s.left ? badge("neutral", L("Đã nghỉ", "Left")) : ""}</p><p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">${s.q.map((q) => `<span class="inline-flex items-center gap-1">${posDot(q, "size-1.5")}${posName(q)}</span>`).join("") || "—"}<span class="ml-auto tabular-nums">${s.rate ? vnd(s.rate) : L("Theo vị trí", "Position default")}</span></p></li>`).join("")}</ul>
-    <div class="border-t border-border px-5 py-3 text-sm text-muted tabular-nums">${list.length} ${L("nhân viên", "staff")}</div></section>`;
-  return appShell(`<div class="space-y-4 p-4 sm:p-6"><div data-wf-block="2"><h1 class="sr-only">${L("Nhân viên", "Staff")}</h1>${tabs}<div class="border-b border-border-strong"></div></div>${ui.nvTab === "list" ? tools : ""}${table}</div>`, L("Nhân viên", "Staff"));
+      <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">${vnd(s.base)}</td>
+      <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">${leadCell(s)}</td></tr>`).join("")}</tbody></table>
+    <ul class="divide-y divide-border md:hidden">${list.map((s) => `<li onclick="ui.staffEdit='${s.id}';render()" class="cursor-pointer px-4 py-3 hover:bg-surface-hover"><p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">${esc(s.name)}</span>${s.left ? badge("neutral", L("Đã nghỉ", "Left")) : ""}</p><p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">${s.q.map((q) => `<span class="inline-flex items-center gap-1">${posDot(q, "size-1.5")}${posName(q)}</span>`).join("") || "—"}<span class="ml-auto tabular-nums">${vnd(s.base)}${canLeadShift(s) && s.lead ? ` · ${L("PT", "Lead")} ${vnd(s.lead)}` : ""}</span></p></li>`).join("")}</ul></section>`;
+  return appShell(`<div class="space-y-4 p-4 sm:p-6">${head}${tools}${table}</div>`, L("Nhân viên", "Staff"));
 }
 function staffForm() {
-  const isNew = ui.staffEdit === "new"; const s = isNew ? { name: "", nick: "", phone: "", q: [], user: "", rate: null, pw: null } : ST[ui.staffEdit];
+  const isNew = ui.staffEdit === "new"; const s = isNew ? { name: "", nick: "", phone: "", q: [], user: "", base: null, lead: null, pw: null } : ST[ui.staffEdit];
+  // Bản nháp của form: vị trí thường đảm nhiệm và công tắc Phụ trách đổi được, chỉ lưu khi bấm Lưu
+  if (!ui.sd || ui.sd.id !== ui.staffEdit) ui.sd = { id: ui.staffEdit, q: s.q.slice() };
+  const q = ui.sd.q, canLead = q.includes("pt");
   const field = (label, input, hint) => `<div class="space-y-1.5"><label class="block w-fit text-sm font-medium">${label}</label>${input}${hint ? `<p class="text-xs text-muted">${hint}</p>` : ""}</div>`;
-  return `<div class="flex items-start gap-2 border-b border-border px-6 pt-5 pb-4"><h2 class="min-w-0 flex-1 text-lg font-semibold">${isNew ? L("Thêm nhân viên", "Add staff") : esc(s.name)}</h2>${iconBtn("x", L("Đóng", "Close"), `onclick="ui.staffEdit=null;render()"`, "size-9")}</div>
+  const money = (v, label, ph = "0", id = "", bad = false) => `<label class="relative block"><span class="sr-only">${label}</span><input ${id ? `id="${id}" oninput="ui.sd.err='';this.classList.remove('border-err-text')"` : ""} value="${v ? v.toLocaleString("vi-VN") : ""}" placeholder="${ph}" inputmode="numeric" class="${cx(INPUT, "pr-16 text-right tabular-nums", bad && "border-err-text")}" /><span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted">đ/${L("giờ", "h")}</span></label>`;
+  const chips = POSITIONS.filter((p) => !p.lead).map((p) => { const on = q.includes(p.id); return `<button type="button" aria-pressed="${on}" onclick="toggleStaffPos('${p.id}')" class="${cx("inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${hrsTag(hrsAt(s, p.id))}</button>`; }).join("");
+  const sw = `<button type="button" role="switch" aria-checked="${canLead}" aria-labelledby="lead-label" onclick="toggleStaffPos('pt')" class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-muted/40 p-0.5 outline-hidden before:absolute before:-inset-2 transition-colors hover:bg-muted/60 aria-checked:bg-primary aria-checked:hover:bg-primary-hover"><span class="size-5 rounded-full bg-surface shadow-sm transition-transform group-aria-checked:translate-x-5 group-aria-checked:bg-primary-foreground motion-reduce:transition-none"></span></button>`;
+  return `<div class="flex items-center gap-2 border-b border-border px-4 pt-4 pb-3">${iconBtn("x", L("Đóng", "Close"), `onclick="closeStaff()"`, "size-9")}<h2 class="min-w-0 flex-1 truncate text-lg font-semibold">${isNew ? L("Thêm nhân viên", "Add staff") : esc(s.name)}</h2></div>
     <div class="flex-1 space-y-5 overflow-y-auto px-6 py-6">
-      ${field(`${L("Họ tên", "Full name")} <span class="text-red-500">*</span>`, `<input class="${INPUT}" value="${esc(s.name)}" />`)}
-      ${field(L("Biệt danh", "Nickname"), `<input class="${INPUT}" value="${esc(s.nick)}" placeholder="${L("Tự đề xuất: tên + chữ đầu của họ", "Suggested: given name + family initial")}" />`, L("Chỉ hiện trên lịch tuần. Không trùng với người đang làm.", "Shown only on the schedule. Must be unique among active staff."))}
+      ${field(`${L("Họ tên", "Full name")} <span class="text-err-text">*</span>`, `<input class="${INPUT}" value="${esc(s.name)}" />`)}
+      ${field(L("Biệt danh", "Nickname"), `<input class="${INPUT}" value="${esc(s.nick)}" placeholder="${L("Tự đề xuất: tên + chữ đầu của họ", "Suggested: given name + family initial")}" />`)}
       ${field(L("Điện thoại", "Phone"), `<input class="${INPUT} tabular-nums" value="${esc(s.phone)}" inputmode="tel" />`)}
-      <fieldset class="space-y-2"><legend class="mb-2 text-sm font-medium">${L("Kinh nghiệm", "Experience")}</legend><div class="flex flex-wrap gap-1.5">${POSITIONS.map((p) => { const on = s.q.includes(p.id); return `<button type="button" aria-pressed="${on}" class="${cx("inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden", on ? "bg-foreground/10 text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${posDot(p.id)}${L(p.vi, p.en)}</button>`; }).join("")}</div><p class="text-xs text-muted">${L("Chỉ để gợi ý khi xếp, không chặn.", "A hint for scheduling, never a block.")}</p></fieldset>
-      <fieldset class="space-y-2.5"><legend class="mb-2 text-sm font-medium">${L("Lương giờ", "Hourly rate")}</legend>
-        <label class="flex cursor-pointer items-center gap-3 text-sm"><input type="radio" name="rate" ${s.rate ? "" : "checked"} class="size-5 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary" />${L("Theo vị trí chính của ca", "From the shift’s primary position")}</label>
-        <label class="flex cursor-pointer items-center gap-3 text-sm"><input type="radio" name="rate" ${s.rate ? "checked" : ""} class="size-5 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary" />${L("Lương riêng", "Own rate")}</label>
-        ${s.rate ? `<label class="relative ml-8 block w-44"><input value="${s.rate.toLocaleString("vi-VN")}" class="${INPUT} pr-16 text-right tabular-nums" /><span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted">đ/${L("giờ", "h")}</span></label>` : ""}</fieldset>
+      <fieldset class="space-y-2"><legend class="mb-2 text-sm font-medium">${L("Vị trí thường đảm nhiệm", "Usual positions")}</legend><div class="flex flex-wrap gap-1.5">${chips}</div>${ui.sd.cap ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.cap}</p>` : ""}</fieldset>
+      <fieldset class="space-y-4"><legend class="mb-2 text-sm font-medium">${L("Lương giờ", "Hourly rate")}</legend>
+        <div class="sm:w-1/2 sm:pr-1.5">${field(`${L("Cơ bản", "Base")} <span class="text-err-text">*</span>`, money(s.base, L("Lương cơ bản", "Base rate")))}</div>
+        <div class="flex items-center justify-between gap-4"><p id="lead-label" class="flex items-baseline gap-1.5 text-sm font-medium">${L("Phụ trách", "Shift lead")}${hrsTag(hrsAt(s, "pt"))}</p>${sw}</div>
+        ${canLead ? `<div class="space-y-1.5 sm:w-1/2 sm:pr-1.5">${field(`${L("Lương phụ trách", "Lead rate")} <span class="text-err-text">*</span>`, money(s.lead, L("Lương phụ trách", "Lead rate"), "0", "lead-rate", ui.sd.err))}${ui.sd.err ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.err}</p>` : ""}</div>` : ""}</fieldset>
       <div class="space-y-4 border-t border-border pt-5"><h3 class="text-sm font-semibold">${L("Đăng nhập", "Sign-in")}</h3>
         ${field(L("Tên đăng nhập", "Username"), `<input class="${INPUT} font-mono" value="${esc(s.user)}" />`)}
         ${field(L("Mật khẩu", "Password"), `<div class="flex gap-2"><input class="${INPUT} font-mono" placeholder="${L("Gõ hoặc tạo mật khẩu mới", "Type or generate a new password")}" />${btn("outline", L("Tạo", "Generate"), { icon: "wand-sparkles", extra: "min-h-11 md:min-h-10 shrink-0" })}</div>`, s.pw ? L(`Đặt lần cuối ${s.pw}. Mật khẩu chỉ hiện tới khi đóng hồ sơ.`, `Last set ${s.pw}. Shown only until you close this record.`) : L("Chưa có mật khẩu. Đặt xong thì gửi cho nhân viên qua Zalo.", "No password yet. Send it to them on Zalo once set."))}
       </div>
       ${isNew || s.left ? "" : `<div class="border-t border-border pt-5"><div class="flex items-center justify-between gap-4"><div><p class="text-sm font-medium">${L("Vô hiệu hoá tài khoản", "Deactivate account")}</p><p class="mt-1 text-sm text-muted">${L("Mất quyền đăng nhập, giữ lịch sử. Ca tương lai được giữ lại và báo cần người thay.", "Revokes sign-in, keeps history. Future shifts stay and are flagged for cover.")}</p></div>${btn("danger", L("Vô hiệu hoá", "Deactivate"), { extra: "shrink-0" })}</div></div>`}
     </div>
-    <div class="flex justify-end gap-2 border-t border-border px-6 py-4">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.staffEdit=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", isNew ? L("Tạo tài khoản", "Create account") : L("Lưu", "Save"), { extra: "min-h-11 md:min-h-10" })}</div>`;
+    <div class="flex justify-end gap-2 border-t border-border px-6 py-4">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="closeStaff()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", isNew ? L("Tạo tài khoản", "Create account") : L("Lưu", "Save"), { attrs: `onclick="saveStaff()"`, extra: "min-h-11 md:min-h-10" })}</div>`;
 }
+// Tối đa hai vị trí thường đảm nhiệm (FR-A12), không tính Phụ trách: chip thứ ba không thêm được, báo lý do thay vì khoá nút
+function toggleStaffPos(id) {
+  const q = ui.sd.q, i = q.indexOf(id);
+  ui.sd.err = ""; ui.sd.cap = "";
+  if (i >= 0) q.splice(i, 1);
+  else if (!isLead(id) && q.filter((x) => !isLead(x)).length >= USUAL_MAX) ui.sd.cap = L("Tối đa 2 vị trí thường đảm nhiệm. Bỏ một vị trí trước khi chọn vị trí khác.", "At most 2 usual positions. Remove one before choosing another.");
+  else q.push(id);
+  render();
+}
+// Lưu (chỉ đổi dữ liệu mẫu): bật Phụ trách mà chưa nhập lương phụ trách thì báo ngay tại ô, không lưu
+function saveStaff() {
+  const lead = ui.sd.q.includes("pt") ? Number((document.getElementById("lead-rate")?.value || "").replace(/\D/g, "")) : null;
+  if (ui.sd.q.includes("pt") && !lead) { ui.sd.err = L("Nhập lương phụ trách, hoặc tắt Phụ trách.", "Enter a lead rate, or turn Shift lead off."); return render(); }
+  if (ui.staffEdit !== "new") Object.assign(ST[ui.staffEdit], { q: ui.sd.q.slice(), lead });
+  closeStaff();
+}
+function closeStaff() { ui.staffEdit = null; ui.sd = null; render(); }
 
 // ===================================================================
 // MÀN 6 · NHẬT KÝ (NFR-1)
@@ -956,9 +1006,9 @@ function screenNk() {
   const loading = S.tt === "dang-tai", err = S.tt === "loi", empty = S.tt === "rong";
   const tx = (v) => (Array.isArray(v) ? L(v[0], v[1]) : v || "—");
   const who = (r) => (r.who === "system" ? `<span class="text-muted">${L("Hệ thống", "System")}</span>` : L("Chủ quán", "Owner"));
-  const tools = `<div class="flex flex-wrap items-center gap-2" data-wf-block="2"><h1 class="mr-2 text-xl font-semibold">${L("Nhật ký thay đổi", "Activity log")}</h1>
-    <label class="relative block w-full sm:ml-auto sm:w-64"><span class="sr-only">${L("Tìm", "Search")}</span><i data-lucide="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"></i><input type="search" placeholder="${L("Tìm theo tên nhân viên", "Search by staff name")}" class="${INPUT} pl-10" /></label>
-    ${selectBtn(L("Loại:", "Type:"), L("Tất cả", "All"))}${selectBtn(L("Khoảng:", "Range:"), L("7 ngày qua", "Last 7 days"))}</div>`;
+  const tools = `<div class="flex flex-wrap items-center gap-2" data-wf-block="2"><h1 class="mr-2 w-full text-xl font-semibold lg:w-auto">${L("Nhật ký thay đổi", "Activity log")}</h1>
+    <label class="relative block w-full sm:w-64 lg:ml-auto"><span class="sr-only">${L("Tìm", "Search")}</span><i data-lucide="search" class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"></i><input type="search" placeholder="${L("Tìm theo tên nhân viên", "Search by staff name")}" class="${INPUT} pl-10" /></label>
+    <div class="flex flex-wrap gap-2">${selectBtn(L("Loại:", "Type:"), L("Tất cả", "All"))}${selectBtn(L("Khoảng:", "Range:"), L("7 ngày qua", "Last 7 days"))}</div></div>`;
   let body;
   if (loading) body = `<ul aria-busy="true" class="divide-y divide-border">${Array.from({ length: 8 }, (_, i) => `<li class="flex gap-4 px-5 py-3.5">${skel("w-20")}<div class="flex-1 space-y-2">${skel(["w-1/2", "w-2/5", "w-1/3"][i % 3])}${skel("w-1/4")}</div></li>`).join("")}</ul>`;
   else if (err) body = errorBlock(L("Không tải được nhật ký", "Couldn’t load the log"), L("Mất kết nối mạng", "Network connection lost"));
@@ -1024,7 +1074,6 @@ function popContent() {
       ${m("border-dashed border-foreground/35 bg-surface text-muted opacity-55", L("Chưa đăng ký gì, tính là rảnh (ẩn mặc định)", "Didn’t register, counted as free (hidden by default)"))}
       ${m("border-foreground/40 bg-foreground/10 text-foreground", L("Đã xếp, chưa có vị trí", "Placed, no position"))}
       ${m("border-p4-bd bg-p4-bg text-p4-tx", L("Đã xếp, màu là vị trí", "Placed, colour is the position"))}
-      ${m("border-p7-bd text-p7-tx", L("Kiêm hai vị trí", "Two positions"), "background:linear-gradient(90deg,var(--p7-bg) 50%,var(--p5-bg) 50%)")}
       <li class="flex items-center gap-3"><span class="inline-flex h-6 w-14 items-center justify-center gap-1 rounded-full border border-foreground/25 bg-surface text-xs font-medium text-foreground/80"><svg viewBox="0 0 24 24" class="size-3 shrink-0 fill-(--star)" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>Mai</span><span class="text-sm">${L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week")}</span></li>
       <li class="flex items-center gap-3"><span class="relative inline-flex h-6 w-14 items-center justify-center rounded-full border border-p4-bd bg-p4-bg text-xs font-medium text-p4-tx">Mai<span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-warn-dot ring-2 ring-surface"></span></span><span class="text-sm">${L("Ngoài lịch rảnh, chưa có kinh nghiệm, hoặc giờ riêng chưa quyết", "Outside availability, no experience, or own times not decided")}</span></li>
       <li class="flex items-center gap-3"><span class="inline-flex h-6 w-14 items-center justify-center gap-1 rounded-full border border-foreground/25 bg-surface text-xs font-medium text-foreground/80">Mai${ic("clock", "size-3 opacity-80")}</span><span class="text-sm">${L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)")}</span></li>
@@ -1052,8 +1101,8 @@ function dialogContent() {
     const g = gateItems(); const ok = !g.noShift.length && !g.noPos.length;
     return `<div class="flex items-start gap-2 px-6 pt-5 pb-2"><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Công bố lịch tuần 12–18/10?", "Publish week 12–18 Oct?")}</h2><p class="mt-2 text-sm/6 text-pretty text-muted">${ok ? L("Nhân viên sẽ thấy ca của mình ngay. Sau đó mỗi thay đổi có hiệu lực ngay, không công bố lại.", "Staff see their shifts right away. Later changes apply immediately; no re-publishing.") : L("Xong các mục dưới đây thì công bố được.", "Resolve the items below to publish.")}</p></div>${iconBtn("x", L("Đóng", "Close"), `onclick="ui.dialog=null;render()"`, "size-9")}</div>
       <div class="max-h-[55vh] space-y-5 overflow-y-auto px-6 py-4">
-        ${g.noShift.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Chưa có ca nào", "No shift at all")} <span class="font-normal text-muted">${g.noShift.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noShift.map((s) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 truncate text-sm">${esc(s.name)}</span>${btn("outline", L("Xếp", "Place"), { attrs: `onclick="gatePlace('${s.id}')"`, extra: "h-8 min-h-8 rounded-lg px-3" })}<button type="button" onclick="openPop(event,'skip','${s.id}')" class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg px-2.5 text-sm font-medium text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${L("Bỏ qua tuần này", "Skip this week")}${ic("chevron-down", "size-3.5")}</button></li>`).join("")}</ul></section>` : ""}
-        ${g.noPos.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Ca chưa có vị trí", "Shifts with no position")} <span class="font-normal text-muted">${g.noPos.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noPos.map(({ s, d, r }) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 truncate text-sm">${esc(s.name)} <span class="text-muted tabular-nums">· ${dayFull(d)} · ${PERIODS[r.from].from}–${PERIODS[r.to].to}</span></span>${btn("outline", L("Gán vị trí", "Give position"), { attrs: `onclick="ui.dialog=null;openPanel('${s.id}',${d},${r.from})"`, extra: "h-8 min-h-8 rounded-lg px-3" })}</li>`).join("")}</ul></section>` : ""}
+        ${g.noShift.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Chưa có ca nào", "No shift at all")} <span class="font-normal text-muted">${g.noShift.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noShift.map((s) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 text-sm">${esc(s.name)}</span>${btn("outline", L("Xếp", "Place"), { attrs: `onclick="gatePlace('${s.id}')"`, extra: "h-8 min-h-8 rounded-lg px-3" })}<button type="button" onclick="openPop(event,'skip','${s.id}')" class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg px-2.5 text-sm font-medium text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${L("Bỏ qua tuần này", "Skip this week")}${ic("chevron-down", "size-3.5")}</button></li>`).join("")}</ul></section>` : ""}
+        ${g.noPos.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Ca chưa có vị trí", "Shifts with no position")} <span class="font-normal text-muted">${g.noPos.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noPos.map(({ s, d, r }) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 text-sm">${esc(s.name)} <span class="text-muted tabular-nums">· ${dayFull(d)} · ${PERIODS[r.from].from}–${PERIODS[r.to].to}</span></span>${btn("outline", L("Gán vị trí", "Give position"), { attrs: `onclick="ui.dialog=null;openPanel('${s.id}',${d},${r.from})"`, extra: "h-8 min-h-8 rounded-lg px-3" })}</li>`).join("")}</ul></section>` : ""}
         ${[...ui.skipped].length ? `<p class="text-sm text-muted">${L("Đã bỏ qua", "Skipped")}: ${[...ui.skipped].map(([id, r]) => `${esc(ST[id].name)} (${r})`).join(", ")}</p>` : ""}
       </div>
       <div class="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Công bố", "Publish"), { attrs: `${ok ? "" : "disabled"} onclick="location.href='${link("tt", "cong-bo")}'"`, extra: "min-h-11 md:min-h-10" })}</div>`;
@@ -1070,7 +1119,7 @@ function dialogContent() {
     const opts = [[L("Xác nhận đến đúng giờ", "Confirm on time"), L("Bỏ cả trừ giờ lẫn tính trễ", "Clears deduction and late flag")], [L(`Trừ đủ ${t.late * 2} phút`, `Deduct full ${t.late * 2} min`), ""], [L("Trừ ít hơn", "Deduct less"), ""], [L("Sửa giờ đến", "Correct arrival time"), ""], [L("Không đi làm", "Didn’t work"), L("Ca này 0 giờ, không tính lương", "Shift counts 0 hours, unpaid")]];
     return `<div class="flex items-start gap-4 px-6 pt-6"><div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-err-bg">${ic("triangle-alert", "size-5 text-err")}</div><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Ca bất thường", "Anomaly")}</h2><p class="mt-2 text-sm/6 text-muted"><span class="font-medium text-foreground">${esc(s.name)}</span> · ${sh.from}–${sh.to} · ${L(`đến ${sh.arrive}, trễ ${t.late} phút. Khoản trừ ${t.late * 2} phút dài hơn cả ca, nên chưa trừ gì.`, `arrived ${sh.arrive}, ${t.late} min late. The ${t.late * 2}-minute deduction exceeds the shift, so nothing was applied.`)}</p></div></div>
       <fieldset class="space-y-1 px-6 pt-5"><legend class="sr-only">${L("Cách xử lý", "Resolution")}</legend>${opts.map(([a, b], i) => `<label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"><input type="radio" name="an" ${i === 0 ? "checked" : ""} class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary" /><span><span class="block text-sm font-medium">${a}</span>${b ? `<span class="block text-xs text-muted">${b}</span>` : ""}</span></label>`).join("")}</fieldset>
-      <div class="space-y-1.5 px-6 pt-3"><label class="block w-fit text-sm font-medium">${L("Lý do", "Reason")} <span class="text-red-500">*</span></label><input class="${INPUT}" placeholder="${L("VD: máy chấm công hỏng lúc giao ca", "e.g. device was down at changeover")}" /></div>
+      <div class="space-y-1.5 px-6 pt-3"><label class="block w-fit text-sm font-medium">${L("Lý do", "Reason")} <span class="text-err-text">*</span></label><input class="${INPUT}" placeholder="${L("VD: máy chấm công hỏng lúc giao ca", "e.g. device was down at changeover")}" /></div>
       <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Lưu cách xử lý", "Save resolution"), { extra: "min-h-11 md:min-h-10" })}</div>`;
   }
   if (dl.id === "record") {
@@ -1086,9 +1135,9 @@ function dialogContent() {
       <div class="px-6 pt-4">${segmented([["time", L("Đổi giờ, về sớm", "Change times")], ["swap", L("Đổi ca", "Swap")]], ui.shiftTab, "setShiftTab", L("Loại", "Kind"))}</div>
       ${ui.shiftTab === "time" ? `<div class="grid grid-cols-2 gap-3 px-6 pt-4"><div class="space-y-1.5"><label class="block text-sm font-medium">${L("Từ", "From")}</label><input class="${INPUT} tabular-nums" value="${from}" /></div><div class="space-y-1.5"><label class="block text-sm font-medium">${L("Đến", "To")}</label><input class="${INPUT} tabular-nums border-focus ring-2 ring-focus" value="09:30" /></div></div>
         <div class="mx-6 mt-4 flex gap-3 rounded-xl border border-warn-bg bg-warn-bg p-3">${ic("triangle-alert", "mt-0.5 size-4 text-warn")}<p class="text-sm"><span class="font-medium text-warn">${L("Về sớm 90 phút, cần người làm thay", "Leaving 90 min early needs cover")}</span></p></div>
-        <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Người làm thay 09:30–" + to, "Cover 09:30–" + to)} <span class="text-red-500">*</span></label>${selectBtn("", `<span class="font-normal text-muted">${L("Chọn người rảnh giờ này", "Choose someone free then")}</span>`, "", "w-full justify-between")}</div>`
+        <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Người làm thay 09:30–" + to, "Cover 09:30–" + to)} <span class="text-err-text">*</span></label>${selectBtn("", `<span class="font-normal text-muted">${L("Chọn người rảnh giờ này", "Choose someone free then")}</span>`, "", "w-full justify-between")}</div>`
       : `<div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Đổi với", "Swap with")}</label>${selectBtn("", "Lê Minh Anh · T5 15/10 · 07:00–13:00", "", "w-full justify-between")}<p class="text-xs text-muted">${L("Hai ca đổi người cho nhau trong một lần lưu.", "Both shifts change hands in one save.")}</p></div>`}
-      <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Lý do", "Reason")} <span class="text-red-500">*</span></label><input class="${INPUT}" placeholder="${L("VD: việc gia đình, đã báo qua Zalo", "e.g. family matter, agreed on Zalo")}" /></div>
+      <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Lý do", "Reason")} <span class="text-err-text">*</span></label><input class="${INPUT}" placeholder="${L("VD: việc gia đình, đã báo qua Zalo", "e.g. family matter, agreed on Zalo")}" /></div>
       <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Lưu", "Save"), { extra: "min-h-11 md:min-h-10" })}</div>`;
   }
   return "";
@@ -1103,10 +1152,13 @@ function renderLayer() {
     html += `<div class="fixed inset-0 z-[55]" onclick="closePop()"></div><div data-pop class="wt-fade fixed z-[60] max-h-[calc(100vh-1rem)] overflow-y-auto rounded-2xl border border-border bg-surface-overlay py-1 shadow-popover" style="top:${Math.min(r.bottom + 8, innerHeight - 120)}px;left:${left}px;width:${w}px">${inner}</div>`;
   }
   if (ui.dialog) html += `<div class="fixed inset-0 z-[45] flex items-start justify-center bg-black/30 p-4 pt-16 sm:pt-[8vh]" onclick="if(event.target===this){ui.dialog=null;render()}"><div role="dialog" aria-modal="true" class="wt-fade w-full max-w-lg overflow-hidden rounded-2xl border border-border bg-surface shadow-modal">${dialogContent()}</div></div>`;
-  const narrow = innerWidth < 1024;
-  if (S.man === "lich" && narrow && ui.panel && S.tt !== "dang-tai" && S.tt !== "loi") html += `<div class="fixed inset-0 z-40 bg-black/15" onclick="closePanel()"></div><div role="dialog" class="wt-sheet fixed inset-x-0 bottom-0 z-40 flex max-h-[85vh] flex-col rounded-t-2xl border-t border-border bg-surface shadow-modal" data-wf-block="5"><div class="mx-auto mt-2 h-1 w-10 rounded-full bg-foreground/15"></div>${panelBody(true)}</div>`;
+  const narrow = innerWidth < 1280;
+  if (S.man === "lich" && narrow && ui.panel && S.tt !== "dang-tai" && S.tt !== "loi") html += `<div class="fixed inset-0 z-40 bg-black/15 xl:hidden" onclick="closePanel()"></div><div role="dialog" class="wt-sheet fixed inset-x-0 bottom-0 z-40 flex max-h-[85vh] flex-col xl:hidden rounded-t-2xl border-t border-border bg-surface shadow-modal" data-wf-block="5"><div class="mx-auto mt-2 h-1 w-10 rounded-full bg-foreground/15"></div>${panelBody(true)}</div>`;
   if (S.man === "lich" && ui.sheet === "staff") html += `<div class="fixed inset-0 z-40 bg-black/15" onclick="ui.sheet=null;render()"></div><div class="wt-sheet fixed inset-x-0 bottom-0 z-40 flex max-h-[85vh] flex-col rounded-t-2xl border-t border-border bg-surface shadow-modal"><div class="mx-auto mt-2 h-1 w-10 rounded-full bg-foreground/15"></div><div class="flex items-center px-5 pt-3 pb-2"><h2 class="text-lg font-semibold">${L("Nhân viên", "Staff")}</h2><span class="ml-auto">${iconBtn("x", L("Đóng", "Close"), `onclick="ui.sheet=null;render()"`, "size-9")}</span></div><div class="overflow-y-auto px-4 pb-6">${staffList(true)}</div></div>`;
-  if (S.man === "nv" && ui.staffEdit) html += `<div class="fixed inset-0 z-40 bg-black/15" onclick="ui.staffEdit=null;render()"></div><aside class="wt-fade fixed inset-y-0 right-0 z-40 flex w-full flex-col border-l border-border bg-surface shadow-modal sm:w-[28rem]" data-wf-block="5">${staffForm()}</aside>`;
+  // Panel hồ sơ nằm trên cả thanh công cụ của wireframe (z 55), để đầu panel không bị che.
+  // Nút » giữa mép trái đóng panel như nút ✕ (ẩn khi panel rộng hết màn điện thoại).
+  if (S.man === "nv" && ui.staffEdit) html += `<div class="fixed inset-0 z-[55] bg-black/15" onclick="closeStaff()"></div><aside class="wt-fade fixed inset-y-0 right-0 z-[55] flex w-full flex-col border-l border-border bg-surface shadow-modal sm:w-[28rem]" data-wf-block="5">
+    <button type="button" onclick="closeStaff()" aria-label="${L("Đóng", "Close")}" title="${L("Đóng", "Close")}" class="absolute top-1/2 -left-4 z-10 hidden size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-border-strong bg-surface text-muted shadow-popover outline-hidden transition-colors before:absolute before:-inset-1 hover:bg-surface-hover hover:text-foreground sm:flex">${ic("chevrons-right", "size-4")}</button>${staffForm()}</aside>`;
   layer.innerHTML = html;
 }
 
@@ -1135,8 +1187,17 @@ function closePanel() { ui.panel = null; render(); }
 function panelDay(dir) { const days = visibleDays(); const i = days.indexOf(ui.panel.d) + dir; if (days[i] != null) { ui.panel.d = days[i]; ui.panel.sel = new Set(); ui.panelMsg = ""; render(); } }
 function togglePeriod(p) { const s = ui.panel.sel; s.has(p) ? s.delete(p) : s.add(p); ui.panelMsg = ""; render(); }
 function quickSel(k) { const s = ST[ui.panel.sid], d = ui.panel.d; ui.panel.sel = new Set(k === "all" ? [0, 1, 2, 3, 4] : k === "none" ? [] : PERIODS.filter((p) => regKind(s, d, p.i) !== "no").map((p) => p.i)); ui.panelMsg = ""; render(); }
-function pickPos(id) { const i = ui.posPick.indexOf(id); i >= 0 ? ui.posPick.splice(i, 1) : ui.posPick.push(id); ui.subPick = ui.subPick.filter((s) => ui.posPick.some((p) => POS[p].subs.some((x) => x[0] === s))); ui.panelMsg = ""; render(); }
-function pickSub(id) { const i = ui.subPick.indexOf(id); i >= 0 ? ui.subPick.splice(i, 1) : ui.subPick.push(id); render(); }
+// Một ca chỉ một vị trí (góp ý 17/10): chọn vị trí khác là thay, bấm lại vị trí đang chọn là bỏ
+function pickPos(id) { ui.posPick = ui.posPick[0] === id ? [] : [id]; ui.subPick = ui.subPick.filter((s) => ui.posPick.some((p) => POS[p].subs.some((x) => x[0] === s))); ui.panelMsg = ""; render(); }
+function pickSub(id) {
+  const i = ui.subPick.indexOf(id); const parent = POSITIONS.find((p) => p.subs.some((x) => x[0] === id));
+  if (i >= 0) ui.subPick.splice(i, 1);
+  // Vị trí con bắt buộc (Phụ trách: Trong / Ngoài) chọn đúng một: chọn cái này thì bỏ cái kia
+  else { if (parent?.subRequired) ui.subPick = ui.subPick.filter((s) => !parent.subs.some((x) => x[0] === s)); ui.subPick.push(id); }
+  ui.panelMsg = ""; render();
+}
+// Vị trí đã chọn mà thiếu vị trí con bắt buộc
+const missingSub = () => ui.posPick.filter((pid) => POS[pid].subRequired && !ui.subPick.some((s) => POS[pid].subs.some((x) => x[0] === s)));
 function toggleSec(k) { ui.secClosed.has(k) ? ui.secClosed.delete(k) : ui.secClosed.add(k); render(); }
 function setSaveAs(v) { ui.saveAs = v; render(); }
 // Lưu và Bỏ khỏi ca luôn bấm được (góp ý 10/10). Không chọn ca nào = bỏ khỏi mọi ca trong ngày, có hộp xác nhận.
@@ -1147,6 +1208,7 @@ function panelAct(kind) {
     if (!Object.keys(day).length) { ui.panelMsg = L("Người này chưa có ca nào trong ngày. Chọn ca để xếp.", "They have no shift this day. Choose a shift to place them."); return render(); }
     return openDialog("removeDay");
   }
+  if (kind === "save" && missingSub().length) { const m = POS[missingSub()[0]]; ui.panelMsg = L(`${m.vi} cần chọn ${m.subs.map((x) => x[1]).join(" hoặc ")}.`, `${m.en} needs ${m.subs.map((x) => x[2]).join(" or ")}.`); return render(); }
   if (kind === "save" && published() && !ui.posPick.length) { ui.panelMsg = L("Ca đã công bố phải có vị trí. Chọn vị trí rồi Lưu.", "A published shift needs a position. Choose one, then Save."); return render(); }
   snapshot();
   const cu = customAt(s, d);
@@ -1267,7 +1329,6 @@ function saveRanh() {
   if (cDirty()) { const { d, p } = ui.cOpen; ui.footMsg = L(`Còn giờ riêng chưa lưu ở ${dayShort(d)} ${PERIODS[p].code}. Lưu hoặc Huỷ trước.`, `Unsaved own times on ${dayShort(d)} ${PERIODS[p].code}. Save or cancel first.`); ui.cMsg = L("Lưu hoặc Huỷ giờ riêng trước.", "Save or cancel these own times first."); return render(); }
   ui.footMsg = ""; ui.ranhSaved = structuredClone(ui.ranh); ui.customSaved = structuredClone(ui.custom); ui.notesSaved = { ...ui.notes }; ui.savedAt = L("vừa xong", "just now"); render(); }
 function discardRanh() { ui.cOpen = null; ui.cMsg = ""; ui.footMsg = ""; ui.dayMsg = null; ui.ranh = structuredClone(ui.ranhSaved); ui.custom = structuredClone(ui.customSaved); ui.notes = { ...ui.notesSaved }; ui.noteOpen.clear(); render(); }
-function setNvTab(v) { ui.nvTab = v; render(); }
 function setShiftTab(v) { ui.shiftTab = v; render(); }
 function setLang(v) { location.href = link("lang", v); }
 function noop() {}
@@ -1310,7 +1371,7 @@ document.addEventListener("mouseover", (e) => {
   tip.style.top = `${r.bottom + 6 + tip.offsetHeight > innerHeight ? r.top - tip.offsetHeight - 6 : r.bottom + 6}px`;
 });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { ui.pop = null; ui.dialog = null; ui.drawer = false; ui.sheet = null; render(); return; }
+  if (e.key === "Escape") { ui.pop = null; ui.dialog = null; ui.drawer = false; ui.sheet = null; ui.staffEdit = null; ui.sd = null; render(); return; }
   // Ctrl+Z / Ctrl+Y (và Ctrl+Shift+Z) trên Lịch tuần; không chặn khi đang gõ trong ô nhập
   if (S.man !== "lich" || !(e.ctrlKey || e.metaKey) || e.target.closest?.("input, textarea")) return;
   const k = e.key.toLowerCase();
@@ -1338,7 +1399,7 @@ function placeBlockNumbers() {
 addEventListener("resize", () => { placeBlockNumbers(); });
 
 // Mặc định: mở sẵn panel của một người để thấy khuôn panel (chỉ ở desktop)
-if (S.man === "lich" && !FRAME && ["du-lieu", "chua-vi-tri", "cong-bo", "mo-dk"].includes(S.tt) && innerWidth >= 1024) openPanel("s1", 2, 2);
+if (S.man === "lich" && !FRAME && ["du-lieu", "chua-vi-tri", "cong-bo", "mo-dk"].includes(S.tt) && innerWidth >= 1280) openPanel("s1", 2, 2);
 buildBar();
 buildReason();
 render();

@@ -1,6 +1,6 @@
-# Neighbouring periods with the same positions form one assignment
+# Neighbouring periods with the same position form one assignment
 
-When the Administrator places a staff member in shift periods on a day, each unbroken run of neighbouring periods with the same positions (including position details) is stored as **one assignment**. A change of position between neighbours splits the run. The assignment is the unit for coverage, the double-booking check, lateness recording, and the deduction and anomaly thresholds.
+When the Administrator places a staff member in shift periods on a day, each unbroken run of neighbouring periods with the same position (including its position details) is stored as **one assignment**. A change of position between neighbours splits the run. Since v1.10 a period carries one position per person ([ADR 0020](0020-one-position-per-period.md)). The assignment is the unit for coverage, the double-booking check, lateness recording, and the deduction and anomaly thresholds.
 
 ## Consequences
 

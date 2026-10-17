@@ -1,8 +1,15 @@
 // Dữ liệu mẫu cho wireframe. Toàn bộ là giả; có cố ý ca biên: tên dài, hai người tên Mai,
 // người rảnh cả tuần (không đăng ký), người đăng ký đủ mọi ca, người thiếu giờ, người chưa có
-// kinh nghiệm nào, người đã nghỉ còn ca, ca xếp ngoài lịch rảnh, ca kiêm hai vị trí, ca chưa có vị trí.
+// kinh nghiệm nào, người đã nghỉ còn ca, ca xếp ngoài lịch rảnh, ca chưa có vị trí, người bị tắt Phụ trách còn ca phụ trách.
+// Góp ý 17/10: trong một ca (CA1–CA5) mỗi người làm đúng một vị trí; nhiều ca trong ngày thì mỗi ca một vị trí được.
+// asg[...].pos vẫn là mảng nhưng luôn có tối đa một phần tử.
 
+// Phụ trách (góp ý 16–17/10): một vị trí cha, bắt buộc chọn đúng một vị trí con Trong hoặc Ngoài (subRequired).
+// Chỉ người được chủ bật "Phụ trách" trong hồ sơ (q có "pt", kèm lương phụ trách bắt buộc) mới xếp được vào vị trí này.
+// Giờ làm ở vị trí Phụ trách tính theo lương phụ trách của từng người (lead: true), Trong hay Ngoài như nhau;
+// mọi vị trí khác tính theo lương cơ bản.
 const POSITIONS = [
+  { id: "pt", n: 8, vi: "Phụ trách", en: "Shift lead", subs: [["pttrong", "Trong", "Inside"], ["ptngoai", "Ngoài", "Outside"]], lead: true, subRequired: true },
   { id: "qc", n: 1, vi: "QC", en: "QC", subs: [["trong", "Trong", "Inside"], ["ngoai", "Ngoài", "Outside"]] },
   { id: "tnoff", n: 2, vi: "Thu Ngân – Offline", en: "Cashier – In-store", subs: [] },
   { id: "tnon", n: 3, vi: "Thu Ngân – Online", en: "Cashier – Online", subs: [] },
@@ -43,36 +50,45 @@ const NEED = [
 ];
 // Rải số người cần của một ca ra từng vị trí (FR-O1): ca ít người thì lấy vị trí đầu danh sách trước,
 // nên tổng theo vị trí luôn bằng NEED của ca đó.
-const NEED_FILL = ["pc", "pv", "tnoff", "qc", "bep", "tnon", "ktd", "pc", "pv"];
+const NEED_FILL = ["pt", "pt", "pc", "pv", "tnoff", "qc", "bep", "tnon", "ktd", "pc", "pv"];
 
 const STAFF = [
-  { id: "s1", name: "Nguyễn Thị Mai", nick: "Mai N", q: ["qc", "tnoff"], type: "some", phone: "0903 112 448", user: "mai.nguyen", rate: null, pw: "02/10/2026" },
-  { id: "s2", name: "Trần Thị Mai", nick: "Mai T", q: ["pc"], type: "some", phone: "0938 554 210", user: "mai.tran", rate: 27000, pw: "02/10/2026" },
-  { id: "s3", name: "Lê Minh Anh", nick: "Minh Anh", q: ["pc", "qc"], type: "some", phone: "0912 668 031", user: "minhanh", rate: null, pw: "28/09/2026" },
-  { id: "s4", name: "Phạm Quốc Bảo", nick: "Bảo", q: ["pv", "bep"], type: "some", phone: "0977 201 556", user: "bao.pham", rate: null, pw: "28/09/2026" },
-  { id: "s5", name: "Võ Thanh Hằng", nick: "Hằng", q: ["tnon"], type: "some", phone: "0909 430 118", user: "hang.vo", rate: null, pw: "28/09/2026" },
-  { id: "s6", name: "Đặng Văn Hùng", nick: "Hùng", q: ["bep"], type: "some", phone: "0961 887 302", user: "hung.dang", rate: 30000, pw: "28/09/2026" },
-  { id: "s7", name: "Huỳnh Ngọc Trâm", nick: "Trâm", q: ["pc"], type: "some", phone: "0938 220 761", user: "tram.huynh", rate: null, pw: "28/09/2026" },
-  { id: "s8", name: "Bùi Đức Long", nick: "Long", q: ["pv"], type: "all", phone: "0905 667 129", user: "long.bui", rate: null, pw: "28/09/2026" },
-  { id: "s9", name: "Đỗ Khánh Linh", nick: "Linh", q: ["ktd", "tnon"], type: "some", phone: "0983 450 873", user: "linh.do", rate: null, pw: "28/09/2026" },
-  { id: "s10", name: "Hồ Gia Huy", nick: "Huy", q: ["pv"], type: "none", phone: "0901 776 345", user: "huy.ho", rate: null, pw: "28/09/2026" },
-  { id: "s11", name: "Ngô Phương Thảo", nick: "Thảo N", q: ["qc"], type: "some", short: true, phone: "0937 019 552", user: "thao.ngo", rate: null, pw: "28/09/2026" },
-  { id: "s12", name: "Dương Tuấn Kiệt", nick: "Kiệt", q: ["bep", "pv"], type: "all", phone: "0918 334 670", user: "kiet.duong", rate: null, pw: "28/09/2026" },
-  { id: "s13", name: "Lý Thu Trang", nick: "Trang", q: ["tnoff"], type: "some", phone: "0976 125 904", user: "trang.ly", rate: null, pw: "28/09/2026" },
-  { id: "s14", name: "Trịnh Hoàng Nam", nick: "Nam", q: ["pc"], type: "some", phone: "0908 662 017", user: "nam.trinh", rate: null, pw: "28/09/2026" },
-  { id: "s15", name: "Mai Anh Thư", nick: "Thư", q: ["ktd"], type: "some", phone: "0939 841 266", user: "thu.mai", rate: null, pw: "28/09/2026" },
-  { id: "s16", name: "Châu Bảo Ngọc", nick: "Ngọc", q: ["pv"], type: "none", phone: "0965 300 482", user: "ngoc.chau", rate: null, pw: "30/09/2026" },
-  { id: "s17", name: "Tôn Nữ Thị Phương Thảo", nick: "Thảo T", q: [], type: "some", short: true, phone: "0912 905 337", user: "", rate: null, pw: null },
-  { id: "s18", name: "Lâm Chí Thanh", nick: "Thanh", q: ["pc"], type: "some", phone: "0903 228 914", user: "thanh.lam", rate: null, pw: "28/09/2026" },
-  { id: "s19", name: "Phan Nhật Vy", nick: "Vy", q: ["tnoff", "qc"], type: "some", phone: "0986 512 740", user: "vy.phan", rate: null, pw: "28/09/2026" },
-  { id: "s20", name: "Kiều Minh Tâm", nick: "Tâm", q: ["pv"], type: "none", phone: "0907 449 063", user: "tam.kieu", rate: null, pw: "28/09/2026" },
-  { id: "s21", name: "Quách Gia Bảo", nick: "Gia Bảo", q: ["bep"], type: "some", phone: "0932 006 781", user: "giabao.quach", rate: null, pw: "28/09/2026" },
-  { id: "s22", name: "Vương Hải Yến", nick: "Yến", q: ["pc"], type: "some", phone: "0911 873 520", user: "yen.vuong", rate: null, pw: "28/09/2026" },
-  { id: "s23", name: "Lưu Văn Đức", nick: "Đức", q: ["bep"], type: "some", left: true, phone: "0968 140 225", user: "duc.luu", rate: null, pw: "28/09/2026" },
+  { id: "s1", name: "Nguyễn Thị Mai", nick: "Mai N", q: ["qc", "tnoff", "pt"], type: "some", phone: "0903 112 448", user: "mai.nguyen", base: 25000, lead: 30000, pw: "02/10/2026" },
+  { id: "s2", name: "Trần Thị Mai", nick: "Mai T", q: ["pc"], type: "some", phone: "0938 554 210", user: "mai.tran", base: 27000, lead: null, pw: "02/10/2026" },
+  { id: "s3", name: "Lê Minh Anh", nick: "Minh Anh", q: ["pc", "qc", "pt"], type: "some", phone: "0912 668 031", user: "minhanh", base: 26000, lead: 31000, pw: "28/09/2026" },
+  { id: "s4", name: "Phạm Quốc Bảo", nick: "Bảo", q: ["pv", "bep"], type: "some", phone: "0977 201 556", user: "bao.pham", base: 23000, lead: null, pw: "28/09/2026" },
+  { id: "s5", name: "Võ Thanh Hằng", nick: "Hằng", q: ["tnon"], type: "some", phone: "0909 430 118", user: "hang.vo", base: 25000, lead: null, pw: "28/09/2026" },
+  { id: "s6", name: "Đặng Văn Hùng", nick: "Hùng", q: ["bep"], type: "some", phone: "0961 887 302", user: "hung.dang", base: 30000, lead: null, pw: "28/09/2026" },
+  { id: "s7", name: "Huỳnh Ngọc Trâm", nick: "Trâm", q: ["pc", "pt"], type: "some", phone: "0938 220 761", user: "tram.huynh", base: 25000, lead: 30000, pw: "28/09/2026" },
+  { id: "s8", name: "Bùi Đức Long", nick: "Long", q: ["pv"], type: "all", phone: "0905 667 129", user: "long.bui", base: 23000, lead: null, pw: "28/09/2026" },
+  { id: "s9", name: "Đỗ Khánh Linh", nick: "Linh", q: ["ktd", "tnon"], type: "some", phone: "0983 450 873", user: "linh.do", base: 24000, lead: null, pw: "28/09/2026" },
+  { id: "s10", name: "Hồ Gia Huy", nick: "Huy", q: ["pv"], type: "none", phone: "0901 776 345", user: "huy.ho", base: 23000, lead: null, pw: "28/09/2026" },
+  { id: "s11", name: "Ngô Phương Thảo", nick: "Thảo N", q: ["qc"], type: "some", short: true, phone: "0937 019 552", user: "thao.ngo", base: 26000, lead: null, pw: "28/09/2026" },
+  { id: "s12", name: "Dương Tuấn Kiệt", nick: "Kiệt", q: ["bep", "pv", "pt"], exp: ["bep", "pv", "pc"], type: "all", phone: "0918 334 670", user: "kiet.duong", base: 27000, lead: 32000, pw: "28/09/2026" },
+  { id: "s13", name: "Lý Thu Trang", nick: "Trang", q: ["tnoff"], type: "some", phone: "0976 125 904", user: "trang.ly", base: 25000, lead: null, pw: "28/09/2026" },
+  { id: "s14", name: "Trịnh Hoàng Nam", nick: "Nam", q: ["pc", "pt"], type: "some", phone: "0908 662 017", user: "nam.trinh", base: 25000, lead: 29000, pw: "28/09/2026" },
+  { id: "s15", name: "Mai Anh Thư", nick: "Thư", q: ["ktd"], type: "some", phone: "0939 841 266", user: "thu.mai", base: 24000, lead: null, pw: "28/09/2026" },
+  { id: "s16", name: "Châu Bảo Ngọc", nick: "Ngọc", q: ["pv"], type: "none", phone: "0965 300 482", user: "ngoc.chau", base: 23000, lead: null, pw: "30/09/2026" },
+  { id: "s17", name: "Tôn Nữ Thị Phương Thảo", nick: "Thảo T", q: [], type: "some", short: true, phone: "0912 905 337", user: "", base: 23000, lead: null, pw: null },
+  { id: "s18", name: "Lâm Chí Thanh", nick: "Thanh", q: ["pc"], type: "some", phone: "0903 228 914", user: "thanh.lam", base: 26000, lead: null, pw: "28/09/2026" },
+  { id: "s19", name: "Phan Nhật Vy", nick: "Vy", q: ["tnoff", "qc", "pt"], type: "some", phone: "0986 512 740", user: "vy.phan", base: 25000, lead: 30000, pw: "28/09/2026" },
+  { id: "s20", name: "Kiều Minh Tâm", nick: "Tâm", q: ["pv"], type: "none", phone: "0907 449 063", user: "tam.kieu", base: 23000, lead: null, pw: "28/09/2026" },
+  { id: "s21", name: "Quách Gia Bảo", nick: "Gia Bảo", q: ["bep"], type: "some", phone: "0932 006 781", user: "giabao.quach", base: 28000, lead: null, pw: "28/09/2026" },
+  { id: "s22", name: "Vương Hải Yến", nick: "Yến", q: ["pc"], type: "some", phone: "0911 873 520", user: "yen.vuong", base: 26000, lead: null, pw: "28/09/2026" },
+  { id: "s23", name: "Lưu Văn Đức", nick: "Đức", q: ["bep"], type: "some", left: true, phone: "0968 140 225", user: "duc.luu", base: 28000, lead: null, pw: "28/09/2026" },
 ];
 const ST = Object.fromEntries(STAFF.map((s) => [s.id, s]));
+// Giờ đã làm theo vị trí (FR-A14): ca đã công bố và đã kết thúc, toàn bộ lịch sử, theo giờ đồng hồ (trọn Ca 5 = 6 giờ).
+// Chủ xem trên chip ở hồ sơ nhân viên, nhân viên xem ở Hồ sơ của tôi. Hai vị trí thường đảm nhiệm của mẫu luôn trên 50 giờ;
+// Kiệt có thêm Pha chế 74 giờ (có kinh nghiệm nhưng ngoài hai vị trí), Trâm có Phục vụ 18 giờ (chưa đủ kinh nghiệm).
+const HOURS = {
+  s1: { qc: 248, tnoff: 132, pt: 86, pv: 12 }, s2: { pc: 196, tnon: 8 }, s3: { pc: 312, pt: 140, qc: 104 }, s4: { pv: 220, bep: 96, pt: 24 },
+  s5: { tnon: 164, qc: 6 }, s6: { bep: 288 }, s7: { pc: 286, pt: 96, pv: 18 }, s8: { pv: 174, ktd: 10 }, s9: { ktd: 150, tnon: 88 },
+  s10: { pv: 92 }, s11: { qc: 118 }, s12: { bep: 412, pv: 236, pt: 120, pc: 74 }, s13: { tnoff: 205 }, s14: { pc: 260, pt: 64 },
+  s15: { ktd: 133 }, s16: { pv: 58 }, s17: { pv: 14, ktd: 6 }, s18: { pc: 140 }, s19: { tnoff: 180, pt: 110, qc: 90 }, s20: { pv: 71 },
+  s21: { bep: 190 }, s22: { pc: 122 }, s23: { bep: 260 },
+};
 const ACTIVE = STAFF.filter((s) => !s.left);
-const RATE_DEFAULT = { qc: 26000, tnoff: 25000, tnon: 25000, pc: 26000, pv: 23000, ktd: 24000, bep: 28000 };
 
 function rng(seed) {
   return function () {
@@ -129,8 +145,8 @@ const WEEK_DATA = buildWeek(20261012);
 (function seedEdgeCases({ reg, asg }) {
   // Hai người chưa có ca nào trong tuần (cổng công bố)
   for (const id of ["s17", "s20"]) asg[id] = WEEK.map(() => ({}));
-  // Kiêm hai vị trí: Hùng T4 CA5
-  asg.s6[2] = { 4: { pos: ["bep", "pv"], sub: [] } };
+  // Hùng T4 CA5 Bếp (ca biên cũ "kiêm hai vị trí" đã bỏ: một ca chỉ một vị trí)
+  asg.s6[2] = { 4: { pos: ["bep"], sub: [] } };
   // Xếp ngoài lịch rảnh: Minh Anh T5 CA5 (đảm bảo không đăng ký ca đó)
   reg.s3[3] = [0, 1];
   asg.s3[3] = { 0: { pos: ["pc"], sub: ["matcha"] }, 1: { pos: ["pc"], sub: ["matcha"] }, 4: { pos: ["pc"], sub: [] } };
@@ -144,6 +160,12 @@ const WEEK_DATA = buildWeek(20261012);
   // Nguyễn Thị Mai: T4 đăng ký CA1–CA3, đã xếp CA1–CA2 QC Trong, CA3 chưa vị trí
   reg.s1[2] = [0, 1, 2];
   asg.s1[2] = { 0: { pos: ["qc"], sub: ["trong"] }, 1: { pos: ["qc"], sub: ["trong"] }, 2: { pos: [], sub: [] } };
+  // Ví dụ của khách (16/10): Minh Anh CN 07:00–17:00, 07–15 Phụ trách - Trong (lương phụ trách), 15–17 Pha chế (lương cơ bản)
+  reg.s3[6] = [0, 1, 2, 3];
+  asg.s3[6] = { 0: { pos: ["pt"], sub: ["pttrong"] }, 1: { pos: ["pt"], sub: ["pttrong"] }, 2: { pos: ["pt"], sub: ["pttrong"] }, 3: { pos: ["pc"], sub: ["trasua"] } };
+  // Nam T7 CA5 Phụ trách - Ngoài
+  reg.s14[5] = [4];
+  asg.s14[5] = { 4: { pos: ["pt"], sub: ["ptngoai"] } };
 })(WEEK_DATA);
 
 function balance({ reg, asg }, seed, skip = []) {
@@ -153,7 +175,7 @@ function balance({ reg, asg }, seed, skip = []) {
     const x = r();
     const target = NEED[d][p] + (x < 0.2 ? -1 - Math.floor(r() * 2) : x > 0.9 ? 1 : 0);
     const placed = STAFF.filter((s) => asg[s.id][d][p]).sort(() => r() - 0.5);
-    const keep = ["s1", "s3", "s5", "s6", "s23"];
+    const keep = ["s1", "s3", "s5", "s6", "s14", "s23"];
     for (let i = placed.length - 1; i >= 0 && placed.length > target; i--) if (!keep.includes(placed[i].id)) delete asg[placed.splice(i, 1)[0].id][d][p];
     const cand = STAFF.filter((s) => !skip.includes(s.id) && !s.left && (s.type !== "some" ? !asg[s.id][d][p] : !asg[s.id][d][p] && reg[s.id][d] && reg[s.id][d].includes(p))).sort(() => r() - 0.5);
     while (placed.length < target && cand.length) {
@@ -164,6 +186,20 @@ function balance({ reg, asg }, seed, skip = []) {
   }
 }
 balance(WEEK_DATA, 7, ["s17", "s20"]);
+// Mỗi ca cần hai Phụ trách, một Trong một Ngoài: giao cho người có kinh nghiệm đang có mặt trong ca.
+// Chừa ca không có ai đủ kinh nghiệm (bảng Phân công báo thiếu) và các ca biên ở trên.
+(function seedLeads({ asg }) {
+  const fixed = { s1: [2], s3: [3, 6], s5: [0], s6: [2], s14: [5] };
+  for (let d = 0; d < 7; d++) for (let p = 0; p < 5; p++) for (const side of ["pttrong", "ptngoai"]) {
+    if (STAFF.some((x) => asg[x.id][d][p]?.sub.includes(side))) continue;
+    const s = STAFF.find((x) => x.q.includes("pt") && !(fixed[x.id] || []).includes(d) && asg[x.id][d][p] && !asg[x.id][d][p].pos.includes("pt"));
+    if (s) asg[s.id][d][p] = { pos: ["pt"], sub: [side] };
+  }
+  // Chủ vừa tắt "Phụ trách" của Bảo nhưng Bảo còn một ca phụ trách: ca giữ nguyên, báo cần đổi người phụ trách
+  const d = asg.s4.findIndex((day, i) => i > 0 && Object.keys(day).length);
+  const p = Number(Object.keys(asg.s4[d])[0]);
+  asg.s4[d][p] = { pos: ["pt"], sub: ["ptngoai"] };
+})(WEEK_DATA);
 // Giờ riêng theo từng ca (spec custom shift 11/10) và ghi chú theo ngày. custom[sid][d][p] = { from, to }.
 WEEK_DATA.custom = { s2: { 4: { 4: { from: "18:00", to: "23:00" } } }, s9: { 0: { 3: { from: "15:30", to: "17:00" }, 4: { from: "17:00", to: "21:00" } } } };
 WEEK_DATA.note = { s2: { 4: "Học tới 17:30, 18:00 mới tới quán được" }, s9: { 0: "Sáng đi khám, chiều tới được" }, s14: { 1: "Quán vắng thì cho mình về sớm 30 phút" } };
@@ -225,7 +261,7 @@ const MY_REG = [[0, 1, 2], [0, 1], null, [0, 1, 2, 3, 4], [4], null, [0, 1, 2]];
 const MY_CUSTOM = { 4: { 4: { from: "18:00", to: "23:00" } } };
 const MY_NOTES = { 4: "Học tới 17:30" };
 
-// Ca của tôi (Trâm) tuần 5–11/10
+// Hồ sơ của tôi (Trâm): ca tuần 5–11/10
 const MY_SHIFTS = [
   { d: 0, from: "07:00", to: "11:00", pos: "pc", sub: "trasua" },
   { d: 1, from: "07:00", to: "11:00", pos: "pc", sub: "trasua" },
@@ -233,17 +269,20 @@ const MY_SHIFTS = [
   { d: 3, from: "17:00", to: "23:00", pos: "pc", sub: "bon" },
   { d: 4, from: "07:00", to: "11:00", pos: "pc", sub: "matcha" },
   { d: 5, from: "07:00", to: "15:00", pos: "pc", sub: "matcha" },
+  // Ví dụ của khách: một ca 07:00–17:00, 07–15 phụ trách, 15–17 pha chế
+  { d: 6, from: "07:00", to: "17:00", parts: [{ from: "07:00", to: "15:00", pos: "pt", sub: "pttrong" }, { from: "15:00", to: "17:00", pos: "pc", sub: "trasua" }] },
 ];
 
 // Nhật ký
 const AUDIT = [
   { at: "10/10 16:42", who: "owner", what: ["Xếp ca", "Placed"], sid: "s1", day: "T4 14/10", before: "—", after: ["07:00–13:00 · QC - Trong", "07:00–13:00 · QC - Inside"], reason: "" },
-  { at: "10/10 16:40", who: "owner", what: ["Gán vị trí", "Gave position"], sid: "s6", day: "T4 14/10", before: ["17:00–23:00 · chưa có vị trí", "17:00–23:00 · no position"], after: ["17:00–23:00 · Bếp, Phục vụ", "17:00–23:00 · Kitchen, Server"], reason: ["Thiếu phục vụ ca tối", "Short of servers in the evening"] },
+  { at: "10/10 16:40", who: "owner", what: ["Gán vị trí", "Gave position"], sid: "s6", day: "T4 14/10", before: ["17:00–23:00 · chưa có vị trí", "17:00–23:00 · no position"], after: ["17:00–23:00 · Bếp", "17:00–23:00 · Kitchen"], reason: "" },
   { at: "10/10 16:31", who: "owner", what: ["Xếp ngoài lịch rảnh", "Placed outside availability"], sid: "s3", day: "T5 15/10", before: "—", after: ["17:00–23:00 · Pha chế", "17:00–23:00 · Barista"], reason: ["Đã thống nhất qua Zalo", "Agreed on Zalo"] },
   { at: "10/10 15:00", who: "system", what: ["Khoá đăng ký", "Registration locked"], sid: null, day: ["Tuần 12–18/10", "Week 12–18 Oct"], before: ["Đang mở", "Open"], after: ["Đã khoá", "Locked"], reason: "" },
   { at: "07/10 12:10", who: "owner", what: ["Ghi giờ đến", "Recorded arrival"], sid: "s8", day: "T4 7/10", before: ["Đúng giờ", "On time"], after: ["Đến 12:05 · bất thường", "Arrived 12:05 · anomaly"], reason: "" },
   { at: "07/10 07:30", who: "owner", what: ["Ghi giờ đến", "Recorded arrival"], sid: "s7", day: "T4 7/10", before: ["Đúng giờ", "On time"], after: ["Đến 07:22 · trễ 22 phút", "Arrived 07:22 · 22 min late"], reason: "" },
   { at: "06/10 18:05", who: "owner", what: ["Rút ngắn ca, có người thay", "Shortened, with cover"], sid: "s4", day: "T3 6/10", before: "07:00–13:00", after: ["07:00–11:30 · Kiệt làm thay 11:30–13:00", "07:00–11:30 · Kiệt covers 11:30–13:00"], reason: ["Về sớm, việc gia đình", "Left early, family matter"] },
+  { at: "04/10 21:15", who: "system", what: ["Thêm vị trí thường đảm nhiệm", "Added a usual position"], sid: "s12", day: "", before: ["Bếp", "Kitchen"], after: ["Bếp, Phục vụ", "Kitchen, Server"], reason: ["Phục vụ 64 giờ trong 12 tuần qua", "Server: 64 h in the last 12 weeks"] },
   { at: "02/10 09:14", who: "owner", what: ["Đặt mật khẩu", "Set password"], sid: "s1", day: "", before: "—", after: ["Đã đặt", "Set"], reason: "" },
   { at: "30/09 20:02", who: "owner", what: ["Vô hiệu hoá tài khoản", "Deactivated account"], sid: "s23", day: "", before: ["Đang làm", "Active"], after: ["Đã nghỉ", "Left"], reason: ["Nghỉ việc từ 01/10", "Left from 1 Oct"] },
 ];

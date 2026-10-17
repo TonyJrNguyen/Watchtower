@@ -8,7 +8,7 @@ How the engineering skills should consume this repo's domain documentation when 
 
 - `docs/prd/shift-scheduling-solution-requirements.md` is the sole source of truth for **what** to build (per `CLAUDE.md`). If a glossary entry or ADR disagrees with the PRD, the PRD wins: flag the drift and fix the derived file.
 - `docs/decisions/pending-confirmation.md` lists rules not yet confirmed by the client. Make these configurable, never hardcode them (ADR-0017).
-- PRD changes are agreed in claude.ai and patched in (`docs/prd/CHANGELOG.md`). When a patch changes a term or a hard-to-reverse decision, update `CONTEXT.md` or add an ADR in the same commit.
+- PRD changes are agreed with the user (in claude.ai or a Claude Code session) and applied in this repo (`docs/prd/CHANGELOG.md`). When a patch changes a term or a hard-to-reverse decision, update `CONTEXT.md` or add an ADR in the same commit.
 
 ## Before exploring, read these
 
