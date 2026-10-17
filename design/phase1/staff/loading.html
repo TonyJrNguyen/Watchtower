@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Nhân viên · Đang tải</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/app.css" />
+  </head>
+  <body class="bg-background font-sans text-foreground antialiased">
+    <div id="app">
+      <div class="flex min-h-screen flex-col">
+        <header class="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-6 border-b border-border bg-surface px-6 lg:flex">
+          <span class="flex min-w-0 items-center gap-2.5"
+            ><span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+              ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+                <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+                <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+                <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg></span
+            ><span class="truncate text-sm font-semibold text-foreground">Watchtower</span></span
+          >
+          <nav class="flex items-center gap-1" aria-label="Mục chính">
+            <a
+              href="../calendar/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-calendar-days size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="M8 14h.01"></path>
+                <path d="M12 14h.01"></path>
+                <path d="M16 14h.01"></path>
+                <path d="M8 18h.01"></path>
+                <path d="M12 18h.01"></path>
+                <path d="M16 18h.01"></path></svg
+              >Lịch tuần</a
+            ><a
+              href="../lateness/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-alarm-clock size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+                <path d="M6.38 18.7 4 21"></path>
+                <path d="M17.64 18.67 20 21"></path></svg
+              >Đi trễ</a
+            ><a
+              href="../staff/data.html"
+              aria-current="page"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors bg-secondary text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-users size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+              >Nhân viên</a
+            ><a
+              href="../activity-log/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-history size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M12 7v5l4 2"></path></svg
+              >Nhật ký</a
+            >
+          </nav>
+          <button
+            type="button"
+            aria-haspopup="menu"
+            class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
+          >
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            ><span class="text-sm font-medium">Trương Hữu Phúc</span
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-chevrons-up-down size-4 text-muted shrink-0"
+              aria-hidden="true"
+            >
+              <path d="m7 15 5 5 5-5"></path>
+              <path d="m7 9 5-5 5 5"></path>
+            </svg>
+          </button>
+        </header>
+        <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 lg:hidden">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+            ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+              <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+              <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+              <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg
+          ></span>
+          <p class="min-w-0 truncate text-base font-semibold">Nhân viên</p>
+          <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+          </button>
+        </header>
+        <div class="flex-1 pb-20 lg:pb-0">
+          <div class="space-y-4 p-4 sm:p-6">
+            <div class="flex items-baseline gap-2"><h1 class="text-xl font-semibold max-lg:sr-only">Nhân viên</h1></div>
+            <div class="flex flex-wrap items-start gap-3">
+              <div class="w-full space-y-1.5 sm:w-72">
+                <label class="relative block"
+                  ><span class="sr-only">Tìm nhân viên</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-search pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path></svg
+                  ><input
+                    type="search"
+                    placeholder="Tìm theo tên, số điện thoại"
+                    class="h-11 w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:h-10 md:text-sm pl-10"
+                /></label>
+              </div>
+              <div class="flex flex-1 flex-wrap items-center gap-3">
+                <label class="inline-flex min-h-11 md:min-h-10 cursor-pointer items-center gap-2.5 text-sm"
+                  ><span class="relative inline-flex shrink-0"
+                    ><input
+                      type="checkbox"
+                      class="peer size-5 rounded-md cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-check pointer-events-none absolute inset-0 m-auto size-3.5 stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"
+                    >
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus pointer-events-none absolute inset-0 m-auto size-3.5 stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
+                    >
+                      <path d="M5 12h14"></path></svg></span
+                  >Hiện cả người đã nghỉ</label
+                >
+                <span class="ml-auto"
+                  ><button
+                    type="button"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-plus size-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5v14"></path></svg
+                    >Thêm nhân viên
+                  </button></span
+                >
+              </div>
+            </div>
+            <div class="rounded-2xl border border-border bg-surface">
+              <ul aria-busy="true" class="divide-y divide-border">
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/3 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/5 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/3 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/5 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+                <li class="flex items-center gap-4 px-5 py-3.5">
+                  <div class="flex-1 space-y-2"><div class="h-3 w-1/3 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div></div>
+                  <div class="h-3 w-24 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <nav
+          class="fixed inset-x-0 bottom-0 z-30 grid h-16 border-t border-border bg-surface lg:hidden"
+          style="grid-template-columns: repeat(4, minmax(0, 1fr))"
+          aria-label="Mục chính"
+        >
+          <a href="../calendar/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-calendar-days size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M8 14h.01"></path>
+              <path d="M12 14h.01"></path>
+              <path d="M16 14h.01"></path>
+              <path d="M8 18h.01"></path>
+              <path d="M12 18h.01"></path>
+              <path d="M16 18h.01"></path></svg
+            >Lịch tuần</a
+          ><a href="../lateness/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-alarm-clock size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="13" r="8"></circle>
+              <path d="M12 9v4l2 2"></path>
+              <path d="M5 3 2 6"></path>
+              <path d="m22 6-3-3"></path>
+              <path d="M6.38 18.7 4 21"></path>
+              <path d="M17.64 18.67 20 21"></path></svg
+            >Đi trễ</a
+          ><a href="../staff/data.html" aria-current="page" class="flex flex-col items-center justify-center gap-1 text-xs font-medium text-primary"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-users size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+            >Nhân viên</a
+          ><a href="../activity-log/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-history size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l4 2"></path></svg
+            >Nhật ký</a
+          >
+        </nav>
+      </div>
+    </div>
+
+    <script src="../assets/static.js"></script>
+  </body>
+</html>

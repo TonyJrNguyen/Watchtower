@@ -1,0 +1,18 @@
+{
+  "name": "watchtower-design-phase1",
+  "private": true,
+  "description": "Static Phase 1 screens built from prototypes/phase1-wireframe",
+  "type": "module",
+  "scripts": {
+    "capture": "node tools/capture.mjs --base http://localhost:4180/wireframe.html",
+    "format": "prettier --print-width 160 --write \"*/*.html\" index.html",
+    "build:css": "tailwindcss -i src/app.css -o assets/app.css --minify",
+    "build": "npm run capture && npm run format && npm run build:css"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "playwright": "1.63.0",
+    "prettier": "3.9.10",
+    "tailwindcss": "4.3.3"
+  }
+}
