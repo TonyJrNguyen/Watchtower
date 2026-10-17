@@ -13,9 +13,9 @@ instead of hardcoding it.
 Build only these four groups. Do not touch anything in Phase 2/3 unless
 explicitly asked. See PRD §4.13 for the exact boundaries.
 
-1. Account Management (FR-A1–FR-A10)
+1. Account Management (FR-A1–FR-A14): includes per-person base and lead rates, the shift-lead switch, usual positions learned from the schedule, and hours worked per position
 2. Availability Registration: whole periods with optional custom times inside a period, a draft until Save, window Thursday 00:00 – Saturday 15:00 (FR-S1–FR-S22)
-3. Shift Assignment: draft/publish, publish gate, early departure, swap (FR-O1–FR-O50, except FR-O34–FR-O37, which are Phase 2, and the retired FR-O41)
+3. Shift Assignment: draft/publish, publish gate, early departure, swap (FR-O1–FR-O51, except FR-O34–FR-O37, which are Phase 2, and the retired FR-O30, FR-O40 and FR-O41)
 4. Manual lateness recording and every rule computed from it: 10-minute grace, late penalty from minute 11, double pay deduction from minute 16, anomaly when the deduction ≥ the shift (FR-O24–FR-O26, FR-S9, FR-S17, FR-S18, FR-T18, FR-B1, FR-B17)
 
 **Not built in Phase 1:** notifications/push (§4.8, all of FR-N*), the control
@@ -66,9 +66,11 @@ wins. The demo only illustrates behaviour, and some of its rules are still
 
 ## PRD update process
 
-The PRD is discussed and agreed in a chat with Claude (claude.ai), not here.
-After each agreed change, the patch is pasted here and applied by hand or with
-Claude Code, then committed. See `docs/prd/CHANGELOG.md`.
+PRD changes may be discussed anywhere, in a claude.ai chat or a Claude Code
+session, but they are always applied in this repo. Claude Code edits the PRD,
+its CHANGELOG and the derived docs (CONTEXT.md, the ADRs, the
+pending-confirmation list) together, and the user reviews the diff before it
+is committed. See `docs/prd/CHANGELOG.md`.
 
 ## Agent skills
 

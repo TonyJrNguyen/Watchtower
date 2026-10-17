@@ -50,8 +50,15 @@ _Avoid_: Work week, roster week
 The upcoming week whose availability is registered, locked and assigned now. Earlier weeks are published and read-only.
 
 **Position** (Vị trí):
-The job a staff member does on an assignment, such as Pha chế or Thu Ngân – Online. Headcount, rate and qualification are held at this level only.
+The job a staff member does on an assignment, such as Pha chế or Thu Ngân – Online. A staff member holds one position per shift period. Headcount and experience are held at this level only.
 _Avoid_: Role, job title, station
+
+**Shift lead** (Phụ trách):
+The position that leads a shift, with a required sub-position, exactly one of Trong or Ngoài. Only staff whose shift-lead switch is on can hold it, and its hours are paid at the lead rate.
+_Avoid_: Supervisor, manager, team lead
+
+**Shift-lead switch**:
+The setting on a staff account that lets the Administrator give that staff member the shift-lead position. While it's on, the account needs a lead rate.
 
 **Sub-position** (Vị trí con):
 The area within a position where the work is done, such as Pha chế - Matcha. Descriptive only.
@@ -64,9 +71,13 @@ _Avoid_: Tag, skill
 **Position detail**:
 The collective name for sub-positions and attributes.
 
-**Qualified positions**:
-The positions a staff member is listed as able to work. Advisory: assigning outside them is flagged, not refused.
-_Avoid_: Permissions, skills, certifications
+**Usual positions** (Vị trí thường đảm nhiệm):
+At most two positions shown on a staff member's account: the top two by published hours over the last 12 weeks, counting only positions above 50 hours. The Administrator can set or remove them by hand. A position set by hand stays; one removed counts again from zero. Never the shift lead.
+_Avoid_: Qualified positions (the term before PRD v1.10), skills, certifications
+
+**Experienced positions** (Có kinh nghiệm):
+The positions a staff member has more than 50 published hours in over their whole history, plus any usual position set by hand. The out-of-experience flag and the calendar filters read these, not the usual positions.
+_Avoid_: Qualified positions, permissions
 
 **Staffing need**:
 The headcount the Administrator wants for one position in one shift period on one date.
@@ -110,21 +121,14 @@ The one Administrator surface for seeing registrations, placing people and givin
 _Avoid_: Availability screen, assignment screen (as separate surfaces)
 
 **Assignment**:
-A record that one staff member works one time range on one date, with zero or more positions. It is the unit for pay, coverage and lateness.
+A record that one staff member works one time range on one date, with one position, or none while the week is a draft. It is the unit for pay, coverage and lateness.
 _Avoid_: Shift (for the record), booking, roster entry
 
 **Place** (Xếp người):
 To put a staff member into shift periods, before or without giving a position.
 
 **Give a position** (Gán vị trí):
-To set the positions, and optionally the position details, on a placed assignment.
-
-**Primary position**:
-The first position on an assignment, which decides the default rate when the staff member has no rate of their own.
-
-**Shared assignment**:
-An assignment that carries two or more positions, so it counts toward each position's headcount and is marked as shared.
-_Avoid_: Split shift, double role
+To set the position, and optionally its position details, on a placed assignment.
 
 **Draft**:
 The state of an assignment before its week is published. Staff can't see draft assignments.
@@ -143,8 +147,9 @@ _Avoid_: Exclude, exempt
 **Out-of-availability**:
 A flag on an assignment that covers time the staff member didn't register. It's a warning, never a block.
 
-**Out-of-qualification**:
-A flag on an assignment to a position outside the staff member's qualified positions. It's a warning, never a block.
+**Out-of-experience**:
+A flag on an assignment to a position outside the staff member's experienced positions. It's a warning, never a block. Giving the shift-lead position without the switch is blocked instead.
+_Avoid_: Out-of-qualification (the term before PRD v1.10)
 
 **Coverage** (Độ phủ):
 How the people placed in a shift period compare with its staffing needs: filled, understaffed or overstaffed.
@@ -167,8 +172,12 @@ _Avoid_: Replacement shift, backup
 **Swap**:
 Two staff members exchanging assignments. They agree on Zalo and the Administrator records it in one action.
 
-**My Schedule** (Lịch của tôi):
-A staff member's own published assignments, read-only.
+**My profile** (Hồ sơ của tôi):
+A staff member's own page: their published assignments (read-only), pay estimate, recorded lateness and hours worked per position. It shows only their own data.
+_Avoid_: My Schedule, My shifts, Ca của tôi (the names before PRD v1.10)
+
+**Positions worked** (Vị trí đã làm):
+The hours a staff member has worked in each position, from published assignments that have ended, over their whole history. Display only, never reset; the Administrator sees them on the staff account, the staff member on My profile.
 
 ### Lateness
 
@@ -206,11 +215,18 @@ The hours of a staff member's assignments, which pay and the 8-hour bonus test a
 _Avoid_: Worked hours, clocked hours, actual hours
 
 **Rate**:
-The hourly pay for an assignment: the staff member's own rate if set, otherwise the primary position's default rate.
+The hourly pay for an assignment: the staff member's lead rate when the position is the shift lead, their base rate otherwise. Positions carry no rate.
 _Avoid_: Wage, salary
 
+**Base rate**:
+A staff member's hourly rate for every position except the shift lead. Every account has one.
+_Avoid_: Confusing it with base pay, which includes hours paid at the lead rate
+
+**Lead rate**:
+A staff member's hourly rate for hours as shift lead. Required while their shift-lead switch is on, absent otherwise.
+
 **Pay estimate**:
-Phase 1's display of assigned hours × rate, labelled as before deductions and bonus. It isn't payroll.
+Phase 1's display of assigned hours × rate, with lead hours and base hours shown apart, labelled as before deductions and bonus. It isn't payroll.
 
 **Pay period**:
 One week, paid the following Monday. Nothing is calculated across two pay periods.
@@ -253,7 +269,7 @@ _Avoid_: Overtime (the shop doesn't have overtime)
 ### Records and time clock
 
 **Audit log** (Nhật ký):
-The record of every change: who made it, when, the old and new values, and a reason where one is required. With no approval workflow, it's the only evidence of why something changed.
+The record of every change: who made it (a person, or System for usual positions the system learns), when, the old and new values, and a reason where one is required. With no approval workflow, it's the only evidence of why something changed.
 _Avoid_: History, activity feed
 
 **Time clock** (Chấm công):

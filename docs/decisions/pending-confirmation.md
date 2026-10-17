@@ -1,6 +1,6 @@
 # Rules proposed pending client confirmation
 
-The eight rules below were decided while building the Phase 1 demo and are
+The seven rules below were decided while building the Phase 1 demo and are
 **not** in the original PRD the client approved. Each rule has been written
 into the PRD (marked *proposed pending client confirmation* in the relevant
 requirement table) and is listed again here as the sign-off list (§5.1,
@@ -17,8 +17,7 @@ hardcoded, because the client may adjust them at sign-off.
 | FR-T18 (addition) | Classifying as "did not work" means 0 hours for pay and for the 8-hours-per-day count, with no late penalty | The PRD lists "no-show" as an anomaly resolution option but does not say what it changes | Directly affects pay; needs explicit client confirmation |
 | FR-B17 | The lateness screen previews the effect on the weekly bonus (view only, not confirmed) | Not in the original PRD; added to make the system easier to understand | No effect on calculations, UI only. One of the two lowest-risk items |
 | FR-A7 (addition) | Setting/changing a password is a field in the staff profile, not a separate generate-password button | From the demo feedback on 2026-09-18 | No effect on business logic, UI only |
-| FR-O40 | The default rate per position is editable in the app, not fixed in code | The original FR-O28 fixed both the position table and the default rates in code | If dropped, every change to a position rate needs a redeploy |
-| FR-O45 (addition) | Staff see sub-positions/attributes in "My Schedule", in the same format, e.g. "Pha chế - Matcha" | The client only confirmed how they are shown to the Owner (2026-09-28), not whether staff see them | Affects the staff-side UI only. Staff only see their own shifts (NFR-2), so there is no data-exposure risk |
+| FR-O45 (addition) | Staff see sub-positions/attributes on "My profile", in the same format, e.g. "Pha chế - Matcha" | The client only confirmed how they are shown to the Owner (2026-09-28), not whether staff see them | Affects the staff-side UI only. Staff only see their own shifts (NFR-2), so there is no data-exposure risk |
 
 **Closing an item:** when the client confirms an item, remove the *proposed
 pending client confirmation* marker from the PRD, remove the matching row from

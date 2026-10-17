@@ -3,6 +3,16 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.10 — 2026-10-17
+- Following the client feedback of 2026-10-16 and 2026-10-17 and the follow-up decisions of 2026-10-17 (`docs/feedback/2026-10-16-client-feedback.md`)
+- **Phụ trách (shift lead):** an eighth position with a required sub-position, exactly one of Trong or Ngoài. It can be given only to staff whose new **shift-lead switch** is on, which is a block, not a flag. Turning the switch off keeps their Phụ trách assignments and flags them for reassignment. Added FR-A13, FR-O51; amended §3.3, FR-O1 (one need for Phụ trách as a whole), FR-O45, FR-O11, FR-O42, FR-O43, FR-O49
+- **Rates per person:** a base rate on every account, plus a lead rate required while the switch is on. Phụ trách hours are paid at the lead rate, every other position at the base rate. Positions carry no rate and there is no primary position. Amended §3.9, FR-C2, FR-C12, FR-C13; **FR-O40 retired**, FR-O28 no longer mentions rates. A lateness deduction is charged at the rate of the assignment it falls on (§3.8.3, FR-S17)
+- **One position per shift period;** a person may hold different positions in different periods of a day. Amended §3.3, §3.5, FR-O29, FR-O44, FR-O4; **FR-O30 retired** (shared assignments, the "covering two positions" filter and the two-colour marker are gone)
+- **Usual positions** replace qualified positions: up to two per staff member, learned from the published schedule (top two by published hours over the last 12 weeks, above 50 hours), pinned when the Administrator sets them by hand, counted again from zero when removed. System changes are logged with the actor System. Added FR-A12. The out-of-experience flag and the filters read **experienced positions** (more than 50 hours over the whole history, or set by hand), which can be more than two (FR-O32, FR-O11). Amended §3.2, §3.3, FR-A1, FR-A2, FR-O39, FR-O43, FR-O46
+- **Hours worked per position:** the Administrator sees them on the position chips in the staff account's side panel, the staff member on their own page, from published shifts that have ended, over the whole history. Added FR-A14. The staff page "Ca của tôi" / *My Schedule* is renamed **"Hồ sơ của tôi" / My profile** (§2, §3.2, §3.5, FR-S11, FR-O45)
+- §4.10 (Staff, Position, Assignment, new PositionHours, AuditLog's System actor), §4.11 (PositionHours kept after the assignment purge), §4.13 Phase 1, §5 (new resolved item, three earlier lines rewritten), §5.0 (four rows moved to *Superseded*), §5.1 O3 and §5.3 updated accordingly
+- Usual positions and the experience flag (FR-A12, FR-O32) were confirmed by the client on 2026-10-17, and every other change was requested or confirmed by the client, so nothing is added to the *pending confirmation* list. FR-O40 leaves the list, being retired (seven rules remain)
+
 ## v1.9 — 2026-10-11
 - Following the client feedback on the Phase 1 wireframe of 2026-10-10 and the answers of 2026-10-10 and 2026-10-11 (`docs/feedback/2026-10-10-client-feedback.md`)
 - Wireframe layouts chosen: weekly calendar B, every other Phase 1 screen A, bottom bar on phones (§5)
