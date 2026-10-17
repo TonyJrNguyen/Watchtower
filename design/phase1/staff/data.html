@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Nhân viên · Có dữ liệu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/app.css" />
+  </head>
+  <body class="bg-background font-sans text-foreground antialiased">
+    <div id="app">
+      <div class="flex min-h-screen flex-col">
+        <header class="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-6 border-b border-border bg-surface px-6 lg:flex">
+          <span class="flex min-w-0 items-center gap-2.5"
+            ><span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+              ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+                <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+                <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+                <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg></span
+            ><span class="truncate text-sm font-semibold text-foreground">Watchtower</span></span
+          >
+          <nav class="flex items-center gap-1" aria-label="Mục chính">
+            <a
+              href="../calendar/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-calendar-days size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="M8 14h.01"></path>
+                <path d="M12 14h.01"></path>
+                <path d="M16 14h.01"></path>
+                <path d="M8 18h.01"></path>
+                <path d="M12 18h.01"></path>
+                <path d="M16 18h.01"></path></svg
+              >Lịch tuần</a
+            ><a
+              href="../lateness/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-alarm-clock size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+                <path d="M6.38 18.7 4 21"></path>
+                <path d="M17.64 18.67 20 21"></path></svg
+              >Đi trễ</a
+            ><a
+              href="../staff/data.html"
+              aria-current="page"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors bg-secondary text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-users size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+              >Nhân viên</a
+            ><a
+              href="../activity-log/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-history size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M12 7v5l4 2"></path></svg
+              >Nhật ký</a
+            >
+          </nav>
+          <button
+            type="button"
+            aria-haspopup="menu"
+            class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
+          >
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            ><span class="text-sm font-medium">Trương Hữu Phúc</span
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-chevrons-up-down size-4 text-muted shrink-0"
+              aria-hidden="true"
+            >
+              <path d="m7 15 5 5 5-5"></path>
+              <path d="m7 9 5-5 5 5"></path>
+            </svg>
+          </button>
+        </header>
+        <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 lg:hidden">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+            ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+              <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+              <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+              <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg
+          ></span>
+          <p class="min-w-0 truncate text-base font-semibold">Nhân viên</p>
+          <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+          </button>
+        </header>
+        <div class="flex-1 pb-20 lg:pb-0">
+          <div class="space-y-4 p-4 sm:p-6">
+            <div class="flex items-baseline gap-2"><h1 class="text-xl font-semibold max-lg:sr-only">Nhân viên</h1></div>
+            <div class="flex flex-wrap items-start gap-3">
+              <div class="w-full space-y-1.5 sm:w-72">
+                <label class="relative block"
+                  ><span class="sr-only">Tìm nhân viên</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-search pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path></svg
+                  ><input
+                    type="search"
+                    placeholder="Tìm theo tên, số điện thoại"
+                    class="h-11 w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:h-10 md:text-sm pl-10"
+                /></label>
+                <p class="px-1 text-sm tabular-nums text-muted">22 nhân viên</p>
+              </div>
+              <div class="flex flex-1 flex-wrap items-center gap-3">
+                <label class="inline-flex min-h-11 md:min-h-10 cursor-pointer items-center gap-2.5 text-sm"
+                  ><span class="relative inline-flex shrink-0"
+                    ><input
+                      type="checkbox"
+                      class="peer size-5 rounded-md cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-check pointer-events-none absolute inset-0 m-auto size-3.5 stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"
+                    >
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus pointer-events-none absolute inset-0 m-auto size-3.5 stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
+                    >
+                      <path d="M5 12h14"></path></svg></span
+                  >Hiện cả người đã nghỉ</label
+                >
+                <span class="ml-auto"
+                  ><button
+                    type="button"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-plus size-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5v14"></path></svg
+                    >Thêm nhân viên
+                  </button></span
+                >
+              </div>
+            </div>
+            <section class="overflow-hidden rounded-2xl border border-border bg-surface">
+              <table class="hidden w-full md:table">
+                <thead>
+                  <tr class="border-b border-border">
+                    <th class="px-5 py-3 text-left text-xs font-medium text-muted">Họ tên</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-muted">Vị trí thường đảm nhiệm</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-muted">Đăng nhập</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-muted">Lương cơ bản</th>
+                    <th class="px-5 py-3 text-right text-xs font-medium text-muted">Lương phụ trách</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Nguyễn Thị Mai</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0903 112 448</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p2-dot" aria-hidden="true"></span>Thu Ngân – Offline</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">mai.nguyen</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">25.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">30.000 đ</td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Trần Thị Mai</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0938 554 210</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">mai.tran</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">27.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Lê Minh Anh</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0912 668 031</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">minhanh</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">26.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">31.000 đ</td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Phạm Quốc Bảo</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0977 201 556</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">bao.pham</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">23.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Võ Thanh Hằng</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0909 430 118</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p3-dot" aria-hidden="true"></span>Thu Ngân – Online</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">hang.vo</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">25.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Đặng Văn Hùng</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0961 887 302</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">hung.dang</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">30.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Huỳnh Ngọc Trâm</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0938 220 761</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">tram.huynh</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">25.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">30.000 đ</td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Bùi Đức Long</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0905 667 129</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">long.bui</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">23.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Đỗ Khánh Linh</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0983 450 873</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Kiểm tra đơn</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p3-dot" aria-hidden="true"></span>Thu Ngân – Online</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">linh.do</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">24.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Hồ Gia Huy</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0901 776 345</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">huy.ho</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">23.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Ngô Phương Thảo</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0937 019 552</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">thao.ngo</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">26.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Dương Tuấn Kiệt</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0918 334 670</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">kiet.duong</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">27.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">32.000 đ</td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Lý Thu Trang</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0976 125 904</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p2-dot" aria-hidden="true"></span>Thu Ngân – Offline</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">trang.ly</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">25.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Trịnh Hoàng Nam</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0908 662 017</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">nam.trinh</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">25.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">29.000 đ</td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Mai Anh Thư</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0939 841 266</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Kiểm tra đơn</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">thu.mai</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">24.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Châu Bảo Ngọc</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0965 300 482</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">ngoc.chau</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">23.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Tôn Nữ Thị Phương Thảo</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0912 905 337</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"><span class="text-sm text-muted">—</span></span>
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="text-xs font-medium text-warn">Chưa có mật khẩu</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">23.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Lâm Chí Thanh</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0903 228 914</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">thanh.lam</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">26.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Phan Nhật Vy</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0986 512 740</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p2-dot" aria-hidden="true"></span>Thu Ngân – Offline</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">vy.phan</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">25.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap">30.000 đ</td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Kiều Minh Tâm</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0907 449 063</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">tam.kieu</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">23.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Quách Gia Bảo</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0932 006 781</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">giabao.quach</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">28.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                  <tr class="cursor-pointer hover:bg-surface-hover">
+                    <td class="px-5 py-3">
+                      <span class="flex items-center gap-2"><span class="truncate text-sm font-medium">Vương Hải Yến</span></span
+                      ><span class="mt-0.5 block text-xs tabular-nums text-muted">0911 873 520</span>
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="flex flex-wrap gap-1.5"
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                        ></span
+                      >
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="font-mono text-xs">yen.vuong</span></td>
+                    <td class="px-4 py-3 text-right text-sm tabular-nums whitespace-nowrap">26.000 đ</td>
+                    <td class="px-5 py-3 text-right text-sm tabular-nums whitespace-nowrap"><span class="text-muted">—</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <ul class="divide-y divide-border md:hidden">
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Nguyễn Thị Mai</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p2-dot" aria-hidden="true"></span>Thu Ngân – Offline</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                    ><span class="ml-auto tabular-nums">25.000 đ · PT 30.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Trần Thị Mai</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                    ><span class="ml-auto tabular-nums">27.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Lê Minh Anh</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                    ><span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                    ><span class="ml-auto tabular-nums">26.000 đ · PT 31.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Phạm Quốc Bảo</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                    ><span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                    ><span class="ml-auto tabular-nums">23.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Võ Thanh Hằng</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p3-dot" aria-hidden="true"></span>Thu Ngân – Online</span
+                    ><span class="ml-auto tabular-nums">25.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Đặng Văn Hùng</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                    ><span class="ml-auto tabular-nums">30.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Huỳnh Ngọc Trâm</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                    ><span class="ml-auto tabular-nums">25.000 đ · PT 30.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Bùi Đức Long</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                    ><span class="ml-auto tabular-nums">23.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Đỗ Khánh Linh</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Kiểm tra đơn</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p3-dot" aria-hidden="true"></span>Thu Ngân – Online</span
+                    ><span class="ml-auto tabular-nums">24.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Hồ Gia Huy</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                    ><span class="ml-auto tabular-nums">23.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Ngô Phương Thảo</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                    ><span class="ml-auto tabular-nums">26.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Dương Tuấn Kiệt</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                    ><span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                    ><span class="ml-auto tabular-nums">27.000 đ · PT 32.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Lý Thu Trang</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p2-dot" aria-hidden="true"></span>Thu Ngân – Offline</span
+                    ><span class="ml-auto tabular-nums">25.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Trịnh Hoàng Nam</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                    ><span class="ml-auto tabular-nums">25.000 đ · PT 29.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Mai Anh Thư</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Kiểm tra đơn</span
+                    ><span class="ml-auto tabular-nums">24.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Châu Bảo Ngọc</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                    ><span class="ml-auto tabular-nums">23.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Tôn Nữ Thị Phương Thảo</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">—<span class="ml-auto tabular-nums">23.000 đ</span></p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Lâm Chí Thanh</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                    ><span class="ml-auto tabular-nums">26.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Phan Nhật Vy</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p2-dot" aria-hidden="true"></span>Thu Ngân – Offline</span
+                    ><span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
+                    ><span class="inline-flex items-center gap-1"
+                      ><span class="size-1.5 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                    ><span class="ml-auto tabular-nums">25.000 đ · PT 30.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Kiều Minh Tâm</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                    ><span class="ml-auto tabular-nums">23.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Quách Gia Bảo</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
+                    ><span class="ml-auto tabular-nums">28.000 đ</span>
+                  </p>
+                </li>
+                <li class="cursor-pointer px-4 py-3 hover:bg-surface-hover">
+                  <p class="flex items-center gap-2 text-sm font-medium"><span class="truncate">Vương Hải Yến</span></p>
+                  <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                    <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                    ><span class="ml-auto tabular-nums">26.000 đ</span>
+                  </p>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+        <nav
+          class="fixed inset-x-0 bottom-0 z-30 grid h-16 border-t border-border bg-surface lg:hidden"
+          style="grid-template-columns: repeat(4, minmax(0, 1fr))"
+          aria-label="Mục chính"
+        >
+          <a href="../calendar/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-calendar-days size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M8 14h.01"></path>
+              <path d="M12 14h.01"></path>
+              <path d="M16 14h.01"></path>
+              <path d="M8 18h.01"></path>
+              <path d="M12 18h.01"></path>
+              <path d="M16 18h.01"></path></svg
+            >Lịch tuần</a
+          ><a href="../lateness/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-alarm-clock size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="13" r="8"></circle>
+              <path d="M12 9v4l2 2"></path>
+              <path d="M5 3 2 6"></path>
+              <path d="m22 6-3-3"></path>
+              <path d="M6.38 18.7 4 21"></path>
+              <path d="M17.64 18.67 20 21"></path></svg
+            >Đi trễ</a
+          ><a href="../staff/data.html" aria-current="page" class="flex flex-col items-center justify-center gap-1 text-xs font-medium text-primary"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-users size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+            >Nhân viên</a
+          ><a href="../activity-log/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-history size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l4 2"></path></svg
+            >Nhật ký</a
+          >
+        </nav>
+      </div>
+    </div>
+
+    <script src="../assets/static.js"></script>
+  </body>
+</html>

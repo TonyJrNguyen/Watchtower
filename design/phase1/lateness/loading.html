@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Đi trễ · Đang tải</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/app.css" />
+  </head>
+  <body class="bg-background font-sans text-foreground antialiased">
+    <div id="app">
+      <div class="flex min-h-screen flex-col">
+        <header class="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-6 border-b border-border bg-surface px-6 lg:flex">
+          <span class="flex min-w-0 items-center gap-2.5"
+            ><span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+              ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+                <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+                <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+                <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg></span
+            ><span class="truncate text-sm font-semibold text-foreground">Watchtower</span></span
+          >
+          <nav class="flex items-center gap-1" aria-label="Mục chính">
+            <a
+              href="../calendar/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-calendar-days size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="M8 14h.01"></path>
+                <path d="M12 14h.01"></path>
+                <path d="M16 14h.01"></path>
+                <path d="M8 18h.01"></path>
+                <path d="M12 18h.01"></path>
+                <path d="M16 18h.01"></path></svg
+              >Lịch tuần</a
+            ><a
+              href="../lateness/data.html"
+              aria-current="page"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors bg-secondary text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-alarm-clock size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+                <path d="M6.38 18.7 4 21"></path>
+                <path d="M17.64 18.67 20 21"></path></svg
+              >Đi trễ</a
+            ><a
+              href="../staff/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-users size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+              >Nhân viên</a
+            ><a
+              href="../activity-log/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-history size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M12 7v5l4 2"></path></svg
+              >Nhật ký</a
+            >
+          </nav>
+          <button
+            type="button"
+            aria-haspopup="menu"
+            class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
+          >
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            ><span class="text-sm font-medium">Trương Hữu Phúc</span
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-chevrons-up-down size-4 text-muted shrink-0"
+              aria-hidden="true"
+            >
+              <path d="m7 15 5 5 5-5"></path>
+              <path d="m7 9 5-5 5 5"></path>
+            </svg>
+          </button>
+        </header>
+        <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 lg:hidden">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+            ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+              <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+              <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+              <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg
+          ></span>
+          <p class="min-w-0 truncate text-base font-semibold">Đi trễ</p>
+          <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+          </button>
+        </header>
+        <div class="flex-1 pb-20 lg:pb-0">
+          <div class="space-y-4 p-4 sm:p-6">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
+              <h1 class="text-xl font-semibold tabular-nums">Đi trễ · 5–11/10</h1>
+              <div class="flex flex-1 items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="Tuần trước"
+                  title="Tuần trước"
+                  class="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors outline-hidden hover:bg-foreground/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent size-10 rounded-xl"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-left size-4 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="m15 18-6-6 6-6"></path>
+                  </svg></button
+                ><button
+                  type="button"
+                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap"
+                >
+                  Tuần này</button
+                ><button
+                  type="button"
+                  aria-label="Tuần sau"
+                  title="Tuần sau"
+                  class="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors outline-hidden hover:bg-foreground/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent size-10 rounded-xl"
+                  disabled=""
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-right size-4 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="m9 18 6-6-6-6"></path>
+                  </svg>
+                </button>
+                <span class="ml-auto"
+                  ><button
+                    type="button"
+                    aria-label="Quy tắc đi trễ"
+                    title="Quy tắc đi trễ"
+                    class="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors outline-hidden hover:bg-foreground/5 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent size-10 rounded-xl"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-circle-help size-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <path d="M12 17h.01"></path>
+                    </svg></button
+                ></span>
+              </div>
+            </div>
+            <div>
+              <div class="scrollbar-clean overflow-x-auto py-0.5">
+                <div role="tablist" aria-label="Ngày" class="flex w-max gap-1 px-1">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                  >
+                    T2 5<span class="text-xs font-normal tabular-nums text-foreground/70">1</span></button
+                  ><button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                  >
+                    T3 6</button
+                  ><button
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors bg-secondary text-foreground"
+                  >
+                    T4 7 · Hôm nay<span class="text-xs font-normal tabular-nums text-foreground/70">4</span></button
+                  ><button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                  >
+                    T5 8</button
+                  ><button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                  >
+                    T6 9</button
+                  ><button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                  >
+                    T7 10</button
+                  ><button
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    class="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent px-3 text-sm font-medium whitespace-nowrap outline-hidden transition-colors text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                  >
+                    CN 11
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+              <section class="rounded-2xl border border-border bg-surface">
+                <header class="flex items-center gap-3 px-5 pt-4 pb-3">
+                  <h2 class="text-base font-semibold">T4 7/10</h2>
+                  <span class="text-sm text-muted tabular-nums">15 ca</span
+                  ><span class="ml-auto hidden text-xs text-muted sm:inline">Không ghi gì là đúng giờ</span>
+                </header>
+
+                <div class="border-t border-border">
+                  <ul aria-busy="true" class="divide-y divide-border">
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-2/5 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-1/3 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-1/2 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-2/5 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-1/3 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-1/2 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-2/5 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                    <li class="flex items-center gap-4 px-5 py-3.5">
+                      <div class="h-3 w-20 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-3 w-1/3 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                        <div class="h-3 w-1/4 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                      </div>
+                      <div class="h-3 w-16 animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                    </li>
+                  </ul>
+                </div>
+              </section>
+              <section class="rounded-2xl border border-border bg-surface">
+                <header class="flex items-baseline justify-between gap-3 px-5 pt-4 pb-2">
+                  <h2 class="text-base font-semibold">Tuần này đến nay</h2>
+                  <span class="text-xs text-muted">Tạm tính</span>
+                </header>
+                <div class="space-y-3 px-5 pb-5">
+                  <div class="h-8 w-full animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-8 w-full animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-8 w-full animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                  <div class="h-8 w-full animate-pulse rounded-full bg-foreground/5 motion-reduce:animate-none"></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+        <nav
+          class="fixed inset-x-0 bottom-0 z-30 grid h-16 border-t border-border bg-surface lg:hidden"
+          style="grid-template-columns: repeat(4, minmax(0, 1fr))"
+          aria-label="Mục chính"
+        >
+          <a href="../calendar/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-calendar-days size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M8 14h.01"></path>
+              <path d="M12 14h.01"></path>
+              <path d="M16 14h.01"></path>
+              <path d="M8 18h.01"></path>
+              <path d="M12 18h.01"></path>
+              <path d="M16 18h.01"></path></svg
+            >Lịch tuần</a
+          ><a href="../lateness/data.html" aria-current="page" class="flex flex-col items-center justify-center gap-1 text-xs font-medium text-primary"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-alarm-clock size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="13" r="8"></circle>
+              <path d="M12 9v4l2 2"></path>
+              <path d="M5 3 2 6"></path>
+              <path d="m22 6-3-3"></path>
+              <path d="M6.38 18.7 4 21"></path>
+              <path d="M17.64 18.67 20 21"></path></svg
+            >Đi trễ</a
+          ><a href="../staff/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-users size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+            >Nhân viên</a
+          ><a href="../activity-log/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-history size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l4 2"></path></svg
+            >Nhật ký</a
+          >
+        </nav>
+      </div>
+    </div>
+
+    <script src="../assets/static.js"></script>
+  </body>
+</html>

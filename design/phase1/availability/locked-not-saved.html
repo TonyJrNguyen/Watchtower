@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Lịch rảnh · Đã khoá, quên bấm Lưu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/app.css" />
+  </head>
+  <body class="bg-background font-sans text-foreground antialiased">
+    <div id="app">
+      <div class="flex min-h-screen flex-col">
+        <header class="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-6 border-b border-border bg-surface px-6 lg:flex">
+          <span class="flex min-w-0 items-center gap-2.5"
+            ><span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+              ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+                <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+                <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+                <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg></span
+            ><span class="truncate text-sm font-semibold text-foreground">Watchtower</span></span
+          >
+          <nav class="flex items-center gap-1" aria-label="Mục chính">
+            <a
+              href="../availability/data.html"
+              aria-current="page"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors bg-secondary text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-calendar-check size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="m9 16 2 2 4-4"></path></svg
+              >Lịch rảnh</a
+            ><a
+              href="../my-profile/data.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-circle-user-round size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M18 20a6 6 0 0 0-12 0"></path>
+                <circle cx="12" cy="10" r="4"></circle>
+                <circle cx="12" cy="12" r="10"></circle></svg
+              >Hồ sơ của tôi</a
+            >
+          </nav>
+          <button
+            type="button"
+            aria-haspopup="menu"
+            class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
+          >
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">T</span
+            ><span class="text-sm font-medium">Huỳnh Ngọc Trâm</span
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-chevrons-up-down size-4 text-muted shrink-0"
+              aria-hidden="true"
+            >
+              <path d="m7 15 5 5 5-5"></path>
+              <path d="m7 9 5-5 5 5"></path>
+            </svg>
+          </button>
+        </header>
+        <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 lg:hidden">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+            ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+              <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+              <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+              <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg
+          ></span>
+          <p class="min-w-0 truncate text-base font-semibold">Lịch rảnh</p>
+          <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">T</span>
+          </button>
+        </header>
+        <div class="flex-1 pb-20 lg:pb-0">
+          <div class="mx-auto w-full max-w-2xl space-y-4 p-4 sm:p-6">
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <h1 class="text-xl font-semibold tabular-nums">Lịch rảnh · 12–18/10</h1>
+                <span
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-black/5 bg-neutral-bg text-neutral"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-lock size-3.5 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg
+                  >Đã khoá</span
+                >
+              </div>
+              <p class="inline-flex items-center gap-1.5 text-sm text-muted">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-lock size-4 text-muted shrink-0"
+                  aria-hidden="true"
+                >
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg
+                >Đã khoá lúc 15:00 T7 10/10, chỉ xem
+              </p>
+              <div role="status" class="flex gap-3 rounded-2xl border border-warn-bg bg-warn-bg p-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-alarm-clock mt-0.5 size-5 text-warn shrink-0"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="13" r="8"></circle>
+                  <path d="M12 9v4l2 2"></path>
+                  <path d="M5 3 2 6"></path>
+                  <path d="m22 6-3-3"></path>
+                  <path d="M6.38 18.7 4 21"></path>
+                  <path d="M17.64 18.67 20 21"></path>
+                </svg>
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-warn">Bạn chưa bấm Lưu trước giờ khoá</p>
+                  <p class="mt-0.5 text-sm text-pretty text-foreground/80">Hệ thống đã tự lưu bản nháp lúc 15:00 T7 10/10. Chủ quán xếp lịch theo bản này.</p>
+                </div>
+              </div>
+
+              <p class="text-sm text-muted">Ngày để trống là ngày bạn không làm được.</p>
+            </div>
+            <ul class="space-y-3">
+              <li class="rounded-2xl border bg-surface p-4 border-border">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Thứ Hai <span class="font-normal tabular-nums text-muted">12/10</span></p>
+                    <p class="mt-0.5 text-xs tabular-nums text-muted">8 giờ</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">17–23</span></span
+                    >
+                  </button>
+                </div>
+              </li>
+              <li class="rounded-2xl border bg-surface p-4 wt-glow">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Thứ Ba <span class="font-normal tabular-nums text-muted">13/10</span></p>
+                    <p class="mt-0.5 text-xs font-medium tabular-nums text-err">6 giờ · dưới 8 tiếng</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">17–23</span></span
+                    >
+                  </button>
+                </div>
+              </li>
+              <li class="rounded-2xl border bg-surface p-4 border-border">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Thứ Tư <span class="font-normal tabular-nums text-muted">14/10</span></p>
+                    <p class="mt-0.5 text-xs text-muted">Không làm</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">17–23</span></span
+                    >
+                  </button>
+                </div>
+              </li>
+              <li class="rounded-2xl border bg-surface p-4 border-border">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Thứ Năm <span class="font-normal tabular-nums text-muted">15/10</span></p>
+                    <p class="mt-0.5 text-xs tabular-nums text-muted">17 giờ</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">17–23</span></span
+                    >
+                  </button>
+                </div>
+              </li>
+              <li class="rounded-2xl border bg-surface p-4 wt-glow">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Thứ Sáu <span class="font-normal tabular-nums text-muted">16/10</span></p>
+                    <p class="mt-0.5 text-xs font-medium tabular-nums text-err">5 giờ · dưới 8 tiếng</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span
+                      class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80 font-medium text-primary-foreground"
+                      ><svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-clock size-3 shrink-0"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline></svg
+                      ><span class="truncate">18–23</span></span
+                    >
+                  </button>
+                </div>
+
+                <p class="mt-3 flex gap-1.5 text-sm text-foreground/80">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-message-square-text mt-0.5 size-4 text-muted shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    <path d="M13 8H7"></path>
+                    <path d="M17 12H7"></path></svg
+                  >Học tới 17:30
+                </p>
+              </li>
+              <li class="rounded-2xl border bg-surface p-4 border-border">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Thứ Bảy <span class="font-normal tabular-nums text-muted">17/10</span></p>
+                    <p class="mt-0.5 text-xs text-muted">Không làm</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="null"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">17–23</span></span
+                    >
+                  </button>
+                </div>
+              </li>
+              <li class="rounded-2xl border bg-surface p-4 border-border">
+                <div class="mb-3 flex items-center gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold whitespace-nowrap">Chủ Nhật <span class="font-normal tabular-nums text-muted">18/10</span></p>
+                    <p class="mt-0.5 text-xs tabular-nums text-muted">8 giờ</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-5 gap-2">
+                  <button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA1</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">07–11</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA2</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">11–13</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="true"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-primary bg-primary text-primary-foreground"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA3</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-primary-foreground/80"
+                      ><span class="truncate">13–15</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA4</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">15–17</span></span
+                    ></button
+                  ><button
+                    type="button"
+                    aria-pressed="false"
+                    disabled=""
+                    class="flex min-w-0 cursor-pointer flex-col items-center justify-center rounded-xl border text-center outline-hidden transition-colors disabled:cursor-not-allowed h-11 border-border-strong bg-surface text-foreground hover:bg-button-hover opacity-60"
+                  >
+                    <span class="text-sm font-semibold leading-none">CA5</span
+                    ><span class="mt-1 inline-flex max-w-full items-center gap-0.5 text-xs leading-none tabular-nums text-muted"
+                      ><span class="truncate">17–23</span></span
+                    >
+                  </button>
+                </div>
+              </li>
+            </ul>
+            <div class="sticky bottom-20 z-20 mt-4 lg:bottom-4">
+              <div class="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 shadow-popover">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold tabular-nums">5 ngày · 44 giờ</p>
+                  <p class="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-warn">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-triangle-alert size-3.5 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path>
+                      <path d="M12 9v4"></path>
+                      <path d="M12 17h.01"></path></svg
+                    >3/5 ngày đủ 8 tiếng
+                  </p>
+                </div>
+                <p class="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-warn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-alarm-clock size-3.5 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="13" r="8"></circle>
+                    <path d="M12 9v4l2 2"></path>
+                    <path d="M5 3 2 6"></path>
+                    <path d="m22 6-3-3"></path>
+                    <path d="M6.38 18.7 4 21"></path>
+                    <path d="M17.64 18.67 20 21"></path></svg
+                  >Tự lưu khi khoá
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <nav
+          class="fixed inset-x-0 bottom-0 z-30 grid h-16 border-t border-border bg-surface lg:hidden"
+          style="grid-template-columns: repeat(2, minmax(0, 1fr))"
+          aria-label="Mục chính"
+        >
+          <a href="../availability/data.html" aria-current="page" class="flex flex-col items-center justify-center gap-1 text-xs font-medium text-primary"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-calendar-check size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="m9 16 2 2 4-4"></path></svg
+            >Lịch rảnh</a
+          ><a href="../my-profile/data.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-circle-user-round size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M18 20a6 6 0 0 0-12 0"></path>
+              <circle cx="12" cy="10" r="4"></circle>
+              <circle cx="12" cy="12" r="10"></circle></svg
+            >Hồ sơ của tôi</a
+          >
+        </nav>
+      </div>
+    </div>
+
+    <script src="../assets/static.js"></script>
+  </body>
+</html>

@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Activity log · With data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/app.css" />
+  </head>
+  <body class="bg-background font-sans text-foreground antialiased">
+    <div id="app">
+      <div class="flex min-h-screen flex-col">
+        <header class="sticky top-0 z-30 hidden h-16 shrink-0 items-center gap-6 border-b border-border bg-surface px-6 lg:flex">
+          <span class="flex min-w-0 items-center gap-2.5"
+            ><span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+              ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+                <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+                <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+                <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg></span
+            ><span class="truncate text-sm font-semibold text-foreground">Watchtower</span></span
+          >
+          <nav class="flex items-center gap-1" aria-label="Main">
+            <a
+              href="../calendar/data.en.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-calendar-days size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="M8 14h.01"></path>
+                <path d="M12 14h.01"></path>
+                <path d="M16 14h.01"></path>
+                <path d="M8 18h.01"></path>
+                <path d="M12 18h.01"></path>
+                <path d="M16 18h.01"></path></svg
+              >Schedule</a
+            ><a
+              href="../lateness/data.en.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-alarm-clock size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+                <path d="M6.38 18.7 4 21"></path>
+                <path d="M17.64 18.67 20 21"></path></svg
+              >Lateness</a
+            ><a
+              href="../staff/data.en.html"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors text-foreground/70 hover:bg-item-hover hover:text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-users size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+              >Staff</a
+            ><a
+              href="../activity-log/data.en.html"
+              aria-current="page"
+              class="inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-medium outline-hidden transition-colors bg-secondary text-foreground"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-history size-4 shrink-0"
+                aria-hidden="true"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M12 7v5l4 2"></path></svg
+              >Activity log</a
+            >
+          </nav>
+          <button
+            type="button"
+            aria-haspopup="menu"
+            class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
+          >
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            ><span class="text-sm font-medium">Trương Hữu Phúc</span
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-chevrons-up-down size-4 text-muted shrink-0"
+              aria-hidden="true"
+            >
+              <path d="m7 15 5 5 5-5"></path>
+              <path d="m7 9 5-5 5 5"></path>
+            </svg>
+          </button>
+        </header>
+        <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 lg:hidden">
+          <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+            ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+              <rect x="4" y="4.5" width="11" height="4" rx="2"></rect>
+              <rect x="9" y="10" width="11" height="4" rx="2"></rect>
+              <rect x="4" y="15.5" width="7" height="4" rx="2"></rect></svg
+          ></span>
+          <p class="min-w-0 truncate text-base font-semibold">Activity log</p>
+          <button type="button" aria-label="Account" class="ml-auto cursor-pointer rounded-full outline-hidden">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+          </button>
+        </header>
+        <div class="flex-1 pb-20 lg:pb-0">
+          <div class="space-y-4 p-4 sm:p-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="mr-2 w-full text-xl font-semibold lg:w-auto">Activity log</h1>
+              <label class="relative block w-full sm:w-64 lg:ml-auto"
+                ><span class="sr-only">Search</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-search pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path></svg
+                ><input
+                  type="search"
+                  placeholder="Search by staff name"
+                  class="h-11 w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:h-10 md:text-sm pl-10"
+              /></label>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="group inline-flex h-10 w-fit max-w-full cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
+                >
+                  <span class="text-muted">Type:</span><span class="truncate font-medium text-foreground">All</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-down size-4 text-muted transition-transform group-aria-expanded:rotate-180 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg></button
+                ><button
+                  type="button"
+                  class="group inline-flex h-10 w-fit max-w-full cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
+                >
+                  <span class="text-muted">Range:</span><span class="truncate font-medium text-foreground">Last 7 days</span
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-chevron-down size-4 text-muted transition-transform group-aria-expanded:rotate-180 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="m6 9 6 6 6-6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <section class="overflow-hidden rounded-2xl border border-border bg-surface">
+              <table class="hidden w-full lg:table">
+                <thead>
+                  <tr class="border-b border-border">
+                    <th class="py-3 text-left text-xs font-medium text-muted px-5">When</th>
+                    <th class="py-3 text-left text-xs font-medium text-muted px-4">What</th>
+                    <th class="py-3 text-left text-xs font-medium text-muted px-4">Before</th>
+                    <th class="py-3 text-left text-xs font-medium text-muted px-4">After</th>
+                    <th class="py-3 text-left text-xs font-medium text-muted px-4">Reason</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border">
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 16:42</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Placed · Nguyễn Thị Mai</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner · T4 14/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">—</td>
+                    <td class="px-4 py-3 text-sm">07:00–13:00 · QC - Inside</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 16:40</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Gave position · Đặng Văn Hùng</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner · T4 14/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">17:00–23:00 · no position</td>
+                    <td class="px-4 py-3 text-sm">17:00–23:00 · Kitchen</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 16:31</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Placed outside availability · Lê Minh Anh</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner · T5 15/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">—</td>
+                    <td class="px-4 py-3 text-sm">17:00–23:00 · Barista</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">Agreed on Zalo</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 15:00</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Registration locked</p>
+                      <p class="mt-0.5 text-xs text-muted"><span class="text-muted">System</span> · Week 12–18 Oct</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">Open</td>
+                    <td class="px-4 py-3 text-sm">Locked</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">07/10 12:10</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Recorded arrival · Bùi Đức Long</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner · T4 7/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">On time</td>
+                    <td class="px-4 py-3 text-sm">Arrived 12:05 · anomaly</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">07/10 07:30</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Recorded arrival · Huỳnh Ngọc Trâm</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner · T4 7/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">On time</td>
+                    <td class="px-4 py-3 text-sm">Arrived 07:22 · 22 min late</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">06/10 18:05</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Shortened, with cover · Phạm Quốc Bảo</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner · T3 6/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">07:00–13:00</td>
+                    <td class="px-4 py-3 text-sm">07:00–11:30 · Kiệt covers 11:30–13:00</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">Left early, family matter</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">04/10 21:15</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Added a usual position · Dương Tuấn Kiệt</p>
+                      <p class="mt-0.5 text-xs text-muted"><span class="text-muted">System</span></p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">Kitchen</td>
+                    <td class="px-4 py-3 text-sm">Kitchen, Server</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">Server: 64 h in the last 12 weeks</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">02/10 09:14</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Set password · Nguyễn Thị Mai</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">—</td>
+                    <td class="px-4 py-3 text-sm">Set</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">30/09 20:02</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Deactivated account · Lưu Văn Đức</p>
+                      <p class="mt-0.5 text-xs text-muted">Owner</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">Active</td>
+                    <td class="px-4 py-3 text-sm">Left</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">Left from 1 Oct</td>
+                  </tr>
+                </tbody>
+              </table>
+              <ul class="divide-y divide-border lg:hidden">
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Placed · Nguyễn Thị Mai</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">10/10 16:42</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → 07:00–13:00 · QC - Inside</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Gave position · Đặng Văn Hùng</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">10/10 16:40</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">17:00–23:00 · no position</span> → 17:00–23:00 · Kitchen</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Placed outside availability · Lê Minh Anh</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">10/10 16:31</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → 17:00–23:00 · Barista</p>
+                  <p class="mt-1 text-xs text-muted">Reason: Agreed on Zalo</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Registration locked</span><span class="shrink-0 text-xs tabular-nums text-muted">10/10 15:00</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">Open</span> → Locked</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Recorded arrival · Bùi Đức Long</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">07/10 12:10</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">On time</span> → Arrived 12:05 · anomaly</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Recorded arrival · Huỳnh Ngọc Trâm</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">07/10 07:30</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">On time</span> → Arrived 07:22 · 22 min late</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Shortened, with cover · Phạm Quốc Bảo</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">06/10 18:05</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">07:00–13:00</span> → 07:00–11:30 · Kiệt covers 11:30–13:00</p>
+                  <p class="mt-1 text-xs text-muted">Reason: Left early, family matter</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Added a usual position · Dương Tuấn Kiệt</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">04/10 21:15</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">Kitchen</span> → Kitchen, Server</p>
+                  <p class="mt-1 text-xs text-muted">Reason: Server: 64 h in the last 12 weeks</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Set password · Nguyễn Thị Mai</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">02/10 09:14</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → Set</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Deactivated account · Lưu Văn Đức</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">30/09 20:02</span>
+                  </p>
+                  <p class="mt-1 text-sm"><span class="text-muted">Active</span> → Left</p>
+                  <p class="mt-1 text-xs text-muted">Reason: Left from 1 Oct</p>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </div>
+        <nav
+          class="fixed inset-x-0 bottom-0 z-30 grid h-16 border-t border-border bg-surface lg:hidden"
+          style="grid-template-columns: repeat(4, minmax(0, 1fr))"
+          aria-label="Main"
+        >
+          <a href="../calendar/data.en.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-calendar-days size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M8 2v4"></path>
+              <path d="M16 2v4"></path>
+              <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+              <path d="M3 10h18"></path>
+              <path d="M8 14h.01"></path>
+              <path d="M12 14h.01"></path>
+              <path d="M16 14h.01"></path>
+              <path d="M8 18h.01"></path>
+              <path d="M12 18h.01"></path>
+              <path d="M16 18h.01"></path></svg
+            >Schedule</a
+          ><a href="../lateness/data.en.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-alarm-clock size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="13" r="8"></circle>
+              <path d="M12 9v4l2 2"></path>
+              <path d="M5 3 2 6"></path>
+              <path d="m22 6-3-3"></path>
+              <path d="M6.38 18.7 4 21"></path>
+              <path d="M17.64 18.67 20 21"></path></svg
+            >Lateness</a
+          ><a href="../staff/data.en.html" class="flex flex-col items-center justify-center gap-1 text-xs text-muted"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-users size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+            >Staff</a
+          ><a href="../activity-log/data.en.html" aria-current="page" class="flex flex-col items-center justify-center gap-1 text-xs font-medium text-primary"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-history size-5 shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l4 2"></path></svg
+            >Activity log</a
+          >
+        </nav>
+      </div>
+    </div>
+
+    <script src="../assets/static.js"></script>
+  </body>
+</html>

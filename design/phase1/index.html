@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchtower · Phase 1 screens</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/app.css" />
+  </head>
+  <body class="bg-background font-sans text-foreground antialiased">
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div class="flex items-center gap-2.5">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground"
+          ><svg viewBox="0 0 24 24" fill="currentColor" class="size-5" aria-hidden="true">
+            <rect x="4" y="4.5" width="11" height="4" rx="2" />
+            <rect x="9" y="10" width="11" height="4" rx="2" />
+            <rect x="4" y="15.5" width="7" height="4" rx="2" /></svg></span
+        ><span class="text-sm font-semibold">Watchtower</span>
+      </div>
+      <h1 class="mt-6 text-2xl font-semibold text-balance">Phase 1 screens</h1>
+      <p class="mt-2 max-w-2xl text-sm/6 text-pretty text-muted">
+        Static pages built from the Phase 1 wireframe: weekly calendar option B, every other screen option A, bottom bar on phones. Each page works from 375 px
+        up unless it is marked with one width. All data is fake.
+      </p>
+      <div class="mt-6 gap-4 md:columns-2">
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Lịch tuần <span class="font-normal text-muted">· Schedule</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Owner</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="calendar/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/no-positions.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Đã xếp ca, chưa giao vị trí</span
+                  ><span class="block text-xs text-muted">Placed, no positions yet</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/registration-open.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Đăng ký đang mở</span><span class="block text-xs text-muted">Registration open</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/published.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Đã công bố</span><span class="block text-xs text-muted">Published</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/loading.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đang tải</span><span class="block text-xs text-muted">Loading</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/empty.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Rỗng</span><span class="block text-xs text-muted">Empty</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+          <p class="border-t border-border bg-background/60 px-4 pt-3 pb-1 text-xs font-medium text-muted">Overlays</p>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="calendar/data-staff-list.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Danh sách nhân viên</span><span class="block text-xs text-muted">Staff list</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">1440 px</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-filters.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Bộ lọc</span><span class="block text-xs text-muted">Filters</span></span>
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">1440 px</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-add-staff.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Thêm người vào ca</span><span class="block text-xs text-muted">Add someone to a period</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">1440 px</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-date-picker.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Chọn tuần theo ngày</span><span class="block text-xs text-muted">Date picker</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">1440 px</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-publish-dialog.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Hộp Công bố</span><span class="block text-xs text-muted">Publish dialog</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-remove-day-dialog.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Hộp Bỏ khỏi mọi ca trong ngày</span
+                  ><span class="block text-xs text-muted">Take off every shift dialog</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/published-edit-shift-dialog.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Hộp Sửa ca (đã công bố)</span
+                  ><span class="block text-xs text-muted">Edit shift dialog (published)</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-panel-sheet.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Panel người (điện thoại)</span
+                  ><span class="block text-xs text-muted">Person panel (phone)</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">375 px</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="calendar/data-staff-sheet.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Danh sách nhân viên (điện thoại)</span
+                  ><span class="block text-xs text-muted">Staff list (phone)</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">375 px</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Đi trễ <span class="font-normal text-muted">· Lateness</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Owner</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="lateness/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="lateness/previous-week.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Tuần trước (chỉ xem)</span
+                  ><span class="block text-xs text-muted">Previous week (view only)</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="lateness/loading.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đang tải</span><span class="block text-xs text-muted">Loading</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="lateness/empty.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Rỗng</span><span class="block text-xs text-muted">Empty</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="lateness/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="lateness/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+          <p class="border-t border-border bg-background/60 px-4 pt-3 pb-1 text-xs font-medium text-muted">Overlays</p>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="lateness/data-anomaly-dialog.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Hộp Ca bất thường</span><span class="block text-xs text-muted">Anomaly dialog</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Lịch rảnh <span class="font-normal text-muted">· Availability</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Staff</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="availability/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/unsaved-draft.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có nháp chưa lưu</span><span class="block text-xs text-muted">Unsaved draft</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/nothing-selected.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Chưa chọn ca nào</span><span class="block text-xs text-muted">Nothing selected</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/locked.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đã khoá</span><span class="block text-xs text-muted">Locked</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/locked-not-saved.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Đã khoá, quên bấm Lưu</span><span class="block text-xs text-muted">Locked, not saved</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/loading.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đang tải</span><span class="block text-xs text-muted">Loading</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="availability/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+          <p class="border-t border-border bg-background/60 px-4 pt-3 pb-1 text-xs font-medium text-muted">Overlays</p>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="availability/data-custom-times.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Sửa giờ riêng</span><span class="block text-xs text-muted">Custom times editor</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Hồ sơ của tôi <span class="font-normal text-muted">· My profile</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Staff</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="my-profile/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="my-profile/not-published.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Chưa công bố</span><span class="block text-xs text-muted">Not published</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="my-profile/loading.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đang tải</span><span class="block text-xs text-muted">Loading</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="my-profile/empty.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Rỗng</span><span class="block text-xs text-muted">Empty</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="my-profile/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="my-profile/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Nhân viên <span class="font-normal text-muted">· Staff</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Owner</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="staff/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="staff/loading.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đang tải</span><span class="block text-xs text-muted">Loading</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="staff/empty.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Rỗng</span><span class="block text-xs text-muted">Empty</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="staff/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="staff/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+          <p class="border-t border-border bg-background/60 px-4 pt-3 pb-1 text-xs font-medium text-muted">Overlays</p>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="staff/data-edit-drawer.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Sửa nhân viên</span><span class="block text-xs text-muted">Edit staff member</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="staff/data-edit-drawer-limit.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Sửa nhân viên: chọn vị trí thứ ba</span
+                  ><span class="block text-xs text-muted">Edit staff member: a third usual position</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Nhật ký <span class="font-normal text-muted">· Activity log</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Owner</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="activity-log/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="activity-log/loading.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Đang tải</span><span class="block text-xs text-muted">Loading</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="activity-log/empty.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Rỗng</span><span class="block text-xs text-muted">Empty</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="activity-log/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="activity-log/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+        <section class="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-border bg-surface">
+          <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+            <h2 class="min-w-0 flex-1 text-base font-semibold">Đăng nhập <span class="font-normal text-muted">· Sign in</span></h2>
+            <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">Everyone</span>
+          </div>
+          <ul class="divide-y divide-border">
+            <li>
+              <a
+                href="sign-in/data.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data</span></span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="sign-in/error.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"><span class="block text-sm font-medium">Lỗi</span><span class="block text-xs text-muted">Error</span></span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+            <li>
+              <a
+                href="sign-in/data.en.html"
+                class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover"
+              >
+                <span class="min-w-0 flex-1"
+                  ><span class="block text-sm font-medium">Có dữ liệu</span><span class="block text-xs text-muted">With data · English copy</span></span
+                >
+                <span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">EN</span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" /></svg
+              ></a>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
