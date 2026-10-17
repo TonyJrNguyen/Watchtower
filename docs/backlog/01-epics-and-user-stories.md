@@ -1,7 +1,7 @@
 # Shift Scheduling & People Management — Epic & Story Breakdown
 
-**Source:** `shift-scheduling-solution-requirements.md` v1.9 (2026-10-11), the approved Phase 1 prototype `prototypes/phase1-demo.html` and, for every v1.9 change, the Phase 1 wireframe `prototypes/phase1-wireframe/wireframe.html`
-**Status:** Draft for internal review. Revised 2026-09-29, 2026-10-04 and 2026-10-11 — see §0. Story IDs are stable once agreed; requirement IDs map back to the PRD.
+**Source:** `shift-scheduling-solution-requirements.md` v1.10 (2026-10-17), the approved Phase 1 prototype `prototypes/phase1-demo.html` and, for every v1.9 and v1.10 change, the Phase 1 wireframe `prototypes/phase1-wireframe/wireframe.html` (approved 2026-10-17)
+**Status:** Draft for internal review. Revised 2026-09-29, 2026-10-04, 2026-10-11 and 2026-10-17 — see §0. Story IDs are stable once agreed; requirement IDs map back to the PRD.
 **Convention:** Mike Cohn use case + Gherkin acceptance criteria. Every story is a vertical slice (UI + API + data), never a technical layer.
 
 ---
@@ -50,19 +50,38 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 
 - **Phase 1 goes from 209 md to 233 md** of stories. Phase 2 is unchanged: the CA 5 rules change what S-9.1 and S-10.1 compute, not how much there is to build.
 
+**Revision 2026-10-17 (PRD v1.10, client feedback of 2026-10-16/17, `docs/feedback/2026-10-16-client-feedback.md`):**
+
+| Change | Stories | md |
+|---|---|---|
+| Shift-lead switch on the staff account, lead rate required, both rates in the staff list | **New S-1.15** | +2 |
+| Usual positions learned from the published schedule: hours per position, top two at publication, pinned by hand, reset on removal, System entries in the log | **New S-1.16** | +5 |
+| Hours worked per position: on the chips in the staff account, "Vị trí đã làm" on My profile | **New S-1.17** | +2 |
+| Phụ trách only for granted staff, wherever positions are given; flagged when the switch goes off | **New S-4.21** | +3 |
+| The flag reads experienced positions (hours or set by hand) and clears itself; filters follow | S-4.6 | +1 |
+| Phụ trách needs exactly one of Trong or Ngoài | S-3.7 | +1 |
+| Per-position default rates retired (FR-O40) | S-1.12 | −2 |
+| Shared assignments retired (FR-O30) | S-3.6 | −3 |
+| One position per period: two positions on one shift retired | S-4.4 | −3 |
+| Side panel gives one position, with no primary | S-4.12 | −1 |
+| **Net** | | **+5** |
+
+- **Phase 1 goes from 233 md to 238 md** of stories. Phase 2 keeps its size: S-9.2 resolves the rate by the shift's position (lead or base) instead of staff-then-default, and S-9.3 becomes the lateness deduction at the shift's rate instead of "multi-position paid once".
+- The staff page is now **My profile** ("Hồ sơ của tôi"), replacing My shifts / My Schedule everywhere.
+
 ---
 
 ## 1. Epic map
 
 | ID | Epic | Phase | PRD requirements | Size | Delivers |
 |---|---|---|---|---|---|
-| **E1** | Foundation, Access & Configuration | 1 | FR-A1–A11, FR-O16, FR-O28, FR-O40, NFR-1, NFR-2, NFR-6, NFR-7, NFR-11 | XL | Accounts with nickname, roles, sign-in, audit log, VI/EN, configuration of shift periods, window, positions, default rates and skip reasons |
+| **E1** | Foundation, Access & Configuration | 1 | FR-A1–A14, FR-C2, FR-O16, FR-O28, NFR-1, NFR-2, NFR-6, NFR-7, NFR-11 | XL | Accounts with nickname, base and lead rates, the shift-lead switch and usual positions learned from the schedule; roles, sign-in, audit log, VI/EN, configuration of shift periods, window, positions and skip reasons |
 | **E2** | Weekly Availability Registration | 1 | FR-S1, S2, S3, S5, S12, S14, S19–S22 | L | Staff register CA 1–CA 5 inside the window, as a draft until saved, with optional custom times inside a period and a note per day |
-| **E3** | Staffing Needs, Positions & Coverage | 1 | FR-O1, O4, O22, O23, O30, O38, O45 | M | Needs set per position, period and day in the Staffing section, sub-positions and attributes, coverage visible before and after assignment |
-| **E4** | Weekly Calendar & Shift Assignment | 1 | FR-O2, O3, O8, O10, O11, O12, O14, O15, O20, O21, O29, O32, O39, O42–O44, O46–O50 | XL | One calendar, by day, three days or week: see who registered → place people → give positions; undo/redo in draft; custom-time requests |
-| **E5** | Draft, Publish & My Schedule | 1 | FR-O31, O33, FR-S4, S11 | M | Publish gate (no shift, no position), skip-with-reason, staff read-only schedule |
+| **E3** | Staffing Needs, Positions & Coverage | 1 | FR-O1, O4, O22, O23, O38, O45 | M | Needs set per position, period and day in the Staffing section, sub-positions and attributes, coverage visible before and after assignment |
+| **E4** | Weekly Calendar & Shift Assignment | 1 | FR-O2, O3, O8, O10, O11, O12, O14, O15, O20, O21, O29, O32, O39, O42–O44, O46–O51 | XL | One calendar, by day, three days or week: see who registered → place people → give positions; undo/redo in draft; custom-time requests |
+| **E5** | Draft, Publish & My profile | 1 | FR-O31, O33, FR-S4, S11 | M | Publish gate (no shift, no position), skip-with-reason, the staff member's own page with their read-only schedule |
 | **E6** | Notifications & Push | **2** | FR-N1–N9, N13, NFR-4, NFR-9, NFR-10 | L | Web push + in-app inbox + install onboarding (S-1.9) |
-| **E7** | Attendance & Lateness (manual) | 1 | FR-O24, O25, O26, FR-S9, S17, S18, FR-T18, FR-B1, FR-B17, FR-C14; pay estimate *(named in FR-C14, no requirement of its own yet)* | M | Lateness rules applied to manual input, in minutes and status; bonus preview; pay estimate |
+| **E7** | Attendance & Lateness (manual) | 1 | FR-O24, O25, O26, FR-S9, S17, S18, FR-T18, FR-B1, FR-B17, FR-C13, FR-C14 (pay estimate) | M | Lateness rules applied to manual input, in minutes and status; bonus preview; pay estimate |
 | **E8** | Control Centre | **2** | FR-O34–O37 | M | Landing surface: where is the week, what needs me |
 | **E16** | Responsive Parity *(cross-cutting)* | 1 / 2 *(control centre and inbox only)* | NFR-5, NFR-10 | L | Every Phase 1 surface has a designed phone layout and works on desktop for staff |
 | **E9** | Payroll & Weekly Close | 2 | FR-C1–C13, FR-O27 | L | Assigned-hours pay, deductions converted and applied, export, close/force-close |
@@ -158,23 +177,23 @@ Only the epics where the outcome is genuinely uncertain are framed as hypotheses
 
 Effort is in man-days (md), covering design + build + test for that slice. Where the approved prototype already settles a screen's layout and behaviour, the design share of the estimate is reduced accordingly. Stories above the 5-md Ready limit (§7) are marked and are split at sprint planning.
 
-**Phase 1 behaviour reference:** `prototypes/phase1-demo.html` replaces Wireframe v1 for every Phase 1 screen (PRD §5.3). Where the prototype and the PRD disagree, the PRD wins.
+**Phase 1 behaviour reference:** `prototypes/phase1-demo.html` replaces Wireframe v1 for every Phase 1 screen (PRD §5.3), and the Phase 1 wireframe (approved 2026-10-17) for every v1.9 and v1.10 change. Where they and the PRD disagree, the PRD wins.
 
 ### E1 — Foundation & Access
 
 #### S-1.1 — Administrator creates a staff account
 - **As an** Administrator (shop owner)
-- **I want to** create a staff account with profile, qualified positions and rate configuration
+- **I want to** create a staff account with profile, base rate and, if I like, usual positions
 - **so that** a new hire can start registering availability the same day, without me setting anything up twice.
 
 **AC — Scenario: new staff account created and usable**
 - **Given** I am signed in as Administrator
 - **and Given** I am on the Account Management screen
-- **When** I submit a valid staff profile with full name, nickname (or leave it empty to accept the suggestion), contact, qualified positions, an optional own hourly rate, a username and a password
+- **When** I submit a valid staff profile with full name, nickname (or leave it empty to accept the suggestion), contact, a base rate, up to two usual positions (optional), a username and a password
 - **Then** the account is created in active state, the password stays on screen until I close the record so I can pass it on, it is never shown again afterwards, and the action is written to the audit log with my actor ID and timestamp.
 
-**Requirements:** FR-A1, FR-A4, FR-A7, FR-A11, NFR-1, NFR-6 · **Effort:** 4 md
-**Note:** qualified positions are recorded at position level only, never per sub-position (§3.3). With no own rate, the position default applies (FR-C13, S-1.12).
+**Requirements:** FR-A1, FR-A4, FR-A7, FR-A11, FR-C2, NFR-1, NFR-6 · **Effort:** 4 md
+**Note:** usual positions are recorded at position level only, never per sub-position (§3.3), and the system keeps them up to date from the published schedule (S-1.16). The shift-lead switch and lead rate are S-1.15.
 
 ---
 
@@ -196,15 +215,15 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 #### S-1.3 — Administrator edits a staff profile
 - **As an** Administrator
-- **I want to** change a staff member's profile, qualified positions or rate at any time
+- **I want to** change a staff member's profile, usual positions or rates at any time
 - **so that** a promotion or a rate change takes effect without waiting for a deployment.
 
 **AC — Scenario: rate change is recorded and traceable**
-- **Given** a staff member has an existing hourly rate
-- **When** I change the rate and save
+- **Given** a staff member has an existing base rate
+- **When** I change the base rate and save
 - **Then** the pay estimate (S-7.8) uses the new rate from then on, and the audit log records the previous value, the new value, my actor ID and the timestamp.
 
-**Requirements:** FR-A2, NFR-1 · **Effort:** 2 md
+**Requirements:** FR-A2, FR-C2, NFR-1 · **Effort:** 2 md
 **Note:** whether a rate change is retroactive within an open pay period (B1) only matters once payroll exists. It is a Phase 2 question and does not block this story.
 
 ---
@@ -273,8 +292,8 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **AC — Scenario: language applies to every screen**
 - **Given** my account language is set to Vietnamese
-- **When** I open My shifts
-- **Then** the interface renders in Vietnamese, including position labels (QC, Thu Ngân – Offline, Thu Ngân – Online, Pha chế, Phục vụ, Kiểm tra đơn, Bếp) and "Position - sub-position" labels such as "Pha chế - Matcha, Trà".
+- **When** I open My profile
+- **Then** the interface renders in Vietnamese, including position labels (Phụ trách, QC, Thu Ngân – Offline, Thu Ngân – Online, Pha chế, Phục vụ, Kiểm tra đơn, Bếp) and "Position - sub-position" labels such as "Pha chế - Matcha, Trà".
 
 **Requirements:** NFR-7 · **Effort:** 4 md
 **Note:** VI is the primary language for staff-facing screens. Budget for Vietnamese string length in layouts. Notification text (FR-N2) is added with E6 in Phase 2.
@@ -333,17 +352,11 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 ---
 
-#### S-1.12 — Administrator sets the default hourly rate of each position
-- **As an** Administrator
-- **I want to** change a position's default hourly rate from the staff screen
-- **so that** a pay change is not a software release.
+#### S-1.12 — ~~Administrator sets the default hourly rate of each position~~ · **REMOVED 2026-10-17**
 
-**AC — Scenario: default rate edited without a deployment**
-- **Given** a staff member has no own rate and is placed as Pha chế
-- **When** I change the Pha chế default rate
-- **Then** their pay estimate (S-7.8) uses the new rate, and the change is logged with old and new values.
+> Removed with FR-O40 in PRD v1.10: rates belong to the person (a base rate, plus a lead rate for shift leads, S-1.15), and positions carry no rate. Kept for traceability; the ID is not reused.
 
-**Requirements:** FR-O40 *(proposed pending client confirmation)*, FR-C13, NFR-1 · **Effort:** 2 md
+**Requirements:** FR-O40 *(retired)* · **Effort:** ~~2 md~~ 0 md
 
 ---
 
@@ -373,9 +386,73 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **Then** every screen shows the new label, existing assignments keep their data, and the change is logged.
 
 **Requirements:** FR-O28, FR-S1, FR-O33, NFR-1 · **Effort:** 5 md
-**Note:** in Phase 1 per CLAUDE.md (2026-09-29). Default rates are S-1.12. Deactivating a position hides it from new assignments but keeps it on past ones.
+**Note:** in Phase 1 per CLAUDE.md (2026-09-29). Positions carry no rate (PRD v1.10); which position is the shift lead is part of the catalogue. Deactivating a position hides it from new assignments but keeps it on past ones.
 
-**E1 subtotal: 38 md** (S-1.9 excluded, 4 md moved to Phase 2)
+---
+
+#### S-1.15 — Administrator grants the shift lead
+- **As an** Administrator
+- **I want to** turn on "Phụ trách" for the staff members I trust to lead a shift, with their lead rate
+- **so that** only they can be placed as shift lead, and their lead hours are paid at the rate we agreed.
+
+**AC — Scenario: the switch needs a lead rate**
+- **Given** staff A has a base rate of 25.000 ₫/h
+- **When** I turn on Phụ trách and save without a lead rate
+- **Then** the save is refused with the reason at the lead-rate field; **and When** I enter 30.000 ₫/h and save, **Then** staff A shows Phụ trách beside their usual positions, the staff list shows both rates, and the change is logged.
+
+**AC — Scenario: turning it off keeps the shifts**
+- **Given** staff A holds a Phụ trách shift next Wednesday
+- **When** I turn the switch off and save
+- **Then** the shift stays and is flagged "Shift lead turned off, needs another lead" (S-4.21), and staff A no longer has a lead rate.
+
+**Requirements:** FR-A13, FR-C2, NFR-1 · **Effort:** 2 md
+
+---
+
+#### S-1.16 — Usual positions keep themselves up to date from the schedule
+- **As an** Administrator
+- **I want to** each staff member's usual positions to follow how I actually schedule them
+- **so that** the staff list and the calendar panel show what people really do, without me maintaining it.
+
+**AC — Scenario: learned at publication**
+- **Given** over the last 12 published weeks staff A has 120 hours as Bếp, 64 as Phục vụ and 30 as Pha chế
+- **When** I publish the week
+- **Then** staff A's usual positions are Bếp and Phục vụ, Pha chế is not added because it is under 50 hours, and the audit log records each change with the actor System and the reason.
+
+**AC — Scenario: the Owner's choice wins**
+- **Given** I set Kiểm tra đơn on staff A by hand and remove Phục vụ
+- **When** the next week is published
+- **Then** Kiểm tra đơn keeps its place, and Phục vụ does not come back until staff A works more than 50 further hours in it.
+
+**AC — Scenario: at most two**
+- **Given** staff A has two usual positions
+- **When** I choose a third in the staff form
+- **Then** it is refused with "At most 2 usual positions. Remove one before choosing another." and nothing changes.
+
+**Requirements:** FR-A12, FR-A2, NFR-1, PositionHours (PRD §4.10) · **Effort:** 5 md
+**Note:** hours are published assignments by clock time (the whole of CA 5 counts 6 hours), Phụ trách excluded; on a tie the position already held stays. The 2 / 50 h / 12-week values are settings. Staff never see which positions are their usual ones.
+
+---
+
+#### S-1.17 — Hours worked per position are visible to the Owner and to each staff member
+- **As an** Administrator, and as a staff member for myself
+- **I want to** see how many hours have been worked in each position
+- **so that** the usual positions explain themselves, and staff can see the work they've done.
+
+**AC — Scenario: the Owner reads hours on the position chips**
+- **Given** staff A has worked 412 hours as Bếp, 236 as Phục vụ, 74 as Pha chế and 120 as Phụ trách
+- **When** I open staff A's account
+- **Then** each position chip shows its hours to the right of its label, the Phụ trách switch shows 120 h, and positions with no hours show no number.
+
+**AC — Scenario: a staff member reads their own**
+- **Given** I am staff A
+- **When** I open My profile
+- **Then** "Vị trí đã làm" sits directly below the pay estimate and lists every position I have worked with its hours, most first, without marking which ones are usual; no other staff member's hours are reachable, enforced server-side.
+
+**Requirements:** FR-A14, NFR-2 · **Effort:** 2 md
+**Note:** counts published shifts that have ended, over the whole history, and is never reset, unlike the counters behind S-1.16 and S-4.6.
+
+**E1 subtotal: 45 md** (S-1.9 excluded, 4 md moved to Phase 2)
 
 ---
 
@@ -609,17 +686,11 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 ---
 
-#### S-3.6 — Coverage counts a shared assignment against both positions
-- **As an** Administrator
-- **I want to** see when one person is covering two positions in the same shift
-- **so that** I don't read two filled slots as two bodies on the floor.
+#### S-3.6 — ~~Coverage counts a shared assignment against both positions~~ · **REMOVED 2026-10-17**
 
-**AC — Scenario: shared marker on a multi-position assignment**
-- **Given** one staff member is assigned to CA 3 carrying both Phục vụ and Thu Ngân – Offline
-- **When** I view coverage for CA 3
-- **Then** both positions count as one filled slot each, and both are visibly marked shared; no headcount-floor warning is produced; **and Given** another assignment carries "Pha chế - Matcha, Trà", **Then** it counts once toward Pha chế and is not marked shared, because sub-positions don't count separately.
+> Removed with FR-O30 in PRD v1.10: a person holds one position per period, so coverage per position is a plain count of people. Kept for traceability; the ID is not reused.
 
-**Requirements:** FR-O29, FR-O30, FR-O45 · **Effort:** 3 md
+**Requirements:** FR-O30 *(retired)* · **Effort:** ~~3 md~~ 0 md
 
 ---
 
@@ -631,10 +702,15 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: label and colour follow the position**
 - **Given** I give a placed staff member Pha chế with sub-positions Matcha and Trà
 - **When** I look at the calendar and the side panel
-- **Then** the label reads "Pha chế - Matcha, Trà", the marker is Pha chế's colour, and headcount, coverage, rate and the qualification flag all read Pha chế only.
+- **Then** the label reads "Pha chế - Matcha, Trà", the marker is Pha chế's colour, and headcount, coverage, rate and the experience flag all read Pha chế only.
 
-**Requirements:** FR-O45 (staff-side display *proposed pending client confirmation*), §3.3 · **Effort:** 3 md
-**Note:** seven positions — QC (Trong, Ngoài), Thu Ngân – Offline, Thu Ngân – Online, Pha chế (Trà sữa, Matcha, Trà, Bồn), Phục vụ (attribute Bưng bàn), Kiểm tra đơn, Bếp. Sub-positions and attributes are optional and may be combined.
+**AC — Scenario: Phụ trách needs exactly one of Trong or Ngoài**
+- **Given** staff B's shift-lead switch is on
+- **When** I give them Phụ trách and save with neither or both of Trong and Ngoài
+- **Then** the save is refused with the reason; with exactly one it saves, and counts once toward Phụ trách's need, which covers Trong and Ngoài together.
+
+**Requirements:** FR-O45 (staff-side display *proposed pending client confirmation*), FR-O1, §3.3 · **Effort:** 4 md
+**Note:** eight positions — Phụ trách (Trong, Ngoài; exactly one required), QC (Trong, Ngoài), Thu Ngân – Offline, Thu Ngân – Online, Pha chế (Trà sữa, Matcha, Trà, Bồn), Phục vụ (attribute Bưng bàn), Kiểm tra đơn, Bếp. Other than on Phụ trách, sub-positions and attributes are optional and may be combined.
 
 ---
 
@@ -650,7 +726,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-O38 *(proposed pending client confirmation — keep the rule configurable)* · **Effort:** 2 md
 
-**E3 subtotal: 24 md**
+**E3 subtotal: 22 md**
 
 ---
 
@@ -679,8 +755,8 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **AC — Scenario: filter options mirror the selection**
 - **Given** all 40 staff are ticked
-- **When** I untick the master checkbox under the staff search and then tick "Qualified for: Bếp" in Filters
-- **Then** exactly the staff qualified for Bếp are ticked and on the calendar; every other filter option shows ticked, "–" or empty according to how many of the staff it describes are now selected; and the coverage figures still reflect the full week rather than the selection.
+- **When** I untick the master checkbox under the staff search and then tick "Experienced in: Bếp" in Filters
+- **Then** exactly the staff experienced in Bếp are ticked and on the calendar; every other filter option shows ticked, "–" or empty according to how many of the staff it describes are now selected; and the coverage figures still reflect the full week rather than the selection.
 
 **AC — Scenario: click a name to show only them**
 - **Given** any selection
@@ -727,18 +803,11 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 ---
 
-#### S-4.4 — Administrator assigns two positions to one shift
-- **As an** Administrator
-- **I want to** record one assignment carrying two positions, one marked primary
-- **so that** a person covering two functions is one record, paid once.
+#### S-4.4 — ~~Administrator assigns two positions to one shift~~ · **REMOVED 2026-10-17**
 
-**AC — Scenario: primary position drives the rate, hours are not doubled**
-- **Given** staff A has no staff-specific rate
-- **and Given** Phục vụ and Bếp have different default rates
-- **When** I assign staff A 13:00–17:00 carrying both, with Bếp marked primary
-- **Then** the assignment is shown with Bếp marked primary and both positions' colours, and staff A's pay estimate (S-7.8) counts 4 hours once at the Bếp default rate; the hours are not apportioned between positions.
+> Removed in PRD v1.10: a person holds one position per period (FR-O29), so there is no multi-position assignment and no primary position. Kept for traceability; the ID is not reused.
 
-**Requirements:** FR-O29, FR-C12, FR-C13 · **Effort:** 3 md
+**Requirements:** FR-O29 (as of v1.9) · **Effort:** ~~3 md~~ 0 md
 
 ---
 
@@ -756,17 +825,23 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 ---
 
-#### S-4.6 — Out-of-qualification assignment is flagged, not blocked
+#### S-4.6 — Out-of-experience assignment is flagged, not blocked
 - **As an** Administrator
-- **I want to** assign someone to a position outside their qualified list, and filter to qualified staff when I'd rather not
-- **so that** qualification helps me choose without ever stopping me.
+- **I want to** assign someone to a position they haven't worked much, and filter to experienced staff when I'd rather not
+- **so that** experience helps me choose without ever stopping me.
 
 **AC — Scenario: flagged, permitted, and filterable**
-- **Given** staff A is not qualified for Bếp
+- **Given** staff A has 20 published hours as Bếp and Bếp isn't set on them by hand
 - **When** I assign them to Bếp
-- **Then** the assignment is created and visibly flagged, pay and bonus are unaffected; **and When** I select only the staff qualified for Bếp through Filters (S-4.2), or filter the day roster to Bếp (S-4.15), **Then** staff A is not among them.
+- **Then** the assignment is created and visibly flagged, pay and bonus are unaffected; **and When** I select only the staff experienced in Bếp through Filters (S-4.2), **Then** staff A is not among them.
 
-**Requirements:** FR-O32, FR-A1 · **Effort:** 2 md
+**AC — Scenario: experience is wider than the two usual positions**
+- **Given** staff B has more than 50 published hours in each of three positions, two of them usual
+- **When** I place staff B in any of the three
+- **Then** none is flagged; **and Given** staff A later passes 50 hours as Bếp, **Then** their Bếp shifts are no longer flagged.
+
+**Requirements:** FR-O32, FR-O11, FR-A12 · **Effort:** 3 md
+**Note:** experience counts over the whole history; removing a usual position by hand restarts its count (S-1.16). Phụ trách is governed by the switch instead (S-4.21).
 
 ---
 
@@ -792,7 +867,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: both assignments reassigned in one action**
 - **Given** staff A holds Monday CA 1 and staff B holds Tuesday CA 5, both published
 - **When** I execute a swap between them with a reason
-- **Then** both assignments are reassigned as modifications in place, keeping their positions, each staff member sees their new shift the next time they open My shifts, and both changes are logged with the reason.
+- **Then** both assignments are reassigned as modifications in place, keeping their positions, each staff member sees their new shift the next time they open My profile, and both changes are logged with the reason.
 
 **Requirements:** FR-O15, FR-O14 · **Effort:** 3 md
 **Note:** the swap notification (FR-N7) is added with E6 in Phase 2.
@@ -807,7 +882,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: cancellation reopens coverage**
 - **Given** staff A holds a published Saturday CA 5 assignment
 - **When** I cancel it
-- **Then** it disappears from staff A's My shifts, the slot returns to the coverage view as unfilled, and the cancellation is logged.
+- **Then** it disappears from staff A's My profile, the slot returns to the coverage view as unfilled, and the cancellation is logged.
 
 **Requirements:** FR-O8 · **Effort:** 2 md
 **Note:** the cancellation notification (FR-N7) is added with E6 in Phase 2.
@@ -856,7 +931,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: several periods at once, calendar still visible**
 - **Given** registration has locked and the week is in draft
 - **When** I select staff A's pill in Tuesday CA 1
-- **Then** a side panel opens beside the calendar (a bottom sheet on a phone) showing staff A's full name, qualified positions, what they registered this week and the shifts and hours already placed; I can select any of Tuesday's periods and place them, give one or more positions with optional sub-positions (the first is primary), clear the position, or take them off; I can step to the previous or next day for staff A; and each change is logged with the day's assignments before and after.
+- **Then** a side panel opens beside the calendar (a bottom sheet below 1280 px wide) showing staff A's full name, usual positions (with Phụ trách while their switch is on), what they registered this week and the shifts and hours already placed; I can select any of Tuesday's periods and place them, give one position with optional sub-positions (Phụ trách only if their shift-lead switch is on, each position marked when they have no experience in it), clear the position, or take them off; I can step to the previous or next day for staff A; and each change is logged with the day's assignments before and after.
 
 **AC — Scenario: one Save, always available**
 - **Given** staff A holds CA 1 and CA 2 on Tuesday
@@ -873,7 +948,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I press Save with no position chosen
 - **Then** the save is refused with "A published shift needs a position" — new shifts must carry a position, and published shifts are cancelled or shortened through S-4.9 and S-4.10.
 
-**Requirements:** FR-O43, FR-O29, FR-S22, FR-O50, NFR-1 · **Effort:** 8 md *(above the Ready limit; split at planning)*
+**Requirements:** FR-O43, FR-O29, FR-S22, FR-O50, FR-O51, NFR-1 · **Effort:** 7 md *(above the Ready limit; split at planning)*
 **Note:** assignments with times that don't match the periods are shown in the panel but edited in the shift dialog.
 
 ---
@@ -901,7 +976,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: default list and search**
 - **Given** registration has locked
 - **When** I choose Add in Wednesday CA 1
-- **Then** the list shows only active staff who didn't register that period, by full name, each with any other shift they hold that day and their qualified positions; **and When** I search by name, **Then** staff who did register, staff counted as free and staff already in this shift also appear, tagged as such; **and When** I pick someone, **Then** they are ticked in the staff list and open in the side panel with Wednesday CA 1 selected.
+- **Then** the list shows only active staff who didn't register that period, by full name, each with any other shift they hold that day and their usual positions; **and When** I search by name, **Then** staff who did register, staff counted as free and staff already in this shift also appear, tagged as such; **and When** I pick someone, **Then** they are ticked in the staff list and open in the side panel with Wednesday CA 1 selected.
 
 **Requirements:** FR-O46, FR-O12 · **Effort:** 3 md
 
@@ -933,7 +1008,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: overlap refused**
 - **Given** staff A holds 07:00–11:00 on Monday
 - **When** I try to create or edit another assignment for staff A overlapping 10:00–12:00 on Monday
-- **Then** the save is refused and names the conflicting assignment. Out-of-availability and out-of-qualification remain flags, not blocks.
+- **Then** the save is refused and names the conflicting assignment. Out-of-availability and out-of-experience remain flags, not blocks.
 
 **Requirements:** FR-O39 *(proposed pending client confirmation — keep it configurable)* · **Effort:** 2 md
 
@@ -1011,11 +1086,31 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-O50, FR-S21, FR-O43, NFR-1 · **Effort:** 3 md
 
+---
+
+#### S-4.21 — Only a granted shift lead can be placed as Phụ trách
+- **As an** Administrator
+- **I want to** have Phụ trách offered only for the staff I've granted it to
+- **so that** nobody leads a shift, or is paid the lead rate, by accident.
+
+**AC — Scenario: blocked for anyone else**
+- **Given** staff B's shift-lead switch is off
+- **When** I open staff B's side panel, the shift dialog, a swap or a cover
+- **Then** Phụ trách is not offered, and a request that gives it anyway, such as a direct API call, is refused with the reason.
+
+**AC — Scenario: switched off with shifts in place**
+- **Given** staff A holds Phụ trách in Wednesday CA 1 and I turn their switch off (S-1.15)
+- **When** I view Wednesday
+- **Then** the shift stays with an orange dot and "Shift lead turned off, needs another lead", is listed under Filters → needs attention → Shift lead turned off, and is paid at staff A's base rate until reassigned.
+
+**Requirements:** FR-O51, FR-O45, FR-O11, FR-C13 · **Effort:** 3 md
+**Note:** the one block among positions (ADR 0021); every other position only flags (S-4.6).
+
 **E4 subtotal: 83 md**
 
 ---
 
-### E5 — Draft, Publish & My Schedule
+### E5 — Draft, Publish & My profile
 
 #### S-5.1 — Draft assignments are invisible to staff
 - **As an** Administrator
@@ -1088,8 +1183,8 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **AC — Scenario: own schedule only, read-only**
 - **Given** the week is published and I hold four assignments
-- **When** I open My Schedule
-- **Then** I see my four assignments with date, time range and "Position - sub-position" label, in read-only form, with any lateness recorded against them (S-7.6) and my pay estimate (S-7.8), and no other staff member's shifts.
+- **When** I open My profile
+- **Then** I see my four assignments with date, time range and "Position - sub-position" label, in read-only form, with any lateness recorded against them (S-7.6) my pay estimate (S-7.8) and the positions I've worked (S-1.17), and no other staff member's shifts.
 
 **Requirements:** FR-S11, FR-S4, FR-O45 *(sub-positions shown to staff proposed pending client confirmation)*, NFR-2, NFR-5 · **Effort:** 3 md
 
@@ -1313,21 +1408,21 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **so that** the rate in the staff account means something before payroll exists.
 
 **AC — Scenario: estimate shown, clearly not payroll**
-- **Given** staff A has no own rate, the Pha chế default is 28.000 ₫/h, and staff A holds 30 assigned hours this week with Pha chế as primary
-- **When** the Administrator opens the week's staff summary, or staff A opens My shifts
-- **Then** 840.000 ₫ is shown as an **estimate** — assigned hours × rate, before lateness deductions and bonus — and staff A can see only their own figure, enforced server-side.
+- **Given** staff A has a base rate of 25.000 ₫/h and a lead rate of 30.000 ₫/h, and holds 30 assigned hours this week, 8 of them as Phụ trách
+- **When** the Administrator opens the week's staff summary, or staff A opens My profile
+- **Then** 790.000 ₫ (8 × 30.000 + 22 × 25.000) is shown as an **estimate**, with lead hours and base hours shown apart — assigned hours × rate, before lateness deductions and bonus — and staff A can see only their own figure, enforced server-side.
 
 **AC — Scenario: no position yet**
-- **Given** staff A has no own rate and one draft shift with no position
-- **When** the estimate is shown
-- **Then** that shift's hours are listed as "no rate yet — no position" rather than priced at zero.
+- **Given** staff A has one draft shift with no position
+- **When** the Administrator views the estimate
+- **Then** that shift's hours are listed as "no position yet — not estimated" rather than priced, since the week can't be published until it has one (S-5.2); staff never see draft shifts.
 
 **AC — Scenario: a whole CA 5 is paid as 7 hours**
 - **Given** staff A holds CA 5 17:00–23:00 on Thursday and, on Friday, 18:00–23:00 placed by their custom times
 - **When** the estimate is shown
 - **Then** Thursday counts 7 hours, marked as paid until 24:00, and Friday counts 5.
 
-**Requirements:** FR-C14 *(names the Phase 1 estimate; the estimate itself still has no requirement of its own — decision 2026-09-29)*; reads FR-C1, FR-C12, FR-C13, NFR-2 · **Effort:** 4 md
+**Requirements:** FR-C13, FR-C14, FR-A14; reads FR-C1, FR-C12, NFR-2 · **Effort:** 4 md
 **Note:** a no-show (S-7.5) counts as zero hours. The estimate is display only; the weekly close and payment are Phase 2 (E9).
 
 ---
@@ -1475,7 +1570,7 @@ The distinction that matters: the Administrator working from a phone mid-service
 - **I want to** register availability and check my schedule in a desktop browser
 - **so that** a broken phone doesn't cost me my shifts.
 
-**AC:** **Given** I open the app in a desktop browser · **When** the registration window is open · **Then** I can register, edit and delete availability, and view My shifts, recorded lateness and my pay estimate, with no function missing relative to the phone.
+**AC:** **Given** I open the app in a desktop browser · **When** the registration window is open · **Then** I can register, edit and delete availability, and view My profile, with my schedule, recorded lateness, pay estimate and positions worked, with no function missing relative to the phone.
 **Requirements:** NFR-10 · **Effort:** 2 md · **PHASE 1**
 
 ---
@@ -1504,7 +1599,7 @@ The distinction that matters: the Administrator working from a phone mid-service
 
 ---
 
-**Phase 1 story total, revised 2026-10-11: 233 md** (E1 38 · E2 26 · E3 24 · E4 83 · E5 15 · E7 24 · E16 23). It was 209 md on 2026-10-04: +24 md for PRD v1.9, itemised in §0. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
+**Phase 1 story total, revised 2026-10-17: 238 md** (E1 45 · E2 26 · E3 22 · E4 83 · E5 15 · E7 24 · E16 23). It was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
 
 | Change | md | Source |
 |---|---|---|
@@ -1537,8 +1632,8 @@ Full Gherkin to be written at the start of Phase 2, when Phase 1 has settled the
 | ID | Story | Core criterion | Reqs |
 |---|---|---|---|
 | S-9.1 | Payout auto-calculated from assigned hours, replacing the Phase 1 estimate; lateness deductions recorded in minutes since Phase 1 are converted at the applicable rate and applied | Arriving early never increases pay; a whole CA 5 is paid until 24:00 | FR-C1, FR-C3, FR-C14, FR-S17 |
-| S-9.2 | Rate resolved staff-first, then primary position default | No staff rate set → primary position default applies | FR-C2, FR-C13 |
-| S-9.3 | Multi-position assignment paid once | Two positions never double the hours | FR-C12 |
+| S-9.2 | Rate resolved by the shift's position: lead rate for Phụ trách, base rate otherwise | A Phụ trách shift whose holder's switch was turned off pays the base rate | FR-C2, FR-C13 |
+| S-9.3 | Lateness deduction charged at the rate of the shift it falls on | 20 minutes late on a Phụ trách shift deducts 40 minutes at the lead rate | FR-S17, FR-C13 |
 | S-9.4 | Special-rate date multiplier | Adjusted portion itemised separately from base pay | FR-C8, FR-O27 |
 | S-9.5 | Base pay releases, bonus is gated | Unresolved anomaly withholds bonus only | FR-C11, FR-C6 |
 | S-9.6 | Export payout summary (CSV/Excel) | Base, bonus and adjustments itemised separately | FR-C4 |
@@ -1623,7 +1718,7 @@ These are not user stories. They carry no direct user value and must be sized se
 
 **Ready** — a story enters a sprint only when: the persona is specific (not "user"); acceptance criteria have one When and one Then per scenario; the requirement IDs are mapped; any PRD open question it depends on is decided; the Vietnamese wording for user-facing strings is agreed; and the story is estimated at 5 md or less (larger → split first).
 
-**Done** — code merged and reviewed; automated tests cover the acceptance criteria; **any story touching NFR-2 has a negative test proving server-side enforcement**; Vietnamese and English strings both present; audit log entries written where NFR-1 applies; deployed to staging; accepted by Tony against the Gherkin; and checked at 390px on a real phone and on a desktop browser — for **every** story, not only staff-facing ones, against the phone layout in the prototype or, for v1.9 changes, the Phase 1 wireframe (NFR-5).
+**Done** — code merged and reviewed; automated tests cover the acceptance criteria; **any story touching NFR-2 has a negative test proving server-side enforcement**; Vietnamese and English strings both present; audit log entries written where NFR-1 applies; deployed to staging; accepted by Tony against the Gherkin; and checked at 390px on a real phone and on a desktop browser — for **every** story, not only staff-facing ones, against the phone layout in the prototype or, for v1.9 and v1.10 changes, the Phase 1 wireframe (NFR-5).
 
 ---
 
@@ -1644,5 +1739,5 @@ Status as of 2026-09-29, checked against the repo.
 | **B9** | NFR-5 tier assignment per surface | **Closed — no longer applies.** Full parity in Phase 1, no tiers (NFR-5, 2026-09-18) | — | — |
 | **B10** | Is a Phase 1 penalty computed but not deducted? | **Decided 2026-09-29:** Phase 1 records and classifies lateness in minutes and status, shows no VND deduction and applies nothing to pay; it shows a pay estimate of assigned hours × rate. Tell the client explicitly (client proposal §1, §4) | S-7.3, S-7.6, S-7.8 | Phase 0 (in the SOW) |
 | **B11** | The date Zalo stops being the scheduling fallback, which sets E6's deadline | **Open.** Phase 1 relies on the Administrator chasing non-registrants on Zalo (PRD §4.13) | E6 scheduling | Before Phase 2 is scheduled |
-| **B12** | Eight rules proposed in the prototype await client confirmation: FR-O38, FR-O39, FR-O20 cover rule, FR-T18 no-show effect, FR-B17, FR-A7, FR-O40, FR-O45 staff-side display (PRD §5.1 O3, `docs/decisions/pending-confirmation.md`) | **Open.** Build them configurable, not hardcoded | S-1.5, S-1.12, S-3.7, S-3.8, S-4.10, S-4.16, S-7.5, S-7.7 | Phase 1 sign-off |
-| **B13** | The pay estimate (S-7.8) has no PRD requirement of its own | **Partly addressed.** PRD v1.9 FR-C14 names it as a reader of paid hours; a requirement defining the estimate itself is still owed | S-7.8 | Before Sprint 9 |
+| **B12** | Seven rules proposed in the prototype await client confirmation: FR-O38, FR-O39, FR-O20 cover rule, FR-T18 no-show effect, FR-B17, FR-A7, FR-O45 staff-side display (PRD §5.1 O3, `docs/decisions/pending-confirmation.md`). FR-O40 left the list when it was retired in v1.10 | **Open.** Build them configurable, not hardcoded | S-1.5, S-3.7, S-3.8, S-4.10, S-4.16, S-7.5, S-7.7 | Phase 1 sign-off |
+| **B13** | The pay estimate (S-7.8) has no PRD requirement of its own | **Resolved in PRD v1.10.** FR-C13 defines the estimate's rate, with lead hours and base hours shown apart, and FR-A14 places it on My profile | — | — |

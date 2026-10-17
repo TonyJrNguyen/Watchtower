@@ -2,7 +2,7 @@
 
 **Companion to:** `01-epics-and-user-stories.md`
 **Roadmap type:** Phase-based with Now / Next / Later framing. This is a plan, not a contract — each phase is re-forecast at its gate.
-**Revised 2026-10-11** against PRD v1.9, the approved Phase 1 prototype, the Phase 1 wireframe and the decisions listed in the backlog §0. Earlier revisions: 2026-09-29 (PRD v1.6) and the first version, 2026-09-08 (PRD v1.1).
+**Revised 2026-10-17** against PRD v1.10, the approved Phase 1 prototype, the Phase 1 wireframe (approved 2026-10-17) and the decisions listed in the backlog §0. Earlier revisions: 2026-10-11 (PRD v1.9), 2026-09-29 (PRD v1.6) and the first version, 2026-09-08 (PRD v1.1).
 
 ---
 
@@ -24,9 +24,9 @@ Three problems, three phases, in the order that returns value fastest:
 ## 2. Now / Next / Later
 
 **NOW — Phase 0 (reduced) + Phase 1 (committed)**
-Four capabilities: **staff register availability · the Administrator arranges and publishes the week on one weekly calendar · the Administrator records who was late · the system applies the lateness rules to it**, in minutes and status, with no money deducted. Plus the foundation they sit on (accounts with nicknames, roles, audit log, bilingual UI, configuration of shift periods, window, positions, rates and skip reasons), a plain pay estimate from assigned hours × rate, and **full phone and desktop parity for every Phase 1 surface**.
+Four capabilities: **staff register availability · the Administrator arranges and publishes the week on one weekly calendar · the Administrator records who was late · the system applies the lateness rules to it**, in minutes and status, with no money deducted. Plus the foundation they sit on (accounts with nicknames, base and lead rates per person, the shift-lead switch and usual positions learned from the schedule, roles, audit log, bilingual UI, configuration of shift periods, window, positions and skip reasons), a plain pay estimate from assigned hours × rate, and **full phone and desktop parity for every Phase 1 surface**.
 
-*Narrowed on 2026-09-08*: notifications & push (E6) and the control centre (E8) moved to Phase 2. *Widened since*: responsive parity returned to Phase 1 on 2026-09-18, PRD v1.3–v1.6 (2026-09-27/28) merged availability and scheduling into one calendar with nicknames, sub-positions, cell Add and spreadsheet filters, and PRD v1.9 (2026-10-11) added registration as a draft until saved, custom times inside a period, day notes, undo/redo, the Staffing section and the CA 5 pay rule, and removed the day roster.
+*Narrowed on 2026-09-08*: notifications & push (E6) and the control centre (E8) moved to Phase 2. *Widened since*: responsive parity returned to Phase 1 on 2026-09-18, PRD v1.3–v1.6 (2026-09-27/28) merged availability and scheduling into one calendar with nicknames, sub-positions, cell Add and spreadsheet filters, and PRD v1.9 (2026-10-11) added registration as a draft until saved, custom times inside a period, day notes, undo/redo, the Staffing section and the CA 5 pay rule, and removed the day roster. PRD v1.10 (2026-10-17) added the Phụ trách position granted per person, base and lead rates per person, one position per period, usual positions learned from the schedule and hours worked per position on My profile.
 
 **NEXT — Phase 2 (high confidence, contingent on Phase 1 acceptance)**
 Notifications & web push (with install onboarding) · control centre · payroll close · bonus & streak engine · performance dashboards · data retention.
@@ -53,11 +53,11 @@ What remains:
 
 | Week | Activity | Output |
 |---|---|---|
-| 1 | Put the eight proposed rules (B12) and the pay estimate (B13) to the client in one decision round; patch the PRD through the claude.ai process | Signed-off rule list, PRD patch |
+| 1 | Put the seven proposed rules (B12) to the client in one decision round; patch the PRD in the repo | Signed-off rule list, PRD patch |
 | 1–2 | Tech stack decision, environments, repo, CI/CD, backup + restore drill (ENABLER-6) | Environments ready before Sprint 1 |
 | 2 | Contract, scope schedule, acceptance criteria, payment milestones, IP terms, maintenance response time (B7) | Signed SOW |
 
-**Gate to Phase 1:** contract signed and deposit received · environments and restore drill done · the eight proposed rules either confirmed or explicitly left configurable.
+**Gate to Phase 1:** contract signed and deposit received · environments and restore drill done · the seven proposed rules either confirmed or explicitly left configurable.
 
 ---
 
@@ -68,18 +68,18 @@ Two-week sprints. Capacity assumption: 2 developers + Tony part-time as BA/PM/QA
 | Sprint | Weeks | Scope | Demo-able outcome |
 |---|---|---|---|
 | **S1** | 1–2 | E1 core: auth, staff accounts CRUD with nickname, roles, deactivation, audit log, i18n scaffold, PWA shell. ENABLER-1. | The Owner creates a staff account; that staff member signs in on their phone. |
-| **S2** | 3–4 | E1 remainder: password from the record, default rate per position, Superadmin log, "include former staff", configuration of shift periods, registration window, positions with sub-positions, skip reasons (S-1.12–S-1.14). | The Owner renames a sub-position and changes a default rate without a release. |
+| **S2** | 3–4 | E1 remainder: password from the record, shift-lead switch and lead rate, Superadmin log, "include former staff", configuration of shift periods, registration window, positions with sub-positions, skip reasons (S-1.13–S-1.15). | The Owner renames a sub-position and grants a shift lead with a lead rate, without a release. |
 | **S3** | 5–6 | E2 core: registration grid, select-all, edit/delete, short-day warning with the CA 5 exemption, own-overlap block, auto-lock, on phone and desktop (S-2.1–S-2.6, S-16.6). ENABLER-4. | A staff member registers a full week on a phone; it locks at the cutoff. |
 | **S4** | 7–8 | E2 v1.9: draft and Save with automatic save at the cutoff, custom times inside a period, day notes (S-2.7–S-2.9). | **A staff member saves a week with a late start on Friday and a note; the Owner sees only the saved version.** |
 | **S5** | 9–10 | Staffing section with needs per position, period and day; the weekly calendar read view with nickname pills, star, clock and note icons, registered vs. counted-as-free, staff who registered nothing left out by default, placed-of-needed per cell, hover/tap, marker order down the day; staff list with registered hours, master checkbox and spreadsheet Filters scoped to the dates in view; Day / 3 Days / Week views, date picker and earlier weeks read-only; phone one-day view (S-4.1, S-4.2, S-4.17, S-4.19, S-3.1, S-3.4, S-3.5, S-16.5 read part). | **The Owner sees who registered, by day, three days or the whole week, on desktop and phone.** |
 | **S6** | 11–12 | Placing: side panel / bottom sheet with one Save and Take off, place without position, join/split of neighbouring periods, cell Add, double-booking block, out-of-availability flag, custom-time requests placed by their times or the standard ones (S-4.3, S-4.5, S-4.12–S-4.14, S-4.16, S-4.20). | The Owner places people for a full week. |
-| **S7** | 13–14 | Positions: give positions with sub-positions and attributes, multi-position with primary, qualification flag, coverage per position with full-period and partial counts and the shared marker, the Staffing section on a phone, undo/redo while drafting (S-3.2, S-3.3, S-3.6–S-3.8, S-4.4, S-4.6, S-4.18, S-16.7). | A full draft week with positions and coverage, and any step undone. |
-| **S8** | 15–16 | E5 and post-publication changes: publish gate (no shift, no position), skip-with-reason, publish, My shifts, edit in place, swap, cancel, shorten + cover with the 30-minute rule, notes, on a phone too (S-4.7–S-4.11, S-5.x, S-16.3). | **The whole scheduling loop works end to end.** |
+| **S7** | 13–14 | Positions: one position per period with sub-positions and attributes, Phụ trách with a required Trong/Ngoài and only for granted staff, experience flag, coverage per position with full-period and partial counts, the Staffing section on a phone, undo/redo while drafting (S-3.2, S-3.3, S-3.7, S-3.8, S-4.6, S-4.18, S-4.21, S-16.7). | A full draft week with positions and coverage, and any step undone. |
+| **S8** | 15–16 | E5 and post-publication changes: publish gate (no shift, no position), skip-with-reason, publish, My profile with the positions worked, usual positions learned at publication (S-1.16, S-1.17), edit in place, swap, cancel, shorten + cover with the 30-minute rule, notes, on a phone too (S-4.7–S-4.11, S-5.x, S-16.3). | **The whole scheduling loop works end to end.** |
 | **S9** | 17–18 | E7 complete: manual arrival, rules engine (ENABLER-5), deductions in minutes, anomaly and resolution with the no-show effect, staff view, bonus preview, pay estimate with the CA 5 rule, earlier weeks read-only, recording from a phone (S-7.x, S-16.2). | **The Owner records a lateness from their phone, on the floor, and sees it classified; each staff member sees their own pay estimate.** |
 | **S10** | 19–20 | Hardening: both layouts on real devices for every surface (S-16.8), NFR-2 negative testing, performance at 40 staff on a phone, staff data import, Vietnamese copy review, training materials. | Release candidate. |
 | **Pilot** | 21–22 | Pilot with 8–10 staff for one full cycle, in parallel with Zalo. Fix, then full rollout. | **Go-live.** |
 
-**Phase 1 acceptance gate:** two consecutive weeks scheduled entirely in the system, no Zalo consolidation; NFR-2 negative tests pass; audit log complete for every change made during the pilot; the Owner builds a week in under 60 minutes unaided; the Owner records a lateness from their phone and the classification and minutes match the rule table in PRD §3.8.3 by hand-check; every Phase 1 surface passes on a real phone and a desktop browser; the eight proposed rules are confirmed or left configurable.
+**Phase 1 acceptance gate:** two consecutive weeks scheduled entirely in the system, no Zalo consolidation; NFR-2 negative tests pass; audit log complete for every change made during the pilot; the Owner builds a week in under 60 minutes unaided; the Owner records a lateness from their phone and the classification and minutes match the rule table in PRD §3.8.3 by hand-check; every Phase 1 surface passes on a real phone and a desktop browser; the seven proposed rules are confirmed or left configurable.
 
 **Not in the Phase 1 gate, and the SOW must say so:** no notification of any kind is delivered, no control centre exists, lateness is not converted to money and nothing is deducted from anyone's pay, and the pay figure shown is an estimate, not a payslip. Each of these is a Phase 2 item, not a defect.
 
@@ -92,7 +92,7 @@ Starts only after Phase 1 has run for **at least 3 clean weeks in production**. 
 | Sprint | Weeks | Scope |
 |---|---|---|
 | **S10** | 1–2 | E6 notifications & push: VAPID, service worker, inbox, install onboarding (S-1.9), all notification events including **FR-N5**, and the notifications added to the Phase 1 surfaces (swap, cancel, early departure, publish, change, anomaly) |
-| **S11** | 3–4 | E9 part 1: assigned-hours calculation replacing the Phase 1 estimate, rate resolution, multi-position paid once, special-rate dates, converting and applying the lateness deductions recorded since Phase 1 |
+| **S11** | 3–4 | E9 part 1: assigned-hours calculation replacing the Phase 1 estimate, rate resolution by the shift's position (lead or base), lateness deductions at the shift's rate, special-rate dates, converting and applying the lateness deductions recorded since Phase 1 |
 | **S12** | 5–6 | E10 part 1: weekly bonus evaluation, streak counter, BonusHold, waiver → re-evaluation and forward cascade |
 | **S13** | 7–8 | E10 part 2 (close screen, bulk confirm, needs-attention sort, override) + E9 part 2 (base/bonus split, force-close, retroactive adjustment, export) |
 | **S14** | 9–10 | E11 dashboards + E12 retention jobs |
@@ -121,17 +121,17 @@ Starts only after Phase 1 has run for **at least 3 clean weeks in production**. 
 
 ## 7. Team and capacity
 
-Re-estimated 2026-09-29, revised 2026-10-04 and 2026-10-11. Phase 1 stories went from 136 md to 200 md, to 209 md with the calendar views and earlier weeks (PRD v1.7–v1.8), and to **233 md** with PRD v1.9 (backlog §0 itemises the +24 md); team effort is scaled with the same ratio used in the first version (113 team md for 136 story md).
+Re-estimated 2026-09-29, revised 2026-10-04, 2026-10-11 and 2026-10-17. Phase 1 stories went from 136 md to 200 md, to 209 md with the calendar views and earlier weeks (PRD v1.7–v1.8), to 233 md with PRD v1.9, and to **238 md** with PRD v1.10 (backlog §0 itemises the +5 md); team effort is scaled with the same ratio used in the first version (113 team md for 136 story md).
 
 | Role | Phase 1 | Phase 2 | Phase 3 | Notes |
 |---|---|---|---|---|
-| BA / PM / tech lead / QA lead (Tony) | ~54 md | ~29 md | ~10 md | Part-time alongside a full-time role — this is the hard capacity constraint. Phase 1 carries twice the device testing now that every surface has two layouts |
-| Senior full-stack developer | ~69 md | ~40 md | ~21 md | Owns the weekly calendar and the rules engine |
-| Mid full-stack developer | ~54 md | ~30 md | ~13 md | |
+| BA / PM / tech lead / QA lead (Tony) | ~55 md | ~29 md | ~10 md | Part-time alongside a full-time role — this is the hard capacity constraint. Phase 1 carries twice the device testing now that every surface has two layouts |
+| Senior full-stack developer | ~71 md | ~40 md | ~21 md | Owns the weekly calendar and the rules engine |
+| Mid full-stack developer | ~55 md | ~30 md | ~13 md | |
 | UI/UX designer | ~17 md | ~15 md | ~4 md | The prototype and the Phase 1 wireframe settle Phase 1 layouts; the work is the visual design, Figma and the phone views. Phase 2 needs Wireframe v1 reconciled |
-| **Total** | **~194 md** (was ~174, ~166 and ~113 before that) | **~114 md** (was ~120) | **~48 md** | Phase 1 is now the larger phase |
+| **Total** | **~198 md** (was ~194, ~174, ~166 and ~113 before that) | **~114 md** (was ~120) | **~48 md** | Phase 1 is now the larger phase |
 
-**Capacity reality check:** 194 md in 20 weeks is ~1.9 people full-time. Tony cannot absorb a meaningful share of that alongside a full-time QA job. Either the two developers are real and paid, or the calendar stretches to roughly double. Pick one deliberately rather than discovering it in Sprint 3.
+**Capacity reality check:** 198 md in 20 weeks is ~2 people full-time. Tony cannot absorb a meaningful share of that alongside a full-time QA job. Either the two developers are real and paid, or the calendar stretches to roughly double. Pick one deliberately rather than discovering it in Sprint 3.
 
 ---
 
@@ -183,7 +183,7 @@ If Phase 1 slips, the honest move is to extend the calendar or cut a sub-feature
 | R11 | Responsive parity doubles the test surface | High | Medium | Two layouts per surface, checked on real devices every sprint (DoD) and in S-16.8, with its own budget. Anything the client later wants on top of the prototype's layouts is a change request |
 | R12 | **A staff member is assigned a shift they cannot work because they forgot to register.** With FR-N5 in Phase 2, nothing automated warns them | **High** | Medium — erodes trust in the system during exactly the weeks it is being adopted | FR-O23 shows the Administrator who defaulted; they chase on Zalo before Saturday 15:00. Put this in the Administrator's weekly checklist, not just the training deck. Closes when E6 ships. |
 | R13 | The client reads Phase 1 as "the system handles penalties" and expects pay to be deducted, or reads the pay estimate as a payslip | Medium | Medium — an acceptance dispute | Decided 2026-09-29 (B10): Phase 1 shows lateness in minutes and status and never deducts; the pay figure is labelled an estimate before deductions and bonus. State both in the SOW and show the labels at the S9 demo. |
-| R14 | The eight rules proposed in the prototype are changed by the client after they are built | Medium | Low–Medium | Build each one configurable (CLAUDE.md, `pending-confirmation.md`); get sign-off in Phase 0 (B12) |
+| R14 | The seven rules proposed in the prototype are changed by the client after they are built | Medium | Low–Medium | Build each one configurable (CLAUDE.md, `pending-confirmation.md`); get sign-off in Phase 0 (B12) |
 
 ---
 
@@ -222,8 +222,8 @@ The client's staff are ~40 café workers who currently use Zalo. Adoption, not c
 
 | # | Action | Owner | By |
 |---|---|---|---|
-| 1 | Send the revised client proposal with the Phase 1 re-estimated for PRD v1.9 (233 story md, ~194 team md, 10 sprints) — `docs/client/04-solution-proposal-and-cost.md` still carries the 2026-09-29 figures | Tony | Week 1 |
-| 2 | Put the eight proposed rules (B12) and the pay estimate (B13) to the client as one decision round; patch the PRD via claude.ai | Tony | Week 1 |
+| 1 | Send the revised client proposal with the Phase 1 re-estimated for PRD v1.10 (238 story md, ~198 team md, 10 sprints) — `docs/client/04-solution-proposal-and-cost.md` still carries the 2026-09-29 figures | Tony | Week 1 |
+| 2 | Put the seven proposed rules (B12) to the client as one decision round; patch the PRD in the repo | Tony | Week 1 |
 | 3 | Decide the stack; stand up environments, CI/CD, backup + restore drill | Tony | Week 1–2 |
 | 4 | Decide the delivery model: solo-and-slow vs. funded two-developer team | Tony | Week 1 |
 | 5 | Issue the Phase 1 SOW with the Phase 1 exclusions written in (no notifications, no control centre, no money deducted for lateness, pay figure is an estimate) and the maintenance response time (B7) | Tony | Week 2 |
