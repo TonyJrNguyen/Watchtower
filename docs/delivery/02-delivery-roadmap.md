@@ -181,7 +181,7 @@ If Phase 1 slips, the honest move is to extend the calendar or cut a sub-feature
 | R9 | Retention purge deletes evidence behind an open dispute | Low | High | Purge gated on the week being closed and reconciled (FR-C6). Test the gate, don't assume it. |
 | R10 | Figma MCP call allowance exhausted during Phase 2 design | Medium | Low | Schedule the Wireframe v1 reconciliation for Phase 2 screens across a month or upgrade the plan for the duration |
 | R11 | Responsive parity doubles the test surface | High | Medium | Two layouts per surface, checked on real devices every sprint (DoD) and in S-16.8, with its own budget. Anything the client later wants on top of the prototype's layouts is a change request |
-| R12 | **A staff member is assigned a shift they cannot work because they forgot to register.** With FR-N5 in Phase 2, nothing automated warns them | **High** | Medium — erodes trust in the system during exactly the weeks it is being adopted | FR-O23 shows the Administrator who defaulted; they chase on Zalo before Saturday 15:00. Put this in the Administrator's weekly checklist, not just the training deck. Closes when E6 ships. |
+| R12 | **A staff member is assigned a shift they cannot work because they forgot to register.** With FR-N5 in Phase 2, nothing automated warns them | **High** | Medium — erodes trust in the system during exactly the weeks it is being adopted | FR-O23 shows the Administrator who defaulted; they chase on Zalo before Friday 13:00. Put this in the Administrator's weekly checklist, not just the training deck. Closes when E6 ships. |
 | R13 | The client reads Phase 1 as "the system handles penalties" and expects pay to be deducted, or reads the pay estimate as a payslip | Medium | Medium — an acceptance dispute | Decided 2026-09-29 (B10): Phase 1 shows lateness in minutes and status and never deducts; the pay figure is labelled an estimate before deductions and bonus. State both in the SOW and show the labels at the S9 demo. |
 | R14 | The seven rules proposed in the prototype are changed by the client after they are built | Medium | Low–Medium | Build each one configurable (CLAUDE.md, `pending-confirmation.md`); get sign-off in Phase 0 (B12) |
 
@@ -194,10 +194,10 @@ The client's staff are ~40 café workers who currently use Zalo. Adoption, not c
 1. **Owner first.** The Owner is trained and builds one week in the system before any staff member sees it. If the Owner isn't fluent, nothing else matters. Set the app up on the Owner's own phone in that session — in Phase 1 the Owner records lateness and adjusts shifts from it. (Push for anomaly and understaffed-slot alerts, which on iOS needs a Home Screen install, arrives in Phase 2.)
 2. **Pilot group of 8–10** for one full cycle, running in parallel with Zalo. Recruit across device types — include the oldest iPhone on the team.
 3. **In-person onboarding**, in Vietnamese, at shift changeover. Add the app to the Home Screen *with* each person, on their own phone — do not send instructions and hope. Push permission is granted in a second round when Phase 2 ships.
-4. **One-page Vietnamese quick guide**, in the shop and pinned in the Zalo group: the window (Thứ Năm 00:00 – Thứ Bảy 15:00), "Chọn tất cả ca", and the rule that registering nothing means fully available.
+4. **One-page Vietnamese quick guide**, in the shop and pinned in the Zalo group: the window (Thứ Năm 00:00 – Thứ Sáu 13:00), "Chọn tất cả ca", and the rule that registering nothing means fully available.
 5. **A hard cut-over date** after the pilot. Parallel channels indefinitely means neither is trusted.
 6. **Two weeks of hypercare** after each phase go-live, with a named response time.
-7. **Add two items to the Owner's weekly routine for Phase 1**, because no notification exists yet: before Saturday 15:00, check who has not registered and message them on Zalo; and when recording a lateness, tell that staff member directly the same day. Both become automatic when E6 ships.
+7. **Add two items to the Owner's weekly routine for Phase 1**, because no notification exists yet: before Friday 13:00, check who has not registered and message them on Zalo; and when recording a lateness, tell that staff member directly the same day. Both become automatic when E6 ships.
 
 ---
 

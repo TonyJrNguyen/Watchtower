@@ -28,6 +28,14 @@ _Avoid_: Using "role" for position, even though the client does
 Staff members whose account has not been deactivated. Every scheduling rule and view counts active staff only.
 _Avoid_: Current staff, enabled staff
 
+**Shift Lead access** (Phase 2):
+What a staff member gets while they hold a published Phụ trách assignment: the roster of that assignment's time range (who works it, with phone numbers), recording arrivals, and recording early departures of 30 minutes or less. It comes from the assignment, not from the account, so it isn't a **Role**. A Shift Lead never sees pay.
+_Avoid_: Manager role, supervisor account
+
+**Evaluation** (Đánh giá, Phase 2):
+The Administrator's own periodic assessment of a staff member's attitude, with a note, shown beside the patterns the system collects. Only the Administrator records or reads it; the system never suggests an outcome.
+_Avoid_: Rating, review score, performance score
+
 **Deactivate**:
 To revoke a staff member's login while keeping all their records. Staff are never deleted.
 _Avoid_: Delete, remove, archive
@@ -53,9 +61,9 @@ The upcoming week whose availability is registered, locked and assigned now. Ear
 The job a staff member does on an assignment, such as Pha chế or Thu Ngân – Online. A staff member holds one position per shift period. Headcount and experience are held at this level only.
 _Avoid_: Role, job title, station
 
-**Shift lead** (Phụ trách):
+**Shift Lead** (Phụ trách):
 The position that leads a shift, with a required sub-position, exactly one of Trong or Ngoài. Only staff whose shift-lead switch is on can hold it, and its hours are paid at the lead rate.
-_Avoid_: Supervisor, manager, team lead
+_Avoid_: Supervisor, manager, team lead, QC (an early note for this position, not a position of its own)
 
 **Shift-lead switch**:
 The setting on a staff account that lets the Administrator give that staff member the shift-lead position. While it's on, the account needs a lead rate.
@@ -70,6 +78,10 @@ _Avoid_: Tag, skill
 
 **Position detail**:
 The collective name for sub-positions and attributes.
+
+**Mark** (Ký hiệu):
+The short sign of a sub-position or attribute shown beside the nickname on a calendar marker, so the detail reads without opening the marker. Colour still identifies the position.
+_Avoid_: Icon, badge, code
 
 **Usual positions** (Vị trí thường đảm nhiệm):
 At most two positions shown on a staff member's account: the top two by published hours over the last 12 weeks, counting only positions above 50 hours. The Administrator can set or remove them by hand. A position set by hand stays; one removed counts again from zero. Never the shift lead.
@@ -100,11 +112,15 @@ _Avoid_: Custom shift (in code), adjusted period, flexible hours
 An optional note a staff member adds to one day of their registration, shown to the Administrator beside them on the calendar.
 
 **Registration window**:
-Thursday 00:00 to Saturday 15:00, when staff can change their registration for the following week.
+Thursday 00:00 to Friday 13:00, when staff can change their registration for the following week.
 _Avoid_: Submission period
 
 **Lock**:
 The moment the registration window closes and registrations become read-only. Assignment can only start after it.
+
+**Registration order** (Thứ tự đăng ký):
+The ranking of staff by when they first saved their registration for the week, which the Administrator uses to give priority to those who registered first. A later change keeps the place; a draft saved automatically at the lock takes the time of its last edit. Shown as a small "T5 08:03" label on markers registered and not yet placed, in the side panel and as the order of the Add list.
+_Avoid_: Queue, sign-up order, submission time
 
 **Counted as free**:
 The state of a staff member who registered nothing for the week, who is then available for every period. This is different from registering every period explicitly.
@@ -139,6 +155,10 @@ _Avoid_: Release, finalise, send
 
 **Publish gate**:
 The check that blocks publishing while any active staff member has no assignment and no skip, or any assignment has no position.
+
+**Schedule export** (Xuất lịch):
+An image or PDF of a published week or day, drawn like the calendar with nicknames, position colours and marks, that the Administrator sends to the Shift Leads on Zalo. Times appear only where they differ from the standard period.
+_Avoid_: Print view, report, download
 
 **Skip** (Bỏ qua tuần này):
 The Administrator's deliberate decision to leave one active staff member unassigned for one week, with a reason from a fixed list.
@@ -186,8 +206,12 @@ When a staff member actually started an assignment. In Phase 1 the Administrator
 _Avoid_: Check-in time, clock-in (until the time clock exists)
 
 **Grace**:
-The first 10 minutes after an assignment's start, during which arriving still counts as on time.
+The first 10 minutes after an assignment's start, during which arriving still counts as on time. An assignment with an agreed late start has none.
 _Avoid_: Tolerance, buffer
+
+**Agreed late start** (Xin đi trễ):
+An assignment that starts later because the staff member asked to come in late and the Administrator agreed: placed by custom times that start later than the period, or moved later on the day and marked as an agreed late arrival. Lateness counts from the agreed start with no grace, so the late penalty and the deduction apply from minute 1.
+_Avoid_: Excused lateness, late permission
 
 **Late penalty**:
 A flag recorded for an arrival from minute 11 onward that voids the week's bonus. It costs no money in itself.
