@@ -101,7 +101,7 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 > **Two consequences of the narrowing, both load-bearing:**
 >
 > 1. **A penalty in Phase 1 is recorded and classified, not priced or applied.** Payroll arrives in Phase 2, so Phase 1 produces the classification and the minutes ("20 minutes late → late penalty, 40-minute deduction") and the late-penalty flag, with no VND figure; the Administrator still applies it by hand to the payslip they compute themselves. What Phase 1 does show in money is a plain pay estimate from assigned hours × rate, labelled as an estimate before deductions and bonus. The flags accumulate from day one, so the Phase 2 bonus engine and payroll inherit a real history rather than starting empty — which is the main argument for keeping lateness in Phase 1 at all.
-> 2. **FR-N5 is not delivered in Phase 1.** The pre-cutoff reminder to staff who registered nothing is the sole automated mitigation for the "silence means fully available" rule (FR-S19). Its Phase 1 substitute is manual: FR-O23 shows the Administrator who actively registered versus who defaulted, and the Administrator chases the defaulters on Zalo before Saturday 15:00. This is acceptable only because Zalo is still running alongside the system during Phase 1. **It stops being acceptable the moment Zalo is cut over**, so E6 cannot slip past the point where the client stops using Zalo for scheduling.
+> 2. **FR-N5 is not delivered in Phase 1.** The pre-cutoff reminder to staff who registered nothing is the sole automated mitigation for the "silence means fully available" rule (FR-S19). Its Phase 1 substitute is manual: FR-O23 shows the Administrator who actively registered versus who defaulted, and the Administrator chases the defaulters on Zalo before Friday 13:00. This is acceptable only because Zalo is still running alongside the system during Phase 1. **It stops being acceptable the moment Zalo is cut over**, so E6 cannot slip past the point where the client stops using Zalo for scheduling.
 
 ---
 
@@ -110,7 +110,7 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 Only the epics where the outcome is genuinely uncertain are framed as hypotheses. E1, E5 and E12 are enablers or obligations, not bets — they are stated as commitments instead.
 
 ### E2 — Weekly Availability Registration
-**If we** let staff register whole shift periods, with custom times inside a period when they need them, in a phone app inside a fixed Thursday–Saturday window
+**If we** let staff register whole shift periods, with custom times inside a period when they need them, in a phone app inside a fixed Thursday–Friday window
 **for** the ~40 staff who currently reply on Zalo
 **Then we will** remove the Owner's weekly consolidation work entirely, because the input arrives already structured.
 
@@ -130,7 +130,7 @@ Only the epics where the outcome is genuinely uncertain are framed as hypotheses
 **for** staff and the Owner
 **Then we will** keep the system usable without any Zalo integration, because the messages that must arrive before a deadline actually arrive.
 
-- **Validation:** ≥85% of active staff have the PWA installed and push granted within 2 weeks of onboarding; pre-cutoff reminder delivered to ≥90% of non-registrants before Saturday 15:00.
+- **Validation:** ≥85% of active staff have the PWA installed and push granted within 2 weeks of onboarding; pre-cutoff reminder delivered to ≥90% of non-registrants before Friday 13:00.
 - **Key risk:** iOS. G54 is parked, not resolved. **Run the iOS push test (SPIKE-1) on the client's real devices before Phase 2 is priced, not during the build.**
 
 ### E7 — Attendance & Lateness (manual)
@@ -293,7 +293,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **AC — Scenario: language applies to every screen**
 - **Given** my account language is set to Vietnamese
 - **When** I open My profile
-- **Then** the interface renders in Vietnamese, including position labels (Phụ trách, QC, Thu Ngân – Offline, Thu Ngân – Online, Pha chế, Phục vụ, Kiểm tra đơn, Bếp) and "Position - sub-position" labels such as "Pha chế - Matcha, Trà".
+- **Then** the interface renders in Vietnamese, including position labels (Phụ trách, Thu Ngân – Offline, Thu Ngân – Online, Kiểm tra đơn, Pha chế, Phục vụ, Bếp) and "Position - sub-position" labels such as "Pha chế - Matcha, Trà".
 
 **Requirements:** NFR-7 · **Effort:** 4 md
 **Note:** VI is the primary language for staff-facing screens. Budget for Vietnamese string length in layouts. Notification text (FR-N2) is added with E6 in Phase 2.
@@ -464,7 +464,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **so that** the Owner knows my constraints without a Zalo conversation.
 
 **AC — Scenario: registration saved and immediately visible**
-- **Given** the registration window is open (Thursday 00:00 – Saturday 15:00)
+- **Given** the registration window is open (Thursday 00:00 – Friday 13:00)
 - **and Given** I am viewing next week's grid
 - **When** I select CA 1 and CA 2 on Monday and save
 - **Then** both periods are recorded as my availability for that Monday and appear in my own view immediately, with a computed daily total of 6 hours; the Owner sees them once I save (S-2.7).
@@ -538,11 +538,11 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 #### S-2.6 — Registration locks automatically at the cutoff
 - **As an** Administrator
-- **I want to** know that nothing changes after Saturday 15:00
+- **I want to** know that nothing changes after Friday 13:00
 - **so that** I build the schedule against a fixed input.
 
 **AC — Scenario: UI and API both go read-only at the cutoff**
-- **Given** the time is Saturday 15:00:01 Asia/Ho_Chi_Minh
+- **Given** the time is Friday 13:00:01 Asia/Ho_Chi_Minh
 - **When** a staff member attempts to create, update or delete a registration for that week, by UI or by direct API call
 - **Then** the request is rejected, and the staff member's view is read-only.
 
@@ -562,7 +562,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **AC — Scenario: a forgotten draft is saved at the cutoff**
 - **Given** I left a draft unsaved
-- **When** the window closes at Saturday 15:00
+- **When** the window closes at Friday 13:00
 - **Then** the draft is saved automatically and becomes the Owner's input, and my screen tells me it was saved for me because I didn't press Save; the Owner sees no difference.
 
 **Requirements:** FR-S20, FR-S5, FR-S12, NFR-1 · **Effort:** 4 md
@@ -710,7 +710,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **Then** the save is refused with the reason; with exactly one it saves, and counts once toward Phụ trách's need, which covers Trong and Ngoài together.
 
 **Requirements:** FR-O45 (staff-side display *proposed pending client confirmation*), FR-O1, §3.3 · **Effort:** 4 md
-**Note:** eight positions — Phụ trách (Trong, Ngoài; exactly one required), QC (Trong, Ngoài), Thu Ngân – Offline, Thu Ngân – Online, Pha chế (Trà sữa, Matcha, Trà, Bồn), Phục vụ (attribute Bưng bàn), Kiểm tra đơn, Bếp. Other than on Phụ trách, sub-positions and attributes are optional and may be combined.
+**Note:** seven positions, in this order — Phụ trách (Trong, Ngoài; exactly one required), Thu Ngân – Offline, Thu Ngân – Online, Kiểm tra đơn, Pha chế (Trà sữa, Matcha, Trà, Bồn), Phục vụ (attribute Bưng bàn), Bếp (PRD v1.11: QC removed, client colours and order). Other than on Phụ trách, sub-positions and attributes are optional and may be combined.
 
 ---
 
@@ -1256,7 +1256,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **I want to** be reminded before the window closes
 - **so that** I can still revise if my week changed.
 
-**AC:** **Given** it is Saturday 09:00 · **When** the reminder is sent · **Then** all active staff receive it, including those who have already registered.
+**AC:** **Given** it is Friday 09:00 · **When** the reminder is sent · **Then** all active staff receive it, including those who have already registered.
 **Requirements:** FR-N13 · **Effort:** 1 md
 
 ---

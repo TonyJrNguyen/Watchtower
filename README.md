@@ -44,7 +44,7 @@ PRD is correct.
 1. **Account management**: Administrator-managed staff accounts, roles and
    unique nicknames.
 2. **Availability registration**: staff register whole shift periods for the
-   coming week, from Thursday 00:00 to Saturday 15:00.
+   coming week, from Thursday 00:00 to Friday 13:00.
 3. **Shift assignment**: one weekly calendar (Day / 3 Days / Week views) to
    see who registered, place people in shifts and give them positions, with
    draft and publish, a publish gate, early departure and swaps.

@@ -14,13 +14,14 @@ Build only these four groups. Do not touch anything in Phase 2/3 unless
 explicitly asked. See PRD §4.13 for the exact boundaries.
 
 1. Account Management (FR-A1–FR-A14): includes per-person base and lead rates, the shift-lead switch, usual positions learned from the schedule, and hours worked per position
-2. Availability Registration: whole periods with optional custom times inside a period, a draft until Save, window Thursday 00:00 – Saturday 15:00 (FR-S1–FR-S22)
-3. Shift Assignment: draft/publish, publish gate, early departure, swap (FR-O1–FR-O51, except FR-O34–FR-O37, which are Phase 2, and the retired FR-O30, FR-O40 and FR-O41)
+2. Availability Registration: whole periods with optional custom times inside a period, a draft until Save, window Thursday 00:00 – Friday 13:00, registration order by first save (FR-S1–FR-S23)
+3. Shift Assignment: draft/publish, publish gate, early departure, swap, schedule export (FR-O1–FR-O52, except FR-O34–FR-O37, which are Phase 2, and the retired FR-O30, FR-O40 and FR-O41)
 4. Manual lateness recording and every rule computed from it: 10-minute grace, late penalty from minute 11, double pay deduction from minute 16, anomaly when the deduction ≥ the shift (FR-O24–FR-O26, FR-S9, FR-S17, FR-S18, FR-T18, FR-B1, FR-B17)
 
 **Not built in Phase 1:** notifications/push (§4.8, all of FR-N*), the control
 centre (FR-O34–FR-O37), weekly payroll close + bonus engine + performance
-dashboard (§3.9–3.13, FR-C*, FR-B1–FR-B16 except FR-B17, FR-P*). The automated
+dashboard (§3.9–3.13, FR-C*, FR-B1–FR-B16 except FR-B17, FR-P*), Shift Lead
+access (FR-L1–FR-L4). The automated
 time clock (§4.4, all of FR-T* except FR-T18) is Phase 3, waiting on decision
 G51.
 
