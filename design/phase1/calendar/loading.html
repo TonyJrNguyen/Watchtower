@@ -121,7 +121,7 @@
             aria-haspopup="menu"
             class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
           >
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span
             ><span class="text-sm font-medium">Trương Hữu Phúc</span
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +150,7 @@
           ></span>
           <p class="min-w-0 truncate text-base font-semibold">Lịch tuần</p>
           <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span>
           </button>
         </header>
         <div class="flex-1 pb-20 lg:pb-0">
@@ -159,7 +159,7 @@
               <div class="flex min-h-10 items-center gap-3">
                 <h1 class="text-xl font-semibold tabular-nums">Tuần 12–18/10</h1>
                 <span
-                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-p7-bg px-2.5 py-1 text-xs font-medium text-p7-tx ring-1 ring-p7-bd ring-inset"
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-black/5 bg-warn-bg text-warn"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -182,10 +182,10 @@
                 >
                 <div class="ml-auto flex items-center gap-3">
                   <button type="button" class="cursor-pointer text-sm font-medium text-warn outline-hidden underline-offset-4 hover:underline">
-                    Còn 6 việc</button
+                    Còn 4 việc</button
                   ><button
                     type="button"
-                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover h-9 min-h-9 rounded-lg px-3"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover h-9 min-h-9 rounded-lg px-3"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -343,7 +343,7 @@
                 <div
                   role="tablist"
                   aria-label="Chế độ xem"
-                  class="inline-flex w-fit max-w-full shrink-0 gap-1 rounded-xl bg-foreground/5 p-1 shadow-(--shadow-segment-track)"
+                  class="inline-flex w-fit max-w-[100%] shrink-0 gap-1 rounded-xl bg-foreground/5 p-1 shadow-(--shadow-segment-track)"
                 >
                   <button
                     type="button"
@@ -395,7 +395,22 @@
                   </svg>
                 </button>
                 <span class="ml-auto flex items-center gap-2"
-                  ><div class="flex items-center gap-1">
+                  ><button
+                    type="button"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Giờ đăng ký trên chip"
+                    title="Hiện giờ lưu đăng ký lần đầu trên chip đã đăng ký, chưa xếp"
+                    class="group inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-2 text-sm whitespace-nowrap text-foreground/80 outline-hidden hover:bg-foreground/5"
+                  >
+                    Giờ đăng ký<span
+                      class="inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-muted/40 p-0.5 transition-colors group-aria-checked:bg-primary"
+                      ><span
+                        class="size-4 rounded-full bg-surface shadow-sm transition-transform group-aria-checked:translate-x-4 motion-reduce:transition-none"
+                      ></span
+                    ></span>
+                  </button>
+                  <div class="flex items-center gap-1">
                     <button
                       type="button"
                       aria-label="Hoàn tác (Ctrl+Z)"
@@ -659,7 +674,7 @@
               <div class="flex items-center gap-2">
                 <h1 class="sr-only">Tuần 12–18/10</h1>
                 <span
-                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-p7-bg px-2.5 py-1 text-xs font-medium text-p7-tx ring-1 ring-p7-bd ring-inset"
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-black/5 bg-warn-bg text-warn"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -680,7 +695,36 @@
                     <path d="m15 5 3 3"></path></svg
                   >Nháp</span
                 ><span class="ml-auto flex items-center gap-1"
-                  ><div class="flex items-center gap-1">
+                  ><button
+                    type="button"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Giờ đăng ký trên chip"
+                    title="Hiện giờ lưu đăng ký lần đầu trên chip đã đăng ký, chưa xếp"
+                    class="group inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-2 text-sm whitespace-nowrap text-foreground/80 outline-hidden hover:bg-foreground/5"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-clock size-4 text-muted shrink-0"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline></svg
+                    ><span class="inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-muted/40 p-0.5 transition-colors group-aria-checked:bg-primary"
+                      ><span
+                        class="size-4 rounded-full bg-surface shadow-sm transition-transform group-aria-checked:translate-x-4 motion-reduce:transition-none"
+                      ></span
+                    ></span>
+                  </button>
+                  <div class="flex items-center gap-1">
                     <button
                       type="button"
                       aria-label="Hoàn tác (Ctrl+Z)"
@@ -944,7 +988,7 @@
               <div class="flex items-center gap-2">
                 <button
                   type="button"
-                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
+                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -967,7 +1011,7 @@
                 ><span class="ml-auto flex items-center gap-2"
                   ><button
                     type="button"
-                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover whitespace-nowrap px-3"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover whitespace-nowrap px-3"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -986,7 +1030,7 @@
                         d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"
                       ></path>
                       <path d="m21.854 2.147-10.94 10.939"></path></svg
-                    >Công bố <span class="rounded-full bg-primary-foreground px-1.5 text-xs font-semibold tabular-nums text-primary">6</span>
+                    >Công bố <span class="rounded-full bg-primary-foreground px-1.5 text-xs font-semibold tabular-nums text-primary">4</span>
                   </button></span
                 >
               </div>

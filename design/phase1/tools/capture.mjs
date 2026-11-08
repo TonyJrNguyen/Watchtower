@@ -68,6 +68,7 @@ const OVERLAYS = [
   { man: "lich", file: "data-publish-dialog", vi: "Hộp Công bố", en: "Publish dialog", steps: [openPanel, "openDialog('publish')"] },
   { man: "lich", file: "data-remove-day-dialog", vi: "Hộp Bỏ khỏi mọi ca trong ngày", en: "Take off every shift dialog", steps: [openPanel, "ui.panel.sel = new Set(); openDialog('removeDay')"] },
   { man: "lich", tt: "cong-bo", file: "published-edit-shift-dialog", vi: "Hộp Sửa ca (đã công bố)", en: "Edit shift dialog (published)", steps: [openPanel, "openDialog('shift')"] },
+  { man: "lich", tt: "cong-bo", file: "published-export-dialog", vi: "Hộp Xuất lịch", en: "Export dialog", steps: [openPanel, "openDialog('export')"] },
   { man: "lich", file: "data-panel-sheet", vi: "Panel người (điện thoại)", en: "Person panel (phone)", only: "mobile", steps: [openPanel] },
   { man: "lich", file: "data-staff-sheet", vi: "Danh sách nhân viên (điện thoại)", en: "Staff list (phone)", only: "mobile", steps: ["ui.sheet = 'staff'; render()"] },
   { man: "tre", file: "data-anomaly-dialog", vi: "Hộp Ca bất thường", en: "Anomaly dialog", steps: [visibleClick(`[onclick*="openDialog('anomaly'"]`)] },

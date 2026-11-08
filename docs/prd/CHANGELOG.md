@@ -3,6 +3,12 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.12 — 2026-11-04
+- §5.3 only, no requirement changes: the v1.11 changes are now drawn in the Phase 1 wireframe (2026-11-01 to 2026-11-04), with no client review of them recorded yet, so this document still applies wherever they differ
+- §5.3 records the wireframe's new **Try-out** state as a demo aid that is not built, and that the static screens in `design/phase1/` were regenerated from the wireframe (client colours, no QC, new export dialog page)
+- `docs/feedback/2026-10-18-client-feedback.md` (and its `.vi.md` copy) no longer says the wireframe and static pages are not updated
+- Nothing added to the *pending confirmation* list. Backlog and roadmap unchanged
+
 ## v1.11 — 2026-10-25
 - Following the client feedback of 2026-10-18 and the client's confirmation of the position catalogue (`docs/feedback/2026-10-18-client-feedback.md`)
 - **Registration window closes Friday 13:00** instead of Saturday 15:00; it still opens Thursday 00:00. Amended §3.4, FR-S1, FR-O28. The default times of the Phase 2 reminders move before the new close: FR-N5 from Friday 18:00 to **Thursday 20:00**, FR-N13 from Saturday 09:00 to **Friday 09:00**

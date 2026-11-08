@@ -623,6 +623,18 @@
     {
       "screen": "lich",
       "dir": "calendar",
+      "file": "calendar/published-export-dialog.html",
+      "lang": "vi",
+      "state": "cong-bo",
+      "overlay": true,
+      "only": null,
+      "vi": "Hộp Xuất lịch",
+      "en": "Export dialog",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=cong-bo&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
       "file": "calendar/data-panel-sheet.html",
       "lang": "vi",
       "state": "du-lieu",

@@ -52,40 +52,38 @@
   --danger-bg: rgb(255 32 86 / 0.1);
   --danger-bg-hover: rgb(255 32 86 / 0.15);
 
-  /* Position colours: pastel, one fixed colour per position.
-     Never green, amber or red: those three mean status. */
-  --p1-bg: #e0f2fe;
-  --p1-bd: #7dd3fc;
-  --p1-tx: #075985;
-  --p1-dot: #0ea5e9; /* QC: sky */
-  --p2-bg: #ede9fe;
-  --p2-bd: #c4b5fd;
-  --p2-tx: #5b21b6;
-  --p2-dot: #8b5cf6; /* Cashier – In-store: violet */
-  --p3-bg: #fce7f3;
-  --p3-bd: #f9a8d4;
-  --p3-tx: #9d174d;
-  --p3-dot: #ec4899; /* Cashier – Online: pink */
-  --p4-bg: #ccfbf1;
-  --p4-bd: #5eead4;
-  --p4-tx: #115e59;
-  --p4-dot: #14b8a6; /* Barista: teal */
-  --p5-bg: #ffedd5;
-  --p5-bd: #fdba74;
-  --p5-tx: #9a3412;
-  --p5-dot: #f97316; /* Server: orange */
-  --p6-bg: #ecfccb;
-  --p6-bd: #bef264;
-  --p6-tx: #3f6212;
-  --p6-dot: #84cc16; /* Order check: lime */
-  --p7-bg: #efe5da;
-  --p7-bd: #c9ab8c;
-  --p7-tx: #5c3d22;
-  --p7-dot: #a0785a; /* Kitchen: brown (yellow went to the shift lead) */
-  --p8-bg: #fcd34d;
-  --p8-bd: #ca8a04;
-  --p8-tx: #422006;
-  --p8-dot: #ca8a04; /* Shift lead (Phụ trách): gold, stronger than the pastels so the owner sees who leads each period */
+  /* Position colours (PRD v1.11, set by the client on 2026-10-18): solid fills as in the shop's
+     spreadsheet, in catalogue order. White text on the shift lead and Kitchen, dark text on the rest.
+     The set includes green, yellow, orange and red, so a state is never shown by hue alone:
+     a check, a "!" badge, a struck-through nickname or a label (FR-O42). */
+  --p1-bg: #000000;
+  --p1-bd: #000000;
+  --p1-tx: #ffffff;
+  --p1-dot: #000000; /* Shift lead (Phụ trách) */
+  --p2-bg: #ff6d01;
+  --p2-bd: #ff6d01;
+  --p2-tx: #1a1a1a;
+  --p2-dot: #ff6d01; /* Cashier – In-store */
+  --p3-bg: #46bdc6;
+  --p3-bd: #46bdc6;
+  --p3-tx: #1a1a1a;
+  --p3-dot: #46bdc6; /* Cashier – Online */
+  --p4-bg: #ff00a0;
+  --p4-bd: #ff00a0;
+  --p4-tx: #1a1a1a;
+  --p4-dot: #ff00a0; /* Order check */
+  --p5-bg: #34a853;
+  --p5-bd: #34a853;
+  --p5-tx: #1a1a1a;
+  --p5-dot: #34a853; /* Barista */
+  --p6-bg: #fbbc04;
+  --p6-bd: #fbbc04;
+  --p6-tx: #1a1a1a;
+  --p6-dot: #fbbc04; /* Server */
+  --p7-bg: #cc0100;
+  --p7-bd: #cc0100;
+  --p7-tx: #ffffff;
+  --p7-dot: #cc0100; /* Kitchen */
 
   --radius: 0.75rem;
 }
@@ -224,8 +222,4 @@ body {
   --color-p7-bd: var(--p7-bd);
   --color-p7-tx: var(--p7-tx);
   --color-p7-dot: var(--p7-dot);
-  --color-p8-bg: var(--p8-bg);
-  --color-p8-bd: var(--p8-bd);
-  --color-p8-tx: var(--p8-tx);
-  --color-p8-dot: var(--p8-dot);
 }

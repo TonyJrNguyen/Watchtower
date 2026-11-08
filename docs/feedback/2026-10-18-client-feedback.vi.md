@@ -198,7 +198,9 @@ FR-P1–FR-P6), thuộc **Phase 2**. Câu hỏi ở mục 4.2.
 ## 3. Những gì thay đổi
 
 Giả định các đề xuất ở mục 4 được chấp nhận. Dòng ghi **xong** đã áp dụng vào
-PRD v1.11; wireframe và các trang tĩnh chưa cập nhật.
+PRD v1.11. Wireframe đã cập nhật mọi dòng Phase 1 từ 01/11 đến 04/11, và các
+trang tĩnh được tạo lại từ wireframe ngày 04/11 (PRD §5.3); chưa có ghi nhận
+khách đã xem các bản vẽ này.
 
 | Mục | PRD | Tài liệu khác | Wireframe và trang tĩnh | Phase / độ lớn |
 |---|---|---|---|---|
