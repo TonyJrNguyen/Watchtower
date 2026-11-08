@@ -121,7 +121,7 @@
             aria-haspopup="menu"
             class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
           >
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span
             ><span class="text-sm font-medium">Trương Hữu Phúc</span
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +150,7 @@
           ></span>
           <p class="min-w-0 truncate text-base font-semibold">Nhật ký</p>
           <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span>
           </button>
         </header>
         <div class="flex-1 pb-20 lg:pb-0">
@@ -178,10 +178,10 @@
                   placeholder="Tìm theo tên nhân viên"
                   class="h-11 w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:h-10 md:text-sm pl-10"
               /></label>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  class="group inline-flex h-10 w-fit max-w-full cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
+                  class="group inline-flex h-10 w-fit max-w-[100%] cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
                 >
                   <span class="text-muted">Loại:</span><span class="truncate font-medium text-foreground">Tất cả</span
                   ><svg
@@ -201,7 +201,7 @@
                   </svg></button
                 ><button
                   type="button"
-                  class="group inline-flex h-10 w-fit max-w-full cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
+                  class="group inline-flex h-10 w-fit max-w-[100%] cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
                 >
                   <span class="text-muted">Khoảng:</span><span class="truncate font-medium text-foreground">7 ngày qua</span
                   ><svg
@@ -220,6 +220,40 @@
                     <path d="m6 9 6 6 6-6"></path>
                   </svg>
                 </button>
+                <label class="inline-flex min-h-10 cursor-pointer items-center gap-2.5 px-1 text-sm"
+                  ><span class="relative inline-flex shrink-0"
+                    ><input
+                      type="checkbox"
+                      class="peer size-4 rounded cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-check pointer-events-none absolute inset-0 m-auto size-3 stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"
+                    >
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus pointer-events-none absolute inset-0 m-auto size-3 stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
+                    >
+                      <path d="M5 12h14"></path></svg></span
+                  >Ẩn thay đổi khi còn nháp</label
+                >
               </div>
             </div>
             <section class="overflow-hidden rounded-2xl border border-border bg-surface">
@@ -230,7 +264,7 @@
                 </div>
                 <button
                   type="button"
-                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover"
+                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

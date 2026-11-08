@@ -121,7 +121,7 @@
             aria-haspopup="menu"
             class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
           >
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span
             ><span class="text-sm font-medium">Trương Hữu Phúc</span
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +150,7 @@
           ></span>
           <p class="min-w-0 truncate text-base font-semibold">Nhật ký</p>
           <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span>
           </button>
         </header>
         <div class="flex-1 pb-20 lg:pb-0">
@@ -178,10 +178,10 @@
                   placeholder="Tìm theo tên nhân viên"
                   class="h-11 w-full rounded-xl border border-border-strong bg-surface px-4 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:h-10 md:text-sm pl-10"
               /></label>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  class="group inline-flex h-10 w-fit max-w-full cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
+                  class="group inline-flex h-10 w-fit max-w-[100%] cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
                 >
                   <span class="text-muted">Loại:</span><span class="truncate font-medium text-foreground">Tất cả</span
                   ><svg
@@ -201,7 +201,7 @@
                   </svg></button
                 ><button
                   type="button"
-                  class="group inline-flex h-10 w-fit max-w-full cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
+                  class="group inline-flex h-10 w-fit max-w-[100%] cursor-pointer items-center gap-2 rounded-xl border border-border-strong bg-surface px-3.5 text-sm outline-hidden transition-colors aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus"
                 >
                   <span class="text-muted">Khoảng:</span><span class="truncate font-medium text-foreground">7 ngày qua</span
                   ><svg
@@ -220,6 +220,40 @@
                     <path d="m6 9 6 6 6-6"></path>
                   </svg>
                 </button>
+                <label class="inline-flex min-h-10 cursor-pointer items-center gap-2.5 px-1 text-sm"
+                  ><span class="relative inline-flex shrink-0"
+                    ><input
+                      type="checkbox"
+                      class="peer size-4 rounded cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-check pointer-events-none absolute inset-0 m-auto size-3 stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"
+                    >
+                      <path d="M20 6 9 17l-5-5"></path>
+                    </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="lucide lucide-minus pointer-events-none absolute inset-0 m-auto size-3 stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
+                    >
+                      <path d="M5 12h14"></path></svg></span
+                  >Ẩn thay đổi khi còn nháp</label
+                >
               </div>
             </div>
             <section class="overflow-hidden rounded-2xl border border-border bg-surface">
@@ -238,17 +272,17 @@
                     <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 16:42</td>
                     <td class="px-4 py-3 text-sm">
                       <p class="font-medium">Xếp ca · Nguyễn Thị Mai</p>
-                      <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 14/10</p>
+                      <p class="mt-0.5 text-xs text-muted">Chủ quán · khi còn nháp · T4 14/10</p>
                     </td>
                     <td class="px-4 py-3 text-sm text-muted">—</td>
-                    <td class="px-4 py-3 text-sm">07:00–13:00 · QC - Trong</td>
+                    <td class="px-4 py-3 text-sm">07:00–13:00 · Phụ trách - Trong</td>
                     <td class="px-4 py-3 text-sm text-foreground/80">—</td>
                   </tr>
                   <tr class="align-top">
                     <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 16:40</td>
                     <td class="px-4 py-3 text-sm">
                       <p class="font-medium">Gán vị trí · Đặng Văn Hùng</p>
-                      <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 14/10</p>
+                      <p class="mt-0.5 text-xs text-muted">Chủ quán · khi còn nháp · T4 14/10</p>
                     </td>
                     <td class="px-4 py-3 text-sm text-muted">17:00–23:00 · chưa có vị trí</td>
                     <td class="px-4 py-3 text-sm">17:00–23:00 · Bếp</td>
@@ -258,20 +292,40 @@
                     <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 16:31</td>
                     <td class="px-4 py-3 text-sm">
                       <p class="font-medium">Xếp ngoài lịch rảnh · Lê Minh Anh</p>
-                      <p class="mt-0.5 text-xs text-muted">Chủ quán · T5 15/10</p>
+                      <p class="mt-0.5 text-xs text-muted">Chủ quán · khi còn nháp · T5 15/10</p>
                     </td>
                     <td class="px-4 py-3 text-sm text-muted">—</td>
                     <td class="px-4 py-3 text-sm">17:00–23:00 · Pha chế</td>
                     <td class="px-4 py-3 text-sm text-foreground/80">Đã thống nhất qua Zalo</td>
                   </tr>
                   <tr class="align-top">
-                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">10/10 15:00</td>
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">09/10 13:00</td>
                     <td class="px-4 py-3 text-sm">
                       <p class="font-medium">Khoá đăng ký</p>
                       <p class="mt-0.5 text-xs text-muted"><span class="text-muted">Hệ thống</span> · Tuần 12–18/10</p>
                     </td>
                     <td class="px-4 py-3 text-sm text-muted">Đang mở</td>
                     <td class="px-4 py-3 text-sm">Đã khoá</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">09/10 09:10</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Lưu đăng ký · Nguyễn Thị Mai</p>
+                      <p class="mt-0.5 text-xs text-muted">Nhân viên · Tuần 12–18/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">Lưu lúc T5 08:03</td>
+                    <td class="px-4 py-3 text-sm">Lưu lúc T6 09:10</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">08/10 08:03</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Lưu đăng ký · Nguyễn Thị Mai</p>
+                      <p class="mt-0.5 text-xs text-muted">Nhân viên · Tuần 12–18/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">—</td>
+                    <td class="px-4 py-3 text-sm">Lưu lúc T5 08:03</td>
                     <td class="px-4 py-3 text-sm text-foreground/80">—</td>
                   </tr>
                   <tr class="align-top">
@@ -285,6 +339,16 @@
                     <td class="px-4 py-3 text-sm text-foreground/80">—</td>
                   </tr>
                   <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">07/10 08:05</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Ghi giờ đến · Lâm Chí Thanh</p>
+                      <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 7/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">Đúng giờ</td>
+                    <td class="px-4 py-3 text-sm">Đến 08:04 · trễ 4 phút, không ân hạn</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
+                  </tr>
+                  <tr class="align-top">
                     <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">07/10 07:30</td>
                     <td class="px-4 py-3 text-sm">
                       <p class="font-medium">Ghi giờ đến · Huỳnh Ngọc Trâm</p>
@@ -295,6 +359,16 @@
                     <td class="px-4 py-3 text-sm text-foreground/80">—</td>
                   </tr>
                   <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">07/10 06:50</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Dời giờ vào · vào trễ đã thống nhất · Lâm Chí Thanh</p>
+                      <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 7/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">07:00–11:00</td>
+                    <td class="px-4 py-3 text-sm">08:00–11:00</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">Xin vào trễ qua Zalo, đi khám</td>
+                  </tr>
+                  <tr class="align-top">
                     <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">06/10 18:05</td>
                     <td class="px-4 py-3 text-sm">
                       <p class="font-medium">Rút ngắn ca, có người thay · Phạm Quốc Bảo</p>
@@ -303,6 +377,16 @@
                     <td class="px-4 py-3 text-sm text-muted">07:00–13:00</td>
                     <td class="px-4 py-3 text-sm">07:00–11:30 · Kiệt làm thay 11:30–13:00</td>
                     <td class="px-4 py-3 text-sm text-foreground/80">Về sớm, việc gia đình</td>
+                  </tr>
+                  <tr class="align-top">
+                    <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">04/10 21:30</td>
+                    <td class="px-4 py-3 text-sm">
+                      <p class="font-medium">Xuất lịch</p>
+                      <p class="mt-0.5 text-xs text-muted">Chủ quán · Tuần 5–11/10</p>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-muted">—</td>
+                    <td class="px-4 py-3 text-sm">Cả tuần · PDF</td>
+                    <td class="px-4 py-3 text-sm text-foreground/80">—</td>
                   </tr>
                   <tr class="align-top">
                     <td class="px-5 py-3 text-sm whitespace-nowrap tabular-nums text-muted">04/10 21:15</td>
@@ -342,13 +426,15 @@
                     <span class="min-w-0 flex-1 font-medium">Xếp ca · Nguyễn Thị Mai</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">10/10 16:42</span>
                   </p>
-                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → 07:00–13:00 · QC - Trong</p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · khi còn nháp · T4 14/10</p>
+                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → 07:00–13:00 · Phụ trách - Trong</p>
                 </li>
                 <li class="px-4 py-3">
                   <p class="flex items-baseline gap-2 text-sm">
                     <span class="min-w-0 flex-1 font-medium">Gán vị trí · Đặng Văn Hùng</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">10/10 16:40</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · khi còn nháp · T4 14/10</p>
                   <p class="mt-1 text-sm"><span class="text-muted">17:00–23:00 · chưa có vị trí</span> → 17:00–23:00 · Bếp</p>
                 </li>
                 <li class="px-4 py-3">
@@ -356,42 +442,88 @@
                     <span class="min-w-0 flex-1 font-medium">Xếp ngoài lịch rảnh · Lê Minh Anh</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">10/10 16:31</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · khi còn nháp · T5 15/10</p>
                   <p class="mt-1 text-sm"><span class="text-muted">—</span> → 17:00–23:00 · Pha chế</p>
                   <p class="mt-1 text-xs text-muted">Lý do: Đã thống nhất qua Zalo</p>
                 </li>
                 <li class="px-4 py-3">
                   <p class="flex items-baseline gap-2 text-sm">
-                    <span class="min-w-0 flex-1 font-medium">Khoá đăng ký</span><span class="shrink-0 text-xs tabular-nums text-muted">10/10 15:00</span>
+                    <span class="min-w-0 flex-1 font-medium">Khoá đăng ký</span><span class="shrink-0 text-xs tabular-nums text-muted">09/10 13:00</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted"><span class="text-muted">Hệ thống</span> · Tuần 12–18/10</p>
                   <p class="mt-1 text-sm"><span class="text-muted">Đang mở</span> → Đã khoá</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Lưu đăng ký · Nguyễn Thị Mai</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">09/10 09:10</span>
+                  </p>
+                  <p class="mt-0.5 text-xs text-muted">Nhân viên · Tuần 12–18/10</p>
+                  <p class="mt-1 text-sm"><span class="text-muted">Lưu lúc T5 08:03</span> → Lưu lúc T6 09:10</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Lưu đăng ký · Nguyễn Thị Mai</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">08/10 08:03</span>
+                  </p>
+                  <p class="mt-0.5 text-xs text-muted">Nhân viên · Tuần 12–18/10</p>
+                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → Lưu lúc T5 08:03</p>
                 </li>
                 <li class="px-4 py-3">
                   <p class="flex items-baseline gap-2 text-sm">
                     <span class="min-w-0 flex-1 font-medium">Ghi giờ đến · Bùi Đức Long</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">07/10 12:10</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 7/10</p>
                   <p class="mt-1 text-sm"><span class="text-muted">Đúng giờ</span> → Đến 12:05 · bất thường</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Ghi giờ đến · Lâm Chí Thanh</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">07/10 08:05</span>
+                  </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 7/10</p>
+                  <p class="mt-1 text-sm"><span class="text-muted">Đúng giờ</span> → Đến 08:04 · trễ 4 phút, không ân hạn</p>
                 </li>
                 <li class="px-4 py-3">
                   <p class="flex items-baseline gap-2 text-sm">
                     <span class="min-w-0 flex-1 font-medium">Ghi giờ đến · Huỳnh Ngọc Trâm</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">07/10 07:30</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 7/10</p>
                   <p class="mt-1 text-sm"><span class="text-muted">Đúng giờ</span> → Đến 07:22 · trễ 22 phút</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Dời giờ vào · vào trễ đã thống nhất · Lâm Chí Thanh</span
+                    ><span class="shrink-0 text-xs tabular-nums text-muted">07/10 06:50</span>
+                  </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · T4 7/10</p>
+                  <p class="mt-1 text-sm"><span class="text-muted">07:00–11:00</span> → 08:00–11:00</p>
+                  <p class="mt-1 text-xs text-muted">Lý do: Xin vào trễ qua Zalo, đi khám</p>
                 </li>
                 <li class="px-4 py-3">
                   <p class="flex items-baseline gap-2 text-sm">
                     <span class="min-w-0 flex-1 font-medium">Rút ngắn ca, có người thay · Phạm Quốc Bảo</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">06/10 18:05</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · T3 6/10</p>
                   <p class="mt-1 text-sm"><span class="text-muted">07:00–13:00</span> → 07:00–11:30 · Kiệt làm thay 11:30–13:00</p>
                   <p class="mt-1 text-xs text-muted">Lý do: Về sớm, việc gia đình</p>
+                </li>
+                <li class="px-4 py-3">
+                  <p class="flex items-baseline gap-2 text-sm">
+                    <span class="min-w-0 flex-1 font-medium">Xuất lịch</span><span class="shrink-0 text-xs tabular-nums text-muted">04/10 21:30</span>
+                  </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán · Tuần 5–11/10</p>
+                  <p class="mt-1 text-sm"><span class="text-muted">—</span> → Cả tuần · PDF</p>
                 </li>
                 <li class="px-4 py-3">
                   <p class="flex items-baseline gap-2 text-sm">
                     <span class="min-w-0 flex-1 font-medium">Thêm vị trí thường đảm nhiệm · Dương Tuấn Kiệt</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">04/10 21:15</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted"><span class="text-muted">Hệ thống</span></p>
                   <p class="mt-1 text-sm"><span class="text-muted">Bếp</span> → Bếp, Phục vụ</p>
                   <p class="mt-1 text-xs text-muted">Lý do: Phục vụ 64 giờ trong 12 tuần qua</p>
                 </li>
@@ -400,6 +532,7 @@
                     <span class="min-w-0 flex-1 font-medium">Đặt mật khẩu · Nguyễn Thị Mai</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">02/10 09:14</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán</p>
                   <p class="mt-1 text-sm"><span class="text-muted">—</span> → Đã đặt</p>
                 </li>
                 <li class="px-4 py-3">
@@ -407,6 +540,7 @@
                     <span class="min-w-0 flex-1 font-medium">Vô hiệu hoá tài khoản · Lưu Văn Đức</span
                     ><span class="shrink-0 text-xs tabular-nums text-muted">30/09 20:02</span>
                   </p>
+                  <p class="mt-0.5 text-xs text-muted">Chủ quán</p>
                   <p class="mt-1 text-sm"><span class="text-muted">Đang làm</span> → Đã nghỉ</p>
                   <p class="mt-1 text-xs text-muted">Lý do: Nghỉ việc từ 01/10</p>
                 </li>

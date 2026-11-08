@@ -199,7 +199,9 @@ section 4.2.
 ## 3. What changes
 
 Assuming the recommendations in section 4 are accepted. Rows marked **done**
-were applied in PRD v1.11; the wireframe and static pages are not updated yet.
+were applied in PRD v1.11. The wireframe was updated for every Phase 1 row
+between 2026-11-01 and 2026-11-04, and the static pages were regenerated from it
+on 2026-11-04 (PRD §5.3); no client review of those drawings is recorded yet.
 
 | Item | PRD | Other docs | Wireframe and static pages | Phase / size |
 |---|---|---|---|---|

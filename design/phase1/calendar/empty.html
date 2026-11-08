@@ -121,7 +121,7 @@
             aria-haspopup="menu"
             class="ml-auto flex h-10 cursor-pointer items-center gap-2.5 rounded-xl px-1 pr-2 outline-hidden hover:bg-item-hover"
           >
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span
             ><span class="text-sm font-medium">Trương Hữu Phúc</span
             ><svg
               xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +150,7 @@
           ></span>
           <p class="min-w-0 truncate text-base font-semibold">Lịch tuần</p>
           <button type="button" aria-label="Tài khoản" class="ml-auto cursor-pointer rounded-full outline-hidden">
-            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-p2-bg text-sm font-semibold text-p2-tx">P</span>
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold text-foreground">P</span>
           </button>
         </header>
         <div class="flex-1 pb-20 lg:pb-0">
@@ -159,7 +159,7 @@
               <div class="flex min-h-10 items-center gap-3">
                 <h1 class="text-xl font-semibold tabular-nums">Tuần 12–18/10</h1>
                 <span
-                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-p7-bg px-2.5 py-1 text-xs font-medium text-p7-tx ring-1 ring-p7-bd ring-inset"
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-black/5 bg-warn-bg text-warn"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -185,7 +185,7 @@
                     Còn 22 việc</button
                   ><button
                     type="button"
-                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover h-9 min-h-9 rounded-lg px-3"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover h-9 min-h-9 rounded-lg px-3"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -343,7 +343,7 @@
                 <div
                   role="tablist"
                   aria-label="Chế độ xem"
-                  class="inline-flex w-fit max-w-full shrink-0 gap-1 rounded-xl bg-foreground/5 p-1 shadow-(--shadow-segment-track)"
+                  class="inline-flex w-fit max-w-[100%] shrink-0 gap-1 rounded-xl bg-foreground/5 p-1 shadow-(--shadow-segment-track)"
                 >
                   <button
                     type="button"
@@ -484,7 +484,7 @@
                     <div class="flex flex-wrap items-center gap-3">
                       <button
                         type="button"
-                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
+                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -605,7 +605,7 @@
                         <tr class="border-t border-border">
                           <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                             <span class="inline-flex items-center gap-2"
-                              ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                              ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>Phụ trách</span
                             >
                           </th>
                           <td class="px-2 py-1.5 text-right whitespace-nowrap">
@@ -670,78 +670,6 @@
                                 inputmode="numeric"
                                 value="2"
                                 aria-label="Phụ trách CA5 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                        </tr>
-                        <tr class="border-t border-border">
-                          <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
-                            <span class="inline-flex items-center gap-2"
-                              ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span
-                            >
-                          </th>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="0"
-                                aria-label="QC CA1 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="0"
-                                aria-label="QC CA2 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="0"
-                                aria-label="QC CA3 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="0"
-                                aria-label="QC CA4 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="QC CA5 T4 14/10"
                                 class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
                             /></span>
                           </td>
@@ -893,151 +821,7 @@
                         <tr class="border-t border-border">
                           <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                             <span class="inline-flex items-center gap-2"
-                              ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
-                            >
-                          </th>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Pha chế CA1 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Pha chế CA2 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Pha chế CA3 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Pha chế CA4 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Pha chế CA5 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                        </tr>
-                        <tr class="border-t border-border">
-                          <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
-                            <span class="inline-flex items-center gap-2"
-                              ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
-                            >
-                          </th>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Phục vụ CA1 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Phục vụ CA2 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="0"
-                                aria-label="Phục vụ CA3 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Phục vụ CA4 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                              ><input
-                                type="number"
-                                min="0"
-                                max="20"
-                                inputmode="numeric"
-                                value="1"
-                                aria-label="Phục vụ CA5 T4 14/10"
-                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                            /></span>
-                          </td>
-                        </tr>
-                        <tr class="border-t border-border">
-                          <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
-                            <span class="inline-flex items-center gap-2"
-                              ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Kiểm tra đơn</span
+                              ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Kiểm tra đơn</span
                             >
                           </th>
                           <td class="px-2 py-1.5 text-right whitespace-nowrap">
@@ -1109,6 +893,150 @@
                         <tr class="border-t border-border">
                           <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                             <span class="inline-flex items-center gap-2"
+                              ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Pha chế</span
+                            >
+                          </th>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Pha chế CA1 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Pha chế CA2 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Pha chế CA3 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Pha chế CA4 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Pha chế CA5 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                        </tr>
+                        <tr class="border-t border-border">
+                          <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2"
+                              ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Phục vụ</span
+                            >
+                          </th>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Phục vụ CA1 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Phục vụ CA2 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="0"
+                                aria-label="Phục vụ CA3 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Phục vụ CA4 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                          <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                            <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
+                              ><input
+                                type="number"
+                                min="0"
+                                max="20"
+                                inputmode="numeric"
+                                value="1"
+                                aria-label="Phục vụ CA5 T4 14/10"
+                                class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                            /></span>
+                          </td>
+                        </tr>
+                        <tr class="border-t border-border">
+                          <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2"
                               ><span class="size-2 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span
                             >
                           </th>
@@ -1166,13 +1094,13 @@
                           </td>
                           <td class="px-2 py-1.5 text-right whitespace-nowrap">
                             <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                              ><span class="">0</span><span class="text-muted">/</span
+                              ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
                               ><input
                                 type="number"
                                 min="0"
                                 max="20"
                                 inputmode="numeric"
-                                value="0"
+                                value="1"
                                 aria-label="Bếp CA5 T4 14/10"
                                 class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
                             /></span>
@@ -1190,7 +1118,7 @@
               <div class="flex items-center gap-2">
                 <h1 class="sr-only">Tuần 12–18/10</h1>
                 <span
-                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-p7-bg px-2.5 py-1 text-xs font-medium text-p7-tx ring-1 ring-p7-bd ring-inset"
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-black/5 bg-warn-bg text-warn"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -1475,7 +1403,7 @@
               <div class="flex items-center gap-2">
                 <button
                   type="button"
-                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
+                  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1498,7 +1426,7 @@
                 ><span class="ml-auto flex items-center gap-2"
                   ><button
                     type="button"
-                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover whitespace-nowrap px-3"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary-hover whitespace-nowrap px-3"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1534,7 +1462,7 @@
                 <div class="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
-                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-full text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
+                    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl min-h-10 px-4 py-2 text-sm font-medium transition-colors max-w-[100%] text-center leading-tight outline-hidden disabled:cursor-not-allowed disabled:opacity-50 border border-border-strong bg-surface text-foreground hover:bg-button-hover whitespace-nowrap px-3"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1599,7 +1527,7 @@
                     <tr class="border-t border-border">
                       <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                         <span class="inline-flex items-center gap-2"
-                          ><span class="size-2 shrink-0 rounded-full bg-p8-dot" aria-hidden="true"></span>Phụ trách</span
+                          ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>Phụ trách</span
                         >
                       </th>
                       <td class="px-2 py-1.5 text-right whitespace-nowrap">
@@ -1664,76 +1592,6 @@
                             inputmode="numeric"
                             value="2"
                             aria-label="Phụ trách CA5 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                    </tr>
-                    <tr class="border-t border-border">
-                      <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
-                        <span class="inline-flex items-center gap-2"><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>QC</span>
-                      </th>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="QC CA1 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="QC CA2 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="QC CA3 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="QC CA4 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="1"
-                            aria-label="QC CA5 T4 14/10"
                             class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
                         /></span>
                       </td>
@@ -1885,7 +1743,79 @@
                     <tr class="border-t border-border">
                       <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                         <span class="inline-flex items-center gap-2"
-                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Pha chế</span
+                          ><span class="size-2 shrink-0 rounded-full bg-p4-dot" aria-hidden="true"></span>Kiểm tra đơn</span
+                        >
+                      </th>
+                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                          ><span class="">0</span><span class="text-muted">/</span
+                          ><input
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            value="0"
+                            aria-label="Kiểm tra đơn CA1 T4 14/10"
+                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                        /></span>
+                      </td>
+                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                          ><span class="">0</span><span class="text-muted">/</span
+                          ><input
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            value="0"
+                            aria-label="Kiểm tra đơn CA2 T4 14/10"
+                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                        /></span>
+                      </td>
+                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                          ><span class="">0</span><span class="text-muted">/</span
+                          ><input
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            value="0"
+                            aria-label="Kiểm tra đơn CA3 T4 14/10"
+                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                        /></span>
+                      </td>
+                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                          ><span class="">0</span><span class="text-muted">/</span
+                          ><input
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            value="0"
+                            aria-label="Kiểm tra đơn CA4 T4 14/10"
+                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                        /></span>
+                      </td>
+                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
+                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
+                          ><span class="">0</span><span class="text-muted">/</span
+                          ><input
+                            type="number"
+                            min="0"
+                            max="20"
+                            inputmode="numeric"
+                            value="0"
+                            aria-label="Kiểm tra đơn CA5 T4 14/10"
+                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
+                        /></span>
+                      </td>
+                    </tr>
+                    <tr class="border-t border-border">
+                      <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
+                        <span class="inline-flex items-center gap-2"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Pha chế</span
                         >
                       </th>
                       <td class="px-2 py-1.5 text-right whitespace-nowrap">
@@ -1957,7 +1887,7 @@
                     <tr class="border-t border-border">
                       <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                         <span class="inline-flex items-center gap-2"
-                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Phục vụ</span
+                          ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Phục vụ</span
                         >
                       </th>
                       <td class="px-2 py-1.5 text-right whitespace-nowrap">
@@ -2028,78 +1958,6 @@
                     </tr>
                     <tr class="border-t border-border">
                       <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
-                        <span class="inline-flex items-center gap-2"
-                          ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Kiểm tra đơn</span
-                        >
-                      </th>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="Kiểm tra đơn CA1 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="Kiểm tra đơn CA2 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="Kiểm tra đơn CA3 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="Kiểm tra đơn CA4 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                      <td class="px-2 py-1.5 text-right whitespace-nowrap">
-                        <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
-                          ><input
-                            type="number"
-                            min="0"
-                            max="20"
-                            inputmode="numeric"
-                            value="0"
-                            aria-label="Kiểm tra đơn CA5 T4 14/10"
-                            class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
-                        /></span>
-                      </td>
-                    </tr>
-                    <tr class="border-t border-border">
-                      <th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap">
                         <span class="inline-flex items-center gap-2"><span class="size-2 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Bếp</span>
                       </th>
                       <td class="px-2 py-1.5 text-right whitespace-nowrap">
@@ -2156,13 +2014,13 @@
                       </td>
                       <td class="px-2 py-1.5 text-right whitespace-nowrap">
                         <span class="inline-flex items-center justify-end gap-1.5 text-sm tabular-nums"
-                          ><span class="">0</span><span class="text-muted">/</span
+                          ><span class="font-medium text-warn">0</span><span class="text-muted">/</span
                           ><input
                             type="number"
                             min="0"
                             max="20"
                             inputmode="numeric"
-                            value="0"
+                            value="1"
                             aria-label="Bếp CA5 T4 14/10"
                             class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:appearance-none"
                         /></span>
