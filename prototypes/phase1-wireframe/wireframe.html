@@ -47,16 +47,16 @@
         --star: #eab308; --glow: #ef4444;
         --danger: #c70036; --danger-bg: rgb(255 32 86 / 0.1); --danger-bg-hover: rgb(255 32 86 / 0.15);
 
-        /* Màu VỊ TRÍ (M8: màu mã hoá dữ liệu, pastel, một vị trí một màu cố định).
-           Không dùng xanh lá, hổ phách, đỏ: ba màu đó là trạng thái. */
-        --p1-bg: #e0f2fe; --p1-bd: #7dd3fc; --p1-tx: #075985; --p1-dot: #0ea5e9; /* QC: sky */
-        --p2-bg: #ede9fe; --p2-bd: #c4b5fd; --p2-tx: #5b21b6; --p2-dot: #8b5cf6; /* Thu Ngân Offline: violet */
-        --p3-bg: #fce7f3; --p3-bd: #f9a8d4; --p3-tx: #9d174d; --p3-dot: #ec4899; /* Thu Ngân Online: pink */
-        --p4-bg: #ccfbf1; --p4-bd: #5eead4; --p4-tx: #115e59; --p4-dot: #14b8a6; /* Pha chế: teal */
-        --p5-bg: #ffedd5; --p5-bd: #fdba74; --p5-tx: #9a3412; --p5-dot: #f97316; /* Phục vụ: orange */
-        --p6-bg: #ecfccb; --p6-bd: #bef264; --p6-tx: #3f6212; --p6-dot: #84cc16; /* Kiểm tra đơn: lime */
-        --p7-bg: #efe5da; --p7-bd: #c9ab8c; --p7-tx: #5c3d22; --p7-dot: #a0785a; /* Bếp: brown (yellow went to Phụ trách) */
-        --p8-bg: #fcd34d; --p8-bd: #ca8a04; --p8-tx: #422006; --p8-dot: #ca8a04; /* Phụ trách: gold, stronger than the pastels so the owner sees who leads each period */
+        /* Màu VỊ TRÍ (PRD v1.11, khách đặt 18/10): tô đặc như ô trong bảng tính của quán, theo thứ tự danh mục.
+           Chữ trắng trên Phụ trách và Bếp, chữ tối trên các màu còn lại. Vì có xanh lá, vàng, cam, đỏ nên trạng thái
+           không bao giờ phân biệt chỉ bằng màu: dùng dấu tích, huy hiệu "!", gạch ngang tên, nhãn (FR-O42). */
+        --p1-bg: #000000; --p1-bd: #000000; --p1-tx: #ffffff; --p1-dot: #000000; /* Phụ trách */
+        --p2-bg: #ff6d01; --p2-bd: #ff6d01; --p2-tx: #1a1a1a; --p2-dot: #ff6d01; /* Thu Ngân – Offline */
+        --p3-bg: #46bdc6; --p3-bd: #46bdc6; --p3-tx: #1a1a1a; --p3-dot: #46bdc6; /* Thu Ngân – Online */
+        --p4-bg: #ff00a0; --p4-bd: #ff00a0; --p4-tx: #1a1a1a; --p4-dot: #ff00a0; /* Kiểm tra đơn */
+        --p5-bg: #34a853; --p5-bd: #34a853; --p5-tx: #1a1a1a; --p5-dot: #34a853; /* Pha chế */
+        --p6-bg: #fbbc04; --p6-bd: #fbbc04; --p6-tx: #1a1a1a; --p6-dot: #fbbc04; /* Phục vụ */
+        --p7-bg: #cc0100; --p7-bd: #cc0100; --p7-tx: #ffffff; --p7-dot: #cc0100; /* Bếp */
 
         --radius: 0.75rem;
       }
@@ -80,7 +80,6 @@
         --p5-bg: #f1f1f2; --p5-bd: #d4d4d8; --p5-tx: #3f3f46; --p5-dot: #a1a1aa;
         --p6-bg: #f1f1f2; --p6-bd: #d4d4d8; --p6-tx: #3f3f46; --p6-dot: #a1a1aa;
         --p7-bg: #f1f1f2; --p7-bd: #d4d4d8; --p7-tx: #3f3f46; --p7-dot: #a1a1aa;
-        --p8-bg: #f1f1f2; --p8-bd: #d4d4d8; --p8-tx: #3f3f46; --p8-dot: #a1a1aa;
       }
       :root {
         --primary-hover: color-mix(in oklab, var(--primary) 85%, var(--background));
@@ -146,7 +145,6 @@
         --color-p5-bg: var(--p5-bg); --color-p5-bd: var(--p5-bd); --color-p5-tx: var(--p5-tx); --color-p5-dot: var(--p5-dot);
         --color-p6-bg: var(--p6-bg); --color-p6-bd: var(--p6-bd); --color-p6-tx: var(--p6-tx); --color-p6-dot: var(--p6-dot);
         --color-p7-bg: var(--p7-bg); --color-p7-bd: var(--p7-bd); --color-p7-tx: var(--p7-tx); --color-p7-dot: var(--p7-dot);
-        --color-p8-bg: var(--p8-bg); --color-p8-bd: var(--p8-bd); --color-p8-tx: var(--p8-tx); --color-p8-dot: var(--p8-dot);
       }
     </style>
 
@@ -245,7 +243,8 @@
     <div id="wt-tip" role="tooltip" class="pointer-events-none fixed z-[70] hidden max-w-64 rounded-xl border border-border bg-surface-overlay px-3 py-2 text-xs shadow-popover"></div>
 
     <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-    <script src="wf-data.js?v=20261017-11"></script>
-    <script src="wf-app.js?v=20261017-11"></script>
+    <script src="wf-data.js?v=20261104-1"></script>
+    <script src="wf-thu.js?v=20261104-1"></script>
+    <script src="wf-app.js?v=20261104-1"></script>
   </body>
 </html>
