@@ -184,7 +184,7 @@ What remains:
 
 | Week | Work |
 |---|---|
-| 1 | You confirm the **eight proposed rules** that came up while building the prototype (see section 10) and how estimated pay is shown |
+| 1 | You confirm the **eight proposed rules** that came up while building the prototype (see section 11) and how estimated pay is shown |
 | 1–2 | Choose the technology, prepare infrastructure, the development environment, backups and a data-recovery drill |
 | 2 | Phase 1 contract and scope, support response times |
 
@@ -379,7 +379,30 @@ After the warranty, support is provided under the maintenance contract in sectio
 
 ---
 
-## 9. OUT OF SCOPE
+## 9. INTELLECTUAL PROPERTY, SOURCE CODE AND DATA
+
+> **Draft of 2026-11-08, pending legal review.** Not yet agreed with you; the final wording goes into the contract.
+
+**9.1 Ownership.** We keep ownership of the system's source code, design, technical documentation and the reusable components inside it, including those we built before or outside this project. Paying for the build does not transfer that ownership.
+
+**9.2 Your licence.** Once each phase is paid in full, you hold a **perpetual, non-exclusive licence** to use what that phase delivered, for running your own business:
+- no limit on the number of users, staff accounts or devices, and no yearly licence fee;
+- the licence continues if you end the maintenance contract, as long as the system keeps running in an environment you or we provide;
+- you may not resell the system, license it to others, or provide it to another business.
+
+**9.3 Your data.** Everything entered into the system — staff records, registrations, schedules, pay rates, lateness records and the activity log — belongs to you, whoever owns the code. We use it only to run and support the system, and it is stored on servers in Vietnam. At any time, including when a contract ends, you can ask for a full export in a common format (CSV or Excel), delivered within 10 working days.
+
+**9.4 Source code handover.** We hand you the source code if:
+- (a) we stop providing maintenance for the system, or stop operating; or
+- (b) we fail to provide the maintenance agreed in section 6.2 and do not remedy the failure within 30 days of your written notice.
+
+The handover includes the source code at its latest version in use, the instructions to build and deploy it, and the database structure and data-migration scripts, delivered within 15 working days of the trigger. From then on you, or a provider you choose, may modify and maintain the code to keep running your own business. The resale limits in section 9.2 still apply, and we keep ownership.
+
+**9.5 Third-party components.** The system uses open-source components under permissive licences (for example MIT, BSD and Apache-2.0) that allow commercial use without disclosing our code. Each keeps its own licence. The contract carries an annex listing them.
+
+---
+
+## 10. OUT OF SCOPE
 
 The following are **not** part of the project. We list them explicitly to avoid misunderstanding later:
 
@@ -396,7 +419,7 @@ The following are **not** part of the project. We list them explicitly to avoid 
 
 ---
 
-## 10. YOUR RESPONSIBILITIES
+## 11. YOUR RESPONSIBILITIES
 
 To keep the project on schedule, we need you to:
 
@@ -415,7 +438,7 @@ Delays on any of the items above will extend the schedule accordingly.
 
 ---
 
-## 11. RISKS AND ASSUMPTIONS
+## 12. RISKS AND ASSUMPTIONS
 
 We state the uncertainties plainly, rather than leaving you to discover them mid-project.
 
@@ -433,7 +456,7 @@ We state the uncertainties plainly, rather than leaving you to discover them mid
 
 ---
 
-## 12. NEXT STEPS
+## 13. NEXT STEPS
 
 | # | Action | Who |
 |---|---|---|
