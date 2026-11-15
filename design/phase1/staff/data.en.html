@@ -183,37 +183,13 @@
               </div>
               <div class="flex flex-1 flex-wrap items-center gap-3">
                 <label class="inline-flex min-h-11 md:min-h-10 cursor-pointer items-center gap-2.5 text-sm"
-                  ><span class="relative inline-flex shrink-0"
-                    ><input
-                      type="checkbox"
-                      class="peer size-5 rounded-md cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-check pointer-events-none absolute inset-0 m-auto size-3.5 stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"
-                    >
-                      <path d="M20 6 9 17l-5-5"></path>
-                    </svg>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-minus pointer-events-none absolute inset-0 m-auto size-3.5 stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
-                    >
-                      <path d="M5 12h14"></path></svg></span
+                  ><button
+                    type="button"
+                    role="checkbox"
+                    aria-checked="false"
+                    class="relative inline-flex shrink-0 cursor-pointer items-center justify-center border-[1.5px] p-0 outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-50 rounded-md border-foreground/30 bg-surface"
+                    style="width: 20px; height: 20px"
+                  ></button
                   >Include former staff</label
                 >
                 <span class="ml-auto"
@@ -462,6 +438,9 @@
                         ><span class="text-muted">·</span
                         ><span class="inline-flex items-center gap-1.5 text-xs"
                           ><span class="size-2 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Server</span
+                        ><span class="text-muted">·</span
+                        ><span class="inline-flex items-center gap-1.5 text-xs"
+                          ><span class="size-2 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Barista</span
                         ><span class="text-muted">·</span
                         ><span class="inline-flex items-center gap-1.5 text-xs"
                           ><span class="size-2 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>Shift Lead</span
@@ -739,6 +718,7 @@
                   <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
                     <span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p7-dot" aria-hidden="true"></span>Kitchen</span
                     ><span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p6-dot" aria-hidden="true"></span>Server</span
+                    ><span class="inline-flex items-center gap-1"><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Barista</span
                     ><span class="inline-flex items-center gap-1"
                       ><span class="size-1.5 shrink-0 rounded-full bg-p1-dot" aria-hidden="true"></span>Shift Lead</span
                     ><span class="ml-auto tabular-nums">27.000 đ · Lead 32.000 đ</span>

@@ -52,38 +52,38 @@
   --danger-bg: rgb(255 32 86 / 0.1);
   --danger-bg-hover: rgb(255 32 86 / 0.15);
 
-  /* Position colours (PRD v1.11, set by the client on 2026-10-18): solid fills as in the shop's
+  /* Position colours (PRD v1.13, changed by the client on 2026-11-10): solid fills as in the shop's
      spreadsheet, in catalogue order. White text on the shift lead and Kitchen, dark text on the rest.
      The set includes green, yellow, orange and red, so a state is never shown by hue alone:
-     a check, a "!" badge, a struck-through nickname or a label (FR-O42). */
-  --p1-bg: #000000;
-  --p1-bd: #000000;
+     a check, a dashed outline, a wavy underline, a struck-through nickname or a label (FR-O42). */
+  --p1-bg: #666666;
+  --p1-bd: #666666;
   --p1-tx: #ffffff;
-  --p1-dot: #000000; /* Shift lead (Phụ trách) */
-  --p2-bg: #ff6d01;
-  --p2-bd: #ff6d01;
+  --p1-dot: #666666; /* Shift lead (Phụ trách) */
+  --p2-bg: #ff9749;
+  --p2-bd: #ff9749;
   --p2-tx: #1a1a1a;
-  --p2-dot: #ff6d01; /* Cashier – In-store */
-  --p3-bg: #46bdc6;
-  --p3-bd: #46bdc6;
+  --p2-dot: #ff9749; /* Cashier – In-store */
+  --p3-bg: #55c0c9;
+  --p3-bd: #55c0c9;
   --p3-tx: #1a1a1a;
-  --p3-dot: #46bdc6; /* Cashier – Online */
-  --p4-bg: #ff00a0;
-  --p4-bd: #ff00a0;
+  --p3-dot: #55c0c9; /* Cashier – Online */
+  --p4-bg: #f57bc8;
+  --p4-bd: #f57bc8;
   --p4-tx: #1a1a1a;
-  --p4-dot: #ff00a0; /* Order check */
-  --p5-bg: #34a853;
-  --p5-bd: #34a853;
+  --p4-dot: #f57bc8; /* Order check */
+  --p5-bg: #56be72;
+  --p5-bd: #56be72;
   --p5-tx: #1a1a1a;
-  --p5-dot: #34a853; /* Barista */
+  --p5-dot: #56be72; /* Barista */
   --p6-bg: #fbbc04;
   --p6-bd: #fbbc04;
   --p6-tx: #1a1a1a;
   --p6-dot: #fbbc04; /* Server */
-  --p7-bg: #cc0100;
-  --p7-bd: #cc0100;
+  --p7-bg: #df564a;
+  --p7-bd: #df564a;
   --p7-tx: #ffffff;
-  --p7-dot: #cc0100; /* Kitchen */
+  --p7-dot: #df564a; /* Kitchen */
 
   --radius: 0.75rem;
 }

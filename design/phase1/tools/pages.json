@@ -611,6 +611,18 @@
     {
       "screen": "lich",
       "dir": "calendar",
+      "file": "calendar/data-leave-panel-dialog.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": null,
+      "vi": "Hộp Lưu thay đổi khi rời panel",
+      "en": "Unsaved panel changes dialog",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
       "file": "calendar/published-edit-shift-dialog.html",
       "lang": "vi",
       "state": "cong-bo",
@@ -631,6 +643,30 @@
       "vi": "Hộp Xuất lịch",
       "en": "Export dialog",
       "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=cong-bo&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
+      "file": "calendar/data-schedule-note.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": "desktop",
+      "vi": "Ghi chú xếp lịch của ngày",
+      "en": "Schedule note for a day",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
+      "file": "calendar/data-owner-note.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": "desktop",
+      "vi": "Ghi chú riêng của tuần",
+      "en": "Owner’s note for the week",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
     },
     {
       "screen": "lich",
@@ -690,18 +726,6 @@
       "only": null,
       "vi": "Sửa nhân viên",
       "en": "Edit staff member",
-      "source": "http://localhost:4180/wireframe.html?man=nv&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
-    },
-    {
-      "screen": "nv",
-      "dir": "staff",
-      "file": "staff/data-edit-drawer-limit.html",
-      "lang": "vi",
-      "state": "du-lieu",
-      "overlay": true,
-      "only": null,
-      "vi": "Sửa nhân viên: chọn vị trí thứ ba",
-      "en": "Edit staff member: a third usual position",
       "source": "http://localhost:4180/wireframe.html?man=nv&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
     }
   ]

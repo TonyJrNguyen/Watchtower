@@ -1,5 +1,7 @@
 # Usual positions are learned from the schedule; the experience flag reads hours
 
+> Amended on 2026-11-10 by [ADR 0029](0029-usual-positions-have-no-limit.md): the limit of two is gone, and the flag and filters read the usual positions instead of a separate list of experienced positions.
+
 A staff member's **usual positions**, at most two, are learned from the published schedule instead of being typed in (FR-A12). At each publication the system ranks positions by published hours over the last 12 weeks, keeps those above 50 hours, and takes the top two. Tony asked for this on 2026-10-17, thinking of how a photo app tags a picture once it has seen enough. The Owner stays in charge: a position set by hand is pinned, and a position the Owner removes is counted again from zero, so it comes back only if the Owner keeps assigning it. Phụ trách is never learned, because it follows the shift-lead switch ([ADR 0021](0021-rates-are-per-person-and-the-shift-lead-is-granted.md)).
 
 The out-of-experience flag and the calendar filters do **not** read the two tags (FR-O32). They read **experienced positions**: more than 50 published hours over the whole history, or a position set by hand. Otherwise someone who regularly works three positions would be flagged forever in the third.

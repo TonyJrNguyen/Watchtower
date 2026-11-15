@@ -221,37 +221,13 @@
                   </svg>
                 </button>
                 <label class="inline-flex min-h-10 cursor-pointer items-center gap-2.5 px-1 text-sm"
-                  ><span class="relative inline-flex shrink-0"
-                    ><input
-                      type="checkbox"
-                      class="peer size-4 rounded cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-check pointer-events-none absolute inset-0 m-auto size-3 stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"
-                    >
-                      <path d="M20 6 9 17l-5-5"></path>
-                    </svg>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-minus pointer-events-none absolute inset-0 m-auto size-3 stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"
-                    >
-                      <path d="M5 12h14"></path></svg></span
+                  ><button
+                    type="button"
+                    role="checkbox"
+                    aria-checked="false"
+                    class="relative inline-flex shrink-0 cursor-pointer items-center justify-center border-[1.5px] p-0 outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-50 rounded border-foreground/30 bg-surface"
+                    style="width: 16px; height: 16px"
+                  ></button
                   >Hide draft changes</label
                 >
               </div>

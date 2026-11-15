@@ -336,7 +336,7 @@
                         <span class="min-w-0 flex-1"
                           ><span class="block truncate text-sm font-medium">Lê Minh Anh</span
                           ><span class="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted"
-                            ><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Pha chế - Matcha</span
+                            ><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Pha chế - Latte</span
                           ></span
                         >
                         <span class="hidden shrink-0 sm:block"
@@ -956,7 +956,7 @@
                         <span class="min-w-0 flex-1"
                           ><span class="block truncate text-sm font-medium">Vương Hải Yến</span
                           ><span class="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted"
-                            ><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Pha chế - Bồn</span
+                            ><span class="size-1.5 shrink-0 rounded-full bg-p5-dot" aria-hidden="true"></span>Pha chế - Topping</span
                           ></span
                         >
                         <span class="hidden shrink-0 sm:block"><span class="text-sm text-muted">Chưa tới giờ</span></span>
@@ -1283,44 +1283,58 @@
           <fieldset class="space-y-1 px-6 pt-5">
             <legend class="sr-only">Cách xử lý</legend>
             <label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"
-              ><input
-                type="radio"
-                name="an"
-                value="0"
-                checked=""
-                class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary"
-              /><span
+              ><button
+                type="button"
+                role="radio"
+                aria-checked="true"
+                data-an="0"
+                class="mt-0.5 shrink-0 cursor-pointer rounded-full bg-surface p-0 outline-hidden focus-visible:ring-2 focus-visible:ring-focus border-[6px] border-primary"
+                style="width: 20px; height: 20px"
+              ></button
+              ><span
                 ><span class="block text-sm font-medium">Xác nhận đến đúng giờ</span
                 ><span class="block text-xs text-muted">Bỏ cả trừ giờ lẫn tính trễ</span></span
               ></label
             ><label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"
-              ><input
-                type="radio"
-                name="an"
-                value="1"
-                class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary"
-              /><span><span class="block text-sm font-medium">Trừ đủ 130 phút</span></span></label
+              ><button
+                type="button"
+                role="radio"
+                aria-checked="false"
+                data-an="1"
+                class="mt-0.5 shrink-0 cursor-pointer rounded-full bg-surface p-0 outline-hidden focus-visible:ring-2 focus-visible:ring-focus border-[1.5px] border-foreground/30"
+                style="width: 20px; height: 20px"
+              ></button
+              ><span><span class="block text-sm font-medium">Trừ đủ 130 phút</span></span></label
             ><label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"
-              ><input
-                type="radio"
-                name="an"
-                value="2"
-                class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary"
-              /><span><span class="block text-sm font-medium">Trừ ít hơn</span></span></label
+              ><button
+                type="button"
+                role="radio"
+                aria-checked="false"
+                data-an="2"
+                class="mt-0.5 shrink-0 cursor-pointer rounded-full bg-surface p-0 outline-hidden focus-visible:ring-2 focus-visible:ring-focus border-[1.5px] border-foreground/30"
+                style="width: 20px; height: 20px"
+              ></button
+              ><span><span class="block text-sm font-medium">Trừ ít hơn</span></span></label
             ><label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"
-              ><input
-                type="radio"
-                name="an"
-                value="3"
-                class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary"
-              /><span><span class="block text-sm font-medium">Sửa giờ đến</span></span></label
+              ><button
+                type="button"
+                role="radio"
+                aria-checked="false"
+                data-an="3"
+                class="mt-0.5 shrink-0 cursor-pointer rounded-full bg-surface p-0 outline-hidden focus-visible:ring-2 focus-visible:ring-focus border-[1.5px] border-foreground/30"
+                style="width: 20px; height: 20px"
+              ></button
+              ><span><span class="block text-sm font-medium">Sửa giờ đến</span></span></label
             ><label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"
-              ><input
-                type="radio"
-                name="an"
-                value="4"
-                class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary"
-              /><span
+              ><button
+                type="button"
+                role="radio"
+                aria-checked="false"
+                data-an="4"
+                class="mt-0.5 shrink-0 cursor-pointer rounded-full bg-surface p-0 outline-hidden focus-visible:ring-2 focus-visible:ring-focus border-[1.5px] border-foreground/30"
+                style="width: 20px; height: 20px"
+              ></button
+              ><span
                 ><span class="block text-sm font-medium">Không đi làm</span><span class="block text-xs text-muted">Ca này 0 giờ, không tính lương</span></span
               ></label
             >

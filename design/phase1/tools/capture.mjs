@@ -67,14 +67,16 @@ const OVERLAYS = [
   { man: "lich", file: "data-date-picker", vi: "Chọn tuần theo ngày", en: "Date picker", only: "desktop", steps: [openPanel, visibleClick(`[onclick^="openPop(event,'datepick'"]`)] },
   { man: "lich", file: "data-publish-dialog", vi: "Hộp Công bố", en: "Publish dialog", steps: [openPanel, "openDialog('publish')"] },
   { man: "lich", file: "data-remove-day-dialog", vi: "Hộp Bỏ khỏi mọi ca trong ngày", en: "Take off every shift dialog", steps: [openPanel, "ui.panel.sel = new Set(); openDialog('removeDay')"] },
+  { man: "lich", file: "data-leave-panel-dialog", vi: "Hộp Lưu thay đổi khi rời panel", en: "Unsaved panel changes dialog", steps: [openPanel, "togglePeriod(4); closePanel()"] },
   { man: "lich", tt: "cong-bo", file: "published-edit-shift-dialog", vi: "Hộp Sửa ca (đã công bố)", en: "Edit shift dialog (published)", steps: [openPanel, "openDialog('shift')"] },
   { man: "lich", tt: "cong-bo", file: "published-export-dialog", vi: "Hộp Xuất lịch", en: "Export dialog", steps: [openPanel, "openDialog('export')"] },
+  { man: "lich", file: "data-schedule-note", vi: "Ghi chú xếp lịch của ngày", en: "Schedule note for a day", only: "desktop", steps: [openPanel, visibleClick(`[onclick^="openPop(event,'dnote',1"]`)] },
+  { man: "lich", file: "data-owner-note", vi: "Ghi chú riêng của tuần", en: "Owner’s note for the week", only: "desktop", steps: [openPanel, visibleClick(`[onclick^="openPop(event,'onote'"]`)] },
   { man: "lich", file: "data-panel-sheet", vi: "Panel người (điện thoại)", en: "Person panel (phone)", only: "mobile", steps: [openPanel] },
   { man: "lich", file: "data-staff-sheet", vi: "Danh sách nhân viên (điện thoại)", en: "Staff list (phone)", only: "mobile", steps: ["ui.sheet = 'staff'; render()"] },
   { man: "tre", file: "data-anomaly-dialog", vi: "Hộp Ca bất thường", en: "Anomaly dialog", steps: [visibleClick(`[onclick*="openDialog('anomaly'"]`)] },
   { man: "ranh", file: "data-custom-times", vi: "Sửa giờ riêng", en: "Custom times editor", steps: ["toggleCustom(WEEK.findIndex((_, d) => ui.custom[d]))"] },
   { man: "nv", file: "data-edit-drawer", vi: "Sửa nhân viên", en: "Edit staff member", steps: ["ui.staffEdit = 's1'; render()"] },
-  { man: "nv", file: "data-edit-drawer-limit", vi: "Sửa nhân viên: chọn vị trí thứ ba", en: "Edit staff member: a third usual position", steps: ["ui.staffEdit = 's12'; render(); toggleStaffPos('pc')"] },
 ];
 
 const pages = [];

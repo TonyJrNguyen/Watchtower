@@ -80,16 +80,12 @@ _Avoid_: Tag, skill
 The collective name for sub-positions and attributes.
 
 **Mark** (Ký hiệu):
-The short sign of a sub-position or attribute shown beside the nickname on a calendar marker, so the detail reads without opening the marker. Colour still identifies the position.
+The short sign of a sub-position or attribute shown in a small badge on the top-right corner of a calendar marker, so the detail reads without opening the marker: 1–4 for Pha chế's stations, T and N for Phụ trách, B for Bưng bàn. Colour still identifies the position.
 _Avoid_: Icon, badge, code
 
 **Usual positions** (Vị trí thường đảm nhiệm):
-At most two positions shown on a staff member's account: the top two by published hours over the last 12 weeks, counting only positions above 50 hours. The Administrator can set or remove them by hand. A position set by hand stays; one removed counts again from zero. Never the shift lead.
-_Avoid_: Qualified positions (the term before PRD v1.10), skills, certifications
-
-**Experienced positions** (Có kinh nghiệm):
-The positions a staff member has more than 50 published hours in over their whole history, plus any usual position set by hand. The out-of-experience flag and the calendar filters read these, not the usual positions.
-_Avoid_: Qualified positions, permissions
+The positions shown on a staff member's account, with no limit: every position with more than 50 published hours over the last 12 weeks, plus any the Administrator sets by hand. A position set by hand stays; one removed counts again from zero. They are also the staff member's experience, read by the out-of-experience flag and the calendar filters. Never the shift lead.
+_Avoid_: Qualified positions (the term before PRD v1.10), experienced positions (a separate list until PRD v1.13), skills, certifications
 
 **Staffing need**:
 The headcount the Administrator wants for one position in one shift period on one date.
@@ -109,7 +105,7 @@ A later start, an earlier end or both, set by a staff member on a registered per
 _Avoid_: Custom shift (in code), adjusted period, flexible hours
 
 **Day note** (Ghi chú):
-An optional note a staff member adds to one day of their registration, shown to the Administrator beside them on the calendar.
+An optional note a staff member adds to one day of their registration, shown to the Administrator beside them on the calendar. Not the owner's note or the schedule note.
 
 **Registration window**:
 Thursday 00:00 to Friday 13:00, when staff can change their registration for the following week.
@@ -146,6 +142,13 @@ To put a staff member into shift periods, before or without giving a position.
 **Give a position** (Gán vị trí):
 To set the position, and optionally its position details, on a placed assignment.
 
+**Side panel** (Panel):
+The panel for one staff member and one day, opened from a marker. Its ticked periods are the day that person will have after Save, and Save writes only the difference from what they held.
+_Avoid_: Selected periods (for periods an action is applied to)
+
+**Context period** (Ca đang sửa):
+The period whose marker opened the side panel, or whose row was selected in it. The position chosen in the panel goes to it and to newly ticked periods; other held periods keep theirs.
+
 **Draft**:
 The state of an assignment before its week is published. Staff can't see draft assignments.
 
@@ -160,6 +163,14 @@ The check that blocks publishing while any active staff member has no assignment
 An image or PDF of a published week or day, drawn like the calendar with nicknames, position colours and marks, that the Administrator sends to the Shift Leads on Zalo. Times appear only where they differ from the standard period.
 _Avoid_: Print view, report, download
 
+**Owner's note** (Ghi chú riêng):
+The Administrator's own note for a week, seen by no one else.
+_Avoid_: Memo, comment
+
+**Schedule note** (Ghi chú xếp lịch):
+The Administrator's note for one day of the schedule, such as "A trains B". Published with the week and read by every staff member working that day. An edit after publication waits until the Administrator publishes it.
+_Avoid_: Day note (the staff member's note on their registration), announcement
+
 **Skip** (Bỏ qua tuần này):
 The Administrator's deliberate decision to leave one active staff member unassigned for one week, with a reason from a fixed list.
 _Avoid_: Exclude, exempt
@@ -168,7 +179,7 @@ _Avoid_: Exclude, exempt
 A flag on an assignment that covers time the staff member didn't register. It's a warning, never a block.
 
 **Out-of-experience**:
-A flag on an assignment to a position outside the staff member's experienced positions. It's a warning, never a block. Giving the shift-lead position without the switch is blocked instead.
+A flag on an assignment to a position outside the staff member's usual positions. It's a warning, never a block. Giving the shift-lead position without the switch is blocked instead.
 _Avoid_: Out-of-qualification (the term before PRD v1.10)
 
 **Coverage** (Độ phủ):

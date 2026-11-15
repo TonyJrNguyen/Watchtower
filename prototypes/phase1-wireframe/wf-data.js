@@ -10,14 +10,14 @@
 // mọi vị trí khác tính theo lương cơ bản.
 // PRD v1.11 (khách chốt 18/10 và 1/11): không có QC (QC chỉ là ghi chú cho Phụ trách Trong/Ngoài). Bảy vị trí theo đúng
 // thứ tự khách đặt, dùng thứ tự này ở mọi nơi liệt kê vị trí. n = số token màu --pN-* trong wireframe.html.
-// subs: [id, VI, EN, ký hiệu trên chip lịch]. Ký hiệu chốt 1/11: TS, M, T, B, BB, Tr, Ng.
+// subs: [id, VI, EN, ký hiệu trên chip lịch]. Ký hiệu đổi 10/11: Pha chế 1–4 (Matcha → Latte, Bồn → Topping), Phụ trách T/N, Bưng bàn B.
 const POSITIONS = [
-  { id: "pt", n: 1, vi: "Phụ trách", en: "Shift Lead", subs: [["pttrong", "Trong", "Inside", "Tr"], ["ptngoai", "Ngoài", "Outside", "Ng"]], lead: true, subRequired: true },
+  { id: "pt", n: 1, vi: "Phụ trách", en: "Shift Lead", subs: [["pttrong", "Trong", "Inside", "T"], ["ptngoai", "Ngoài", "Outside", "N"]], lead: true, subRequired: true },
   { id: "tnoff", n: 2, vi: "Thu Ngân – Offline", en: "Cashier – In-store", subs: [] },
   { id: "tnon", n: 3, vi: "Thu Ngân – Online", en: "Cashier – Online", subs: [] },
   { id: "ktd", n: 4, vi: "Kiểm tra đơn", en: "Order Check", subs: [] },
-  { id: "pc", n: 5, vi: "Pha chế", en: "Barista", subs: [["trasua", "Trà sữa", "Milk tea", "TS"], ["matcha", "Matcha", "Matcha", "M"], ["tra", "Trà", "Tea", "T"], ["bon", "Bồn", "Washing", "B"]] },
-  { id: "pv", n: 6, vi: "Phục vụ", en: "Server", subs: [["bungban", "Bưng bàn", "Table running", "BB"]], attr: true },
+  { id: "pc", n: 5, vi: "Pha chế", en: "Barista", subs: [["trasua", "Trà sữa", "Milk tea", "1"], ["matcha", "Latte", "Latte", "2"], ["tra", "Trà", "Tea", "3"], ["bon", "Topping", "Topping", "4"]] },
+  { id: "pv", n: 6, vi: "Phục vụ", en: "Server", subs: [["bungban", "Bưng bàn", "Table running", "B"]], attr: true },
   { id: "bep", n: 7, vi: "Bếp", en: "Kitchen", subs: [] },
 ];
 const POS = Object.fromEntries(POSITIONS.map((p) => [p.id, p]));
@@ -68,7 +68,7 @@ const STAFF = [
   { id: "s9", name: "Đỗ Khánh Linh", nick: "Linh", q: ["ktd", "tnon"], type: "some", phone: "0983 450 873", user: "linh.do", base: 24000, lead: null, pw: "28/09/2026" },
   { id: "s10", name: "Hồ Gia Huy", nick: "Huy", q: ["pv"], type: "none", phone: "0901 776 345", user: "huy.ho", base: 23000, lead: null, pw: "28/09/2026" },
   { id: "s11", name: "Ngô Phương Thảo", nick: "Thảo N", q: ["tnoff"], type: "some", short: true, phone: "0937 019 552", user: "thao.ngo", base: 26000, lead: null, pw: "28/09/2026" },
-  { id: "s12", name: "Dương Tuấn Kiệt", nick: "Kiệt", q: ["bep", "pv", "pt"], exp: ["bep", "pv", "pc"], type: "all", phone: "0918 334 670", user: "kiet.duong", base: 27000, lead: 32000, pw: "28/09/2026" },
+  { id: "s12", name: "Dương Tuấn Kiệt", nick: "Kiệt", q: ["bep", "pv", "pc", "pt"], type: "all", phone: "0918 334 670", user: "kiet.duong", base: 27000, lead: 32000, pw: "28/09/2026" },
   { id: "s13", name: "Lý Thu Trang", nick: "Trang", q: ["tnoff"], type: "some", phone: "0976 125 904", user: "trang.ly", base: 25000, lead: null, pw: "28/09/2026" },
   { id: "s14", name: "Trịnh Hoàng Nam", nick: "Nam", q: ["pc", "pt"], type: "some", phone: "0908 662 017", user: "nam.trinh", base: 25000, lead: 29000, pw: "28/09/2026" },
   { id: "s15", name: "Mai Anh Thư", nick: "Thư", q: ["ktd"], type: "some", phone: "0939 841 266", user: "thu.mai", base: 24000, lead: null, pw: "28/09/2026" },
@@ -83,8 +83,8 @@ const STAFF = [
 ];
 const ST = Object.fromEntries(STAFF.map((s) => [s.id, s]));
 // Giờ đã làm theo vị trí (FR-A14): ca đã công bố và đã kết thúc, toàn bộ lịch sử, theo giờ đồng hồ (trọn Ca 5 = 6 giờ).
-// Chủ xem trên chip ở hồ sơ nhân viên, nhân viên xem ở Hồ sơ của tôi. Hai vị trí thường đảm nhiệm của mẫu luôn trên 50 giờ;
-// Kiệt có thêm Pha chế 74 giờ (có kinh nghiệm nhưng ngoài hai vị trí), Trâm có Phục vụ 18 giờ (chưa đủ kinh nghiệm).
+// Chủ xem trên chip ở hồ sơ nhân viên, nhân viên xem ở Hồ sơ của tôi. Vị trí thường đảm nhiệm của mẫu luôn trên 50 giờ, không giới hạn
+// số lượng (PRD v1.13): Kiệt có bốn, kể cả Pha chế 74 giờ; Trâm có Phục vụ 18 giờ (chưa đủ, nên xếp Phục vụ sẽ có cảnh báo).
 const HOURS = {
   s1: { ktd: 248, tnoff: 132, pt: 86, pv: 12 }, s2: { pc: 196, tnon: 8 }, s3: { pc: 312, pt: 140, tnoff: 104 }, s4: { pv: 220, bep: 96, pt: 24 },
   s5: { tnon: 164, tnoff: 6 }, s6: { bep: 288 }, s7: { pc: 286, pt: 96, pv: 18 }, s8: { pv: 174, ktd: 10 }, s9: { ktd: 150, tnon: 88 },
@@ -153,7 +153,7 @@ const WEEK_DATA = buildWeek(20261012);
   asg.s6[2] = { 4: { pos: ["bep"], sub: [] } };
   // Xếp ngoài lịch rảnh: Minh Anh T5 CA5 (đảm bảo không đăng ký ca đó)
   reg.s3[3] = [0, 1];
-  // CA1–CA2 kiêm hai trạm Matcha và Trà: chip hiện cả hai ký hiệu "M·T"
+  // CA1–CA2 kiêm hai trạm Latte và Trà: chip hiện cả hai ký hiệu "2·3" trong một huy hiệu
   asg.s3[3] = { 0: { pos: ["pc"], sub: ["matcha", "tra"] }, 1: { pos: ["pc"], sub: ["matcha", "tra"] }, 4: { pos: ["pc"], sub: [] } };
   // Xếp vị trí chưa có kinh nghiệm: Hằng (Thu Ngân Online) xếp Thu Ngân Offline T2 CA2
   reg.s5[0] = [1, 2];
@@ -207,6 +207,10 @@ balance(WEEK_DATA, 7, ["s17", "s20"]);
 })(WEEK_DATA);
 // Giờ riêng theo từng ca (spec custom shift 11/10) và ghi chú theo ngày. custom[sid][d][p] = { from, to }.
 WEEK_DATA.custom = { s2: { 4: { 4: { from: "18:00", to: "23:00" } } }, s9: { 0: { 3: { from: "15:30", to: "17:00" }, 4: { from: "17:00", to: "21:00" } } } };
+// Ghi chú xếp lịch theo ngày (FR-O54) và ghi chú riêng của chủ cho tuần (FR-O53), góp ý 10/11. text = bản chủ đang sửa,
+// pub = bản nhân viên đang thấy (null khi tuần chưa công bố).
+WEEK_DATA.dnote = { 1: { text: "Minh Anh kèm Thảo T ở Thu Ngân – Offline ca sáng", pub: null }, 3: { text: "Kiệt thử Pha chế CA 3, Nam kèm", pub: null } };
+WEEK_DATA.onote = "Hùng xin nghỉ T7, chưa chốt. Hỏi lại Linh có làm thêm CA 5 T6 được không.";
 WEEK_DATA.note = { s2: { 4: "Học tới 17:30, 18:00 mới tới quán được" }, s9: { 0: "Sáng đi khám, chiều tới được" }, s14: { 1: "Quán vắng thì cho mình về sớm 30 phút" } };
 (function seedCustom({ reg, asg }) {
   // Mai T: T6 xin vào 18:00, chưa xếp (chủ chưa quyết)
@@ -283,6 +287,8 @@ const MY_CUSTOM = { 4: { 4: { from: "18:00", to: "23:00" } } };
 const MY_NOTES = { 4: "Học tới 17:30" };
 
 // Hồ sơ của tôi (Trâm): ca tuần 5–11/10
+// Ghi chú xếp lịch đã công bố mà nhân viên đang xem thấy ở Hồ sơ của tôi (ngày có ca)
+const MY_SCHED_NOTES = { 2: "Ca sáng Thảo T học pha trà sữa, Trâm kèm." };
 const MY_SHIFTS = [
   { d: 0, from: "07:00", to: "11:00", pos: "pc", sub: "trasua" },
   { d: 1, from: "07:00", to: "11:00", pos: "pc", sub: "trasua" },
@@ -313,3 +319,12 @@ const AUDIT = [
   { at: "02/10 09:14", who: "owner", what: ["Đặt mật khẩu", "Set password"], sid: "s1", day: "", before: "—", after: ["Đã đặt", "Set"], reason: "" },
   { at: "30/09 20:02", who: "owner", what: ["Vô hiệu hoá tài khoản", "Deactivated account"], sid: "s23", day: "", before: ["Đang làm", "Active"], after: ["Đã nghỉ", "Left"], reason: ["Nghỉ việc từ 01/10", "Left from 1 Oct"] },
 ];
+
+// Thêm một nhân viên lúc chạy (Thêm nhân viên, góp ý 10/11 mục 7): tạo đủ chỗ trong mọi tuần để lịch, đăng ký và dùng thử chạy được.
+function addStaffRecord(n) {
+  if (ST[n.id]) return ST[n.id];
+  STAFF.push(n); ST[n.id] = n; if (!n.left) ACTIVE.push(n);
+  const weeks = [WEEK_DATA, PREV_WEEK]; if (typeof DATA !== "undefined") weeks.push(DATA);
+  for (const w of weeks) { w.reg[n.id] ||= WEEK.map(() => null); w.asg[n.id] ||= WEEK.map(() => ({})); }
+  return n;
+}
