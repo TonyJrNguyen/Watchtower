@@ -129,7 +129,7 @@ _Avoid_: Minimum hours rule, quota
 ### Scheduling
 
 **Weekly calendar** (Lịch tuần):
-The one Administrator surface for seeing registrations, placing people and giving positions. It can be viewed by Day, 3 Days or Week.
+The one Administrator surface for seeing registrations, placing people and giving positions. It can be viewed by Day or Week.
 _Avoid_: Availability screen, assignment screen (as separate surfaces)
 
 **Assignment**:
@@ -148,6 +148,12 @@ _Avoid_: Selected periods (for periods an action is applied to)
 
 **Context period** (Ca đang sửa):
 The period whose marker opened the side panel, or whose row was selected in it. The position chosen in the panel goes to it and to newly ticked periods; other held periods keep theirs.
+
+**Selection tint**:
+The background tint of a staff member's cells while their side panel is open: warm where they are placed when a placed marker was selected, cool where they registered when an unplaced one was.
+
+**Folded marker** (+N):
+A staff member registered for a period but placed in another period that day, shown in that period only inside a "+N" marker. Choosing them from its list brings the marker back while their side panel is open.
 
 **Draft**:
 The state of an assignment before its week is published. Staff can't see draft assignments.
@@ -168,8 +174,12 @@ The Administrator's own note for a week, seen by no one else.
 _Avoid_: Memo, comment
 
 **Schedule note** (Ghi chú xếp lịch):
-The Administrator's note for one day of the schedule, such as "A trains B". Published with the week and read by every staff member working that day. An edit after publication waits until the Administrator publishes it.
+The Administrator's note for one day of the schedule, such as "A trains B". Published with the week; read by the staff working that day, on the shop schedule and in the export. An edit after publication applies at once.
 _Avoid_: Day note (the staff member's note on their registration), announcement
+
+**Shop schedule** (Lịch quán):
+The published schedule of the whole shop as staff see it, laid out like the export, with each day's schedule note. The Administrator can turn it off.
+_Avoid_: Roster (the Phase 2 Shift Lead view), team calendar
 
 **Skip** (Bỏ qua tuần này):
 The Administrator's deliberate decision to leave one active staff member unassigned for one week, with a reason from a fixed list.

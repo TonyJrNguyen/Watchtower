@@ -13,3 +13,7 @@ The client asked on 2026-11-10 for a note the Owner writes per day while schedul
 - Publishing the week publishes its notes. An edit after publication is held as a draft until the Owner publishes that note, and staff keep seeing the published text meanwhile. That differs from assignments, whose later changes apply at once (3.5), so the Owner can tidy a note without staff seeing every intermediate version.
 - The Owner writes these notes knowing who will read them. The owner's note for the week (FR-O53) is the place for anything staff shouldn't see.
 - Writing, editing, deleting and publishing a note are audit-logged (NFR-1).
+
+## Amended on 2026-11-16
+
+[ADR 0032](0032-staff-see-the-published-shop-schedule.md) lets every staff member read the published shop schedule, schedule notes included, while the Owner has it on, and the export prints the notes too. An edit to a note after publication now applies at once, so the separate publish step above is gone. Staff working a day still see its note on My profile.

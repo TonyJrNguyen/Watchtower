@@ -3,6 +3,19 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.14 — 2026-11-16
+- Following the feedback sheet's tab 12.11 (items 1–2 from the client, 3–7 from Tony), the client's list of real staff, and Tony's answers on the Q&A page of 2026-11-16 (`docs/feedback/2026-11-12-client-feedback.md`)
+- **Shop schedule** for staff, Phase 1: the published week of the whole shop, read-only, laid out as the export with each day's schedule note; on by default, switchable by the Administrator; the third exception to NFR-2. Proposed by Tony, confirmed by the client. New **FR-S24**; amended §3.5, FR-S11, FR-O52, FR-O54, NFR-2, §4.9.1 (Settings), §4.10 (ShopSetting), §4.13 Phase 1. New ADR 0032, which amends ADR 0030
+- **Schedule notes** are printed under each day in the export, and an edit after publication applies at once (no separate publish step). Amended FR-O52, FR-O54, §4.9.1, §4.10
+- **Warning:** a small warm dot on the marker's bottom-right corner replaces the wavy underline; a registered day below the daily minimum (FR-S3) is warned only on a marker not yet placed in that period. Amended FR-O42, FR-O49
+- **Selection tint:** a placed marker selected tints that staff member's placed cells warm; an unplaced one tints their registered cells cool; background only. Amended FR-O42
+- **Folded markers** (closes §5.1 O7): a staff member registered for a period but placed elsewhere that day is folded into "+N"; its list, titled *Registered* with the period and date, brings a marker back with the side panel. Amended FR-O42, FR-O49
+- **Calendar:** an empty spot closes the side panel, asking first if it holds unsaved changes, and the panel's sections (shifts of the day, position, reason) start collapsed (FR-O43); the 3 Days view is removed (FR-O47); the owner's note opens full width above the calendar and the panel, with basic formatting (FR-O53)
+- §5 (new resolved block), §5.0 (four rows), §5.1 (O7 removed) and §5.3 (v1.14 drawn in the wireframe, `design/phase1/` regenerated) updated accordingly. CONTEXT.md: *shop schedule*, *folded marker*, *selection tint*; *schedule note* and *weekly calendar* updated. CLAUDE.md's read-access rule now names the NFR-2 exceptions
+- The wireframe and its Try-out use the client's 32 real staff (no requirement change)
+- Nothing is added to the *pending confirmation* list: the shop schedule was confirmed by the client, the rest are Tony's decisions
+- Backlog and roadmap not touched here; the re-estimate for v1.11, v1.13 and v1.14 follows in its own change
+
 ## v1.13 — 2026-11-12
 - Following the client's review of the v1.11 drawings in the Try-out on 2026-11-10 and Tony's answers of 2026-11-12 (`docs/feedback/2026-11-10-client-feedback.md`)
 - **Colours:** Phụ trách grey `#666666`, Thu Ngân – Offline `#ff9749`, Thu Ngân – Online `#55c0c9`, Kiểm tra đơn `#f57bc8`, Pha chế `#56be72`, Phục vụ `#fbbc04` (unchanged), Bếp `#df564a`. Amended §3.3

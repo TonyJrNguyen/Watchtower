@@ -17,6 +17,7 @@ const SCREENS = {
   tre: { vi: "Đi trễ", role: "owner", options: ["a", "b"], rec: "a", states: ["du-lieu", "tuan-truoc", "dang-tai", "rong", "loi", "thu"] },
   ranh: { vi: "Lịch rảnh", role: "staff", options: ["a", "b"], rec: "a", states: ["du-lieu", "nhap", "chua-dk", "khoa", "khoa-quen", "dang-tai", "loi", "thu"] },
   ca: { vi: "Hồ sơ của tôi", role: "staff", options: ["a"], rec: "a", states: ["du-lieu", "chua-cong-bo", "dang-tai", "rong", "loi", "thu"] },
+  quan: { vi: "Lịch quán", role: "staff", options: ["a"], rec: "a", states: ["du-lieu", "chua-cong-bo", "tat", "dang-tai", "loi", "thu"] },
   nv: { vi: "Nhân viên", role: "owner", options: ["a"], rec: "a", states: ["du-lieu", "dang-tai", "rong", "loi", "thu"] },
   nk: { vi: "Nhật ký", role: "owner", options: ["a"], rec: "a", states: ["du-lieu", "dang-tai", "rong", "loi", "thu"] },
   dn: { vi: "Đăng nhập", role: "none", options: ["a"], rec: "a", states: ["du-lieu", "loi", "thu"] },
@@ -24,7 +25,7 @@ const SCREENS = {
 const STATE_LABEL = {
   "du-lieu": "Có dữ liệu", "mo-dk": "Đăng ký đang mở", "cong-bo": "Đã công bố", "dang-tai": "Đang tải", rong: "Rỗng", loi: "Lỗi",
   "tuan-truoc": "Tuần trước (chỉ xem)", "chua-dk": "Chưa chọn ca nào", khoa: "Đã khoá", "chua-cong-bo": "Chưa công bố",
-  "chua-vi-tri": "Đã xếp ca, chưa giao vị trí", nhap: "Có nháp chưa lưu", "khoa-quen": "Đã khoá, quên bấm Lưu",
+  "chua-vi-tri": "Đã xếp ca, chưa giao vị trí", tat: "Chủ quán tắt Lịch quán", nhap: "Có nháp chưa lưu", "khoa-quen": "Đã khoá, quên bấm Lưu",
   // wf-thu.js: chỉ có dữ liệu nhân viên, khách tự đi hết một vòng; giữ qua các màn
   thu: "Trải nghiệm từ đầu (chỉ có nhân viên)",
 };
@@ -145,7 +146,7 @@ const ui = {
   rosterDay: 2, mDay: 2, sheet: null, posPick: [], subPick: [], skipped: new Map(),
   lateDay: 2, lateEdit: null, lateVal: "", staffEdit: null, drawer: false, shiftTab: "time",
   // Lịch tuần: undo/redo chỉ trong phiên (hist/fut), người thêm thủ công theo thứ tự thêm (manual), mục panel đang thu (secClosed)
-  hist: [], fut: [], manual: new Map(), seq: 0, secClosed: new Set(), saveAs: "reg", panelMsg: "", panelReason: "", needCopied: false,
+  hist: [], fut: [], manual: new Map(), seq: 0, secClosed: new Set(["shifts", "pos", "reason"]) /* mặc định thu gọn cả ba mục (Tony 16/11) */, saveAs: "reg", panelMsg: "", panelReason: "", needCopied: false,
   // Giờ đăng ký trên chip (FR-S23, bật mặc định), hộp Xuất lịch (FR-O52), lọc nhật ký
   regTimes: true, exp: { scope: "week", day: 2, fmt: "img" }, hideDraft: false,
   // Lịch rảnh: bản nháp (ranh, custom, notes) và bản đã Lưu (…Saved). Chủ quán chỉ thấy bản đã Lưu.
@@ -165,7 +166,8 @@ if (S.tt === "cong-bo") {
 }
 // Số người cần theo ngày × ca × vị trí (FR-O1), sửa được ở mục Phân công; tổng hiện ở đầu ô lịch.
 // Phương án xếp chip đang xem (mục 12) và các ô "+N" đã mở; nhớ trong trình duyệt để khung mobile dùng chung
-ui.arr = (() => { try { return +localStorage.getItem("wt-arr") || 0; } catch { return 0; } })(); ui.unfold = new Set();
+// Chip đã gỡ khỏi +N bằng popup (góp ý 12/11 mục 5): chỉ hiện khi panel còn mở cho đúng người và ngày đó
+ui.reveal = null; ui.onoteOpen = false;
 const needFrom = (n) => { const o = Object.fromEntries(POSITIONS.map((p) => [p.id, 0])); NEED_FILL.slice(0, n).forEach((id) => o[id]++); return o; };
 ui.need = NEED.map((row) => row.map(needFrom));
 const PREV_NEED = NEED.map((row) => row.map((n, p) => needFrom(n + (p === 4 ? 1 : 0))));
@@ -322,6 +324,7 @@ const REASONS = {
       cons: ["Trên điện thoại mỗi ô chỉ khoảng 42px, dễ chạm nhầm", "Giờ ca nằm ở cột trái, xa ô đang chạm"], fit: "Nhân viên đăng ký trên máy tính.",
       tips: ["Ô to hơn", "Thêm giờ vào từng ô"] },
   },
+  quan: { a: { name: "A · Lịch cả quán như file xuất", rec: true, why: "Nhân viên thấy lịch đã công bố của cả quán để tự đổi ca cho nhau (góp ý 12/11, mục 3): cùng nội dung với file xuất lịch, thêm ghi chú xếp lịch của từng ngày. Chủ bật hay tắt được.", pros: ["Không còn phải chờ chủ dán ảnh lịch vào nhóm", "Luôn là bản mới nhất, kể cả khi chủ sửa sau khi công bố"], cons: ["Thêm một ngoại lệ của luật riêng tư NFR-2"], fit: "Quán hay đổi ca cho nhau.", tips: ["Chỉ hiện ngày có ca của mình"] } },
   ca: { a: { name: "A · Ca theo ngày", rec: true, why: "Một màn duy nhất bố cục mặc định: tuần này theo ngày, ca hôm nay đánh dấu, tổng giờ và lương ước tính trên cùng.", pros: ["Đọc trong năm giây"], cons: ["Không xem được tuần trước quá một tuần"], fit: "Nhân viên mở xem nhanh.", tips: ["Bỏ lương ước tính"] } },
   nv: { a: { name: "A · Bảng nhân viên + panel hồ sơ", rec: true, why: "Bố cục mặc định của bảng quản lý: tìm, bảng, bấm một dòng mở hồ sơ trượt từ phải.", pros: ["Mật khẩu là một ô trong hồ sơ (FR-A7)", "Lương cơ bản và lương phụ trách đặt theo từng người, thấy ngay trên bảng"], cons: ["Bảng rộng, dưới 1024px thành dòng"], fit: "Quản lý khoảng 40 tài khoản.", tips: ["Thêm cột biệt danh"] } },
   nk: { a: { name: "A · Bảng nhật ký", rec: true, why: "Bố cục mặc định: lọc theo người và loại việc, mỗi dòng ai, lúc nào, trước → sau, lý do.", pros: ["Trả lời được vì sao một ca đã đổi"], cons: ["Dòng dài, mobile thành thẻ"], fit: "Tra lại khi có thắc mắc.", tips: ["Nhóm theo ngày"] } },
@@ -345,8 +348,16 @@ function buildReason() {
 // Khung app
 // ===================================================================
 const OWNER_NAV = () => [["lich", "calendar-days", L("Lịch tuần", "Schedule")], ["tre", "alarm-clock", L("Đi trễ", "Lateness")], ["nv", "users", L("Nhân viên", "Staff")], ["nk", "history", L("Nhật ký", "Activity log")]];
-const STAFF_NAV = () => [["ranh", "calendar-check", L("Lịch rảnh", "Availability")], ["ca", "circle-user-round", L("Hồ sơ của tôi", "My profile")]];
-const ME = () => (SC.role === "owner" ? { name: "Trương Hữu Phúc", user: "phuc.owner", init: "P" } : SANDBOX ? { name: ST[SB.me].name, user: ST[SB.me].user, init: ST[SB.me].nick[0] } : { name: "Huỳnh Ngọc Trâm", user: "tram.huynh", init: "T" });
+const STAFF_NAV = () => [["ranh", "calendar-check", L("Lịch rảnh", "Availability")], ...(shopOn() ? [["quan", "calendar-range", L("Lịch quán", "Shop schedule")]] : []), ["ca", "circle-user-round", L("Hồ sơ của tôi", "My profile")]];
+// Công tắc của chủ: nhân viên xem được lịch cả quán (góp ý 12/11 mục 3, khách đã đồng ý; bật sẵn)
+const shopOn = () => (S.tt === "tat" ? false : SANDBOX ? SB.shopView !== false : ui.shopView !== false);
+function toggleShop() {
+  const on = !shopOn();
+  if (SANDBOX) { SB.shopView = on; sbTick(1, 1); sbLog({ what: ["Đổi cài đặt Lịch quán", "Changed the shop schedule setting"], before: on ? ["Tắt", "Off"] : ["Bật", "On"], after: on ? ["Bật", "On"] : ["Tắt", "Off"] }); }
+  else ui.shopView = on;
+  render();
+}
+const ME = () => (SC.role === "owner" ? { name: "Trương Hữu Phúc", user: "phuc.owner", init: "P" } : SANDBOX ? { name: ST[SB.me].name, user: ST[SB.me].user, init: ST[SB.me].nick[0] } : { name: ST.s7.name, user: ST.s7.user, init: ST.s7.nick[0] });
 function appShell(content, title) {
   const nav = SC.role === "owner" ? OWNER_NAV() : STAFF_NAV();
   const me = ME();
@@ -399,7 +410,8 @@ function tipFor(s, d, p) {
     else if (a.pos.some((x) => lacksExp(s, x))) lines.push(`<span class="text-warn">${L("Chưa có kinh nghiệm vị trí này", "No experience in this position")}</span>`);
     if (s.left) lines.push(`<span class="text-err">${L("Đã nghỉ, cần người thay", "Left, needs someone")}</span>`);
   } else lines.push(k === "reg" ? L("Đã đăng ký, chưa xếp", "Registered, not placed") : L("Chưa đăng ký, tính là rảnh", "Didn’t register, counted as free"));
-  if (!s.left && shortDay(s, d)) lines.push(`<span class="text-warn">${L("Ngày đăng ký dưới 8 tiếng", "Registered day under 8 hours")}</span>`);
+  // Ngày đăng ký dưới 8 tiếng: chỉ cảnh báo trên chip chưa xếp (Tony 16/11, F1)
+  if (!s.left && !a && shortDay(s, d)) lines.push(`<span class="text-warn">${L("Ngày đăng ký dưới 8 tiếng", "Registered day under 8 hours")}</span>`);
   if (!a && regSave(s)) lines.push(`<span class="tabular-nums text-muted">${L(`Đăng ký thứ ${regRank(s) + 1} · lưu lần đầu ${regT(regSave(s).first)}`, `Registered ${ord(regRank(s) + 1)} · first saved ${regT(regSave(s).first)}`)}</span>`);
   if (customPending(s, d, p)) lines.push(`<span class="text-warn tabular-nums">${L(`Đăng ký giờ riêng ${cu.from}–${cu.to}, chưa quyết`, `Asked for own times ${cu.from}–${cu.to}, not decided`)}</span>`);
   if (note) lines.push(`<span class="text-muted">${L("Ghi chú", "Note")}: ${esc(note)}</span>`);
@@ -407,7 +419,9 @@ function tipFor(s, d, p) {
 }
 // PRD v1.13 (FR-O42, góp ý 10/11): có vị trí thì tô đặc màu vị trí; ký hiệu vị trí con là huy hiệu đặc ở góc phải trên.
 // Trạng thái không phân biệt bằng màu: đã đăng ký chưa xếp = chip nền trong, viền nét đứt, có dấu tích (mép trên bên trái là
-// giờ lưu đăng ký lần đầu, công tắc "Giờ đăng ký" tắt được); cảnh báo = gạch sóng dưới biệt danh; người đã nghỉ còn ca = gạch ngang.
+// giờ lưu đăng ký lần đầu, công tắc "Giờ đăng ký" tắt được); người đã nghỉ còn ca = gạch ngang.
+// Cảnh báo (góp ý 12/11 mục 4, thay gạch sóng): chấm màu nóng ở góc phải dưới, đối diện huy hiệu ký hiệu, cỡ bằng nửa huy hiệu.
+const WARN_DOT = `<span class="pointer-events-none absolute -right-0.5 -bottom-[3px] size-[7px] rounded-full bg-(--warn-hot) ring-2 ring-surface"></span>`;
 function marker(s, d, p) {
   const a = asgAt(s, d, p); const k = regKind(s, d, p);
   let style;
@@ -415,14 +429,14 @@ function marker(s, d, p) {
   else if (k === "reg") style = "border-[1.5px] border-dashed border-foreground/50 bg-surface text-foreground/85";
   // Không đăng ký gì: nét đứt mảnh, mờ hẳn, không dấu tích, để tách khỏi người đã đăng ký (góp ý 10/10)
   else style = "border-dashed border-foreground/35 bg-surface text-muted opacity-55";
-  const warn = !s.left && ((a && (k === "no" || flagPos(s, a))) || customPending(s, d, p) || shortDay(s, d));
+  const warn = !s.left && ((a && (k === "no" || flagPos(s, a))) || customPending(s, d, p) || (!a && shortDay(s, d)));
   const selected = ui.panel && ui.panel.sid === s.id && ui.panel.d === d;
   // Ghi chú theo ngày: biểu tượng chỉ ở chip đầu tiên của người đó trong ngày, không lặp ở mọi ca
   const noteHere = noteAt(s, d) && PERIODS.find((pp) => shownIn(d, pp.i).includes(s))?.i === p;
   const solid = !!a?.pos.length, mk = marksOf(a);
   const rs = !a && k === "reg" && ui.regTimes ? regSave(s) : null;
   const star = typeOf(s) === "all" ? `<svg viewBox="0 0 24 24" class="${solid ? "size-3 shrink-0 fill-current" : "size-3 shrink-0 fill-(--star) text-(--star)"}" aria-label="${L("Đăng ký mọi ca", "Every shift")}"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>` : "";
-  return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="markerClick('${s.id}',${d},${p})" aria-pressed="${!!selected}" class="${cx("relative inline-flex h-6 max-w-[100%] cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && (ui.panel.ctx === p ? "ring-[3px] ring-primary ring-offset-1 ring-offset-surface" : "ring-2 ring-primary/45 ring-offset-1 ring-offset-surface"))}">${rs ? `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] font-medium tabular-nums text-muted">${regT(rs.first)}</span>` : ""}${!a && k === "reg" ? ic("check", "-ml-0.5 size-3 opacity-80") : ""}${star}<span class="${cx("truncate", s.left && "line-through", warn && "-mb-[3px] pb-[3px] underline decoration-wavy decoration-[1.5px] underline-offset-[3px]")}">${esc(s.nick)}</span>${warn ? `<span class="sr-only">${L("Cần chú ý", "Needs attention")}</span>` : ""}${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${mk ? `<span class="pointer-events-none absolute -top-[7px] -right-1 rounded-full bg-foreground px-1 text-[9px] leading-[13px] font-bold tabular-nums text-surface ring-2 ring-surface">${mk}</span>` : ""}</button>`;
+  return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="markerClick('${s.id}',${d},${p})" aria-pressed="${!!selected}" class="${cx("relative inline-flex h-6 max-w-[100%] cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && (ui.panel.ctx === p ? "ring-[3px] ring-primary ring-offset-1 ring-offset-surface" : "ring-2 ring-primary/45 ring-offset-1 ring-offset-surface"))}">${rs ? `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] font-medium tabular-nums text-muted">${regT(rs.first)}</span>` : ""}${!a && k === "reg" ? ic("check", "-ml-0.5 size-3 opacity-80") : ""}${star}<span class="${cx("truncate", s.left && "line-through")}">${esc(s.nick)}</span>${warn ? `${WARN_DOT}<span class="sr-only">${L("Cần chú ý", "Needs attention")}</span>` : ""}${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${mk ? `<span class="pointer-events-none absolute -top-[7px] -right-1 rounded-full bg-foreground px-1 text-[9px] leading-[13px] font-bold tabular-nums text-surface ring-2 ring-surface">${mk}</span>` : ""}</button>`;
 }
 // Bấm lại chip của ca ngữ cảnh thì đóng panel; chip khác của cùng người cùng ngày thì đổi ca ngữ cảnh; chip khác thì
 // chuyển panel, hỏi trước nếu còn thay đổi chưa lưu (góp ý 10/11 mục 11, ADR 0031)
@@ -456,25 +470,42 @@ function dayOrder(d) {
     const pos0 = (s) => asgAt(s, d, p)?.pos[0];
     const grouped = list.filter(pos0).sort((a, b) => CAT[pos0(a)] - CAT[pos0(b)] || az(a, b));
     const cell = [...grouped, ...prev.filter((s) => !pos0(s))];
-    // Phương án 1 và 2 của mục 12: người đã được xếp ca khác trong ngày xuống cuối ô, sau những người chưa được xếp
-    out.push(ui.arr === 1 || ui.arr === 2 ? [...cell.filter((s) => !isElsewhere(s, d, p)), ...cell.filter((s) => isElsewhere(s, d, p))] : cell);
+    // Người đã được xếp ca khác trong ngày xuống cuối ô (rồi gom vào +N, xem cellChips)
+    out.push([...cell.filter((s) => !isElsewhere(s, d, p)), ...cell.filter((s) => isElsewhere(s, d, p))]);
   }
   return out;
 }
 const cellPeople = (d, p) => dayOrder(d)[p];
-// Chip của một ô theo phương án xếp chip đang chọn (mục 12, chỉ để khách chọn trên wireframe; PRD §5.1 O7)
+// Chip của một ô. Người đăng ký ca này nhưng đã được xếp ca khác trong ngày được gom vào "+N" (Tony chốt 12/11, mục 5,
+// đóng O7): rê chuột thấy danh sách, bấm mở popup như Thêm (không ô tìm, có nút đóng). Bấm một người trong popup thì chip
+// hiện lại trong ô và mở panel với ca này; Lưu mà có xếp ca này thì chip ở lại, không thì đóng panel hay bấm chip người khác
+// là chip về lại +N.
+function revealed(s, d, p) {
+  const R = ui.reveal, P = ui.panel;
+  if (R && (!P || P.sid !== R.sid || P.d !== R.d)) { ui.reveal = null; return false; }
+  return !!R && R.sid === s.id && R.d === d && R.p === p;
+}
+const foldedIn = (d, p) => cellPeople(d, p).filter((s) => isElsewhere(s, d, p) && !revealed(s, d, p));
 function cellChips(d, p, gap) {
   const list = cellPeople(d, p), chips = (xs) => xs.map((s) => marker(s, d, p)).join("");
-  if (ui.arr === 3) {
-    const up = list.filter((s) => asgAt(s, d, p)), low = list.filter((s) => !asgAt(s, d, p));
-    return `${up.length ? `<div class="${peopleCls(gap)}">${chips(up)}</div>` : ""}${up.length && low.length ? `<div class="mt-2 border-t border-dashed border-foreground/15"></div>` : ""}${low.length ? `<div class="${peopleCls(gap)}">${chips(low)}</div>` : ""}`;
-  }
-  const key = `${d}|${p}`, away = ui.arr === 2 && !ui.unfold.has(key) ? list.filter((s) => isElsewhere(s, d, p)) : [];
+  const away = foldedIn(d, p);
   if (!away.length) return `<div class="${peopleCls(gap)}">${chips(list)}</div>`;
   const names = away.map((s) => esc(s.name)).join("<br>");
-  return `<div class="${peopleCls(gap)}">${chips(list.filter((s) => !away.includes(s)))}<button type="button" onclick="unfold('${key}')" data-tip="${esc(`${L("Đã được xếp ca khác trong ngày:", "Placed in another shift today:")}<br>${names}`)}" aria-label="${L(`Hiện ${away.length} người đã được xếp ca khác`, `Show ${away.length} placed elsewhere`)}" class="inline-flex h-6 cursor-pointer items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted outline-hidden hover:text-foreground">+${away.length}</button></div>`;
+  const mine = ui.panel && ui.panel.d === d && away.some((s) => s.id === ui.panel.sid);
+  return `<div class="${peopleCls(gap)}">${chips(list.filter((s) => !away.includes(s)))}<button type="button" onclick="openPop(event,'fold',${d},${p})" aria-haspopup="dialog" data-tip="${esc(`${L("Đã được xếp ca khác trong ngày:", "Placed in another shift today:")}<br>${names}`)}" aria-label="${L(`${away.length} người đã được xếp ca khác`, `${away.length} placed elsewhere`)}" class="${cx("inline-flex h-6 cursor-pointer items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted outline-hidden hover:text-foreground", mine && "ring-2 ring-(--hl-cold) ring-offset-1 ring-offset-surface")}">+${away.length}</button></div>`;
 }
-function unfold(key) { ui.unfold.add(key); render(); }
+// Góp ý 12/11 mục 5, Tony chốt 16/11: bấm vùng trống trên lịch thì đóng panel (còn thay đổi chưa lưu thì vẫn hỏi), chip gỡ từ +N về lại
+function calBlank(e) { if (ui.panel && !e.target.closest("button, a, input, textarea, select, label, [role=dialog]")) closePanel(); }
+function revealPick(sid, d, p) { ui.pop = null; leavePanel(() => { openPanel(sid, d, p); ui.reveal = { sid, d, p }; render(); }); }
+// Góp ý 12/11 mục 1, Tony chốt 16/11 (theo chip vừa bấm): chip đang chọn chưa được xếp thì tô xanh (màu lạnh) mọi ca người đó
+// đăng ký (hay rảnh vì không đăng ký gì); chip đã được xếp thì tô cam (màu nóng) mọi ca người đó đã được xếp. Chỉ tô nền, không viền.
+function hlCell(d, p) {
+  const P = ui.panel; if (!P || !ST[P.sid]) return "";
+  const s = ST[P.sid];
+  const hot = P.ctx != null ? !!asgAt(s, P.d, P.ctx) : PERIODS.some((q) => asgAt(s, P.d, q.i));
+  if (hot) return asgAt(s, d, p) ? "wt-hl-hot" : "";
+  return !s.left && regKind(s, d, p) !== "no" ? "wt-hl-cold" : "";
+}
 // Giờ đăng ký (trái) và huy hiệu ký hiệu (phải) nằm trên mép trên chip, nên hàng chip luôn có khoảng cách dọc
 const peopleCls = (gap = "gap-x-1.5") => (!isEmptyWeek ? `flex flex-wrap ${gap} gap-y-2.5 pt-1.5` : `flex flex-wrap ${gap} gap-y-1`);
 function cellHead(d, p, mobile) {
@@ -490,21 +521,21 @@ function calGrid() {
     const rows = days.map((d) => {
       const pl = PERIODS.reduce((a, p) => a + placedCount(d, p.i), 0), nd = PERIODS.reduce((a, p) => a + needTotal(d, p.i), 0);
       return `<div class="border-t border-border-strong px-3 py-3"><div class="flex items-start gap-1"><button type="button" onclick="goDay(${d})" class="-mx-1 cursor-pointer rounded-lg px-1 text-left text-sm font-semibold outline-hidden hover:bg-foreground/5">${dayShort(d)} <span class="tabular-nums">${WEEK[d].date}/10</span></button>${noteBtn(d)}</div><p class="${cx("mt-0.5 text-xs tabular-nums", pl < nd ? "text-warn" : "text-muted")}">${pl}/${nd}</p></div>` +
-        PERIODS.map((p) => `<div class="min-w-0 border-t border-l border-border-strong p-2"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div>${cellChips(d, p.i)}</div>`).join("");
+        PERIODS.map((p) => `<div class="${cx("min-w-0 border-t border-l border-border-strong p-2", hlCell(d, p.i))}"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div>${cellChips(d, p.i)}</div>`).join("");
     }).join("");
-    return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4"><div class="grid" style="grid-template-columns:76px repeat(5,minmax(0,1fr))"><div></div>${PERIODS.map((p) => `<div class="border-l border-border-strong px-2 py-2.5"><p class="text-sm font-semibold">${p.code}</p><p class="text-xs tabular-nums text-muted">${p.from}–${p.to}</p></div>`).join("")}${rows}</div></div>`;
+    return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4" onclick="calBlank(event)"><div class="grid" style="grid-template-columns:76px repeat(5,minmax(0,1fr))"><div></div>${PERIODS.map((p) => `<div class="border-l border-border-strong px-2 py-2.5"><p class="text-sm font-semibold">${p.code}</p><p class="text-xs tabular-nums text-muted">${p.from}–${p.to}</p></div>`).join("")}${rows}</div></div>`;
   }
   // Bấm ngày trên header thì mở view Ngày của ngày đó (góp ý 10/11, mục 9); nút bên cạnh là ghi chú xếp lịch của ngày (FR-O54)
   const head = days.map((d) => `<div class="flex items-start gap-1 border-l border-border-strong px-2 py-2"><button type="button" onclick="goDay(${d})" ${ui.view === "day" ? "disabled" : ""} title="${ui.view === "day" ? "" : L("Xem ngày này", "View this day")}" class="-mx-1 min-w-0 flex-1 cursor-pointer rounded-lg px-1 text-left outline-hidden hover:bg-foreground/5 disabled:cursor-default disabled:hover:bg-transparent"><p class="text-xs text-muted">${dayShort(d)}</p><p class="text-base font-semibold tabular-nums">${WEEK[d].date}</p></button>${noteBtn(d)}</div>`).join("");
   const rows = PERIODS.map((p) => `<div class="border-t border-border-strong px-2.5 py-2"><p class="text-xs font-semibold">${p.code}</p><p class="text-xs tabular-nums text-muted">${pTime(p.i)}</p></div>` +
-    days.map((d) => `<div class="min-w-0 border-t border-l border-border-strong p-2"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div>${cellChips(d, p.i)}</div>`).join("")).join("");
-  return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4"><div class="grid" style="grid-template-columns:56px repeat(${days.length},minmax(0,1fr))"><div></div>${head}${rows}</div></div>`;
+    days.map((d) => `<div class="${cx("min-w-0 border-t border-l border-border-strong p-2", hlCell(d, p.i))}"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div>${cellChips(d, p.i)}</div>`).join("")).join("");
+  return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4" onclick="calBlank(event)"><div class="grid" style="grid-template-columns:56px repeat(${days.length},minmax(0,1fr))"><div></div>${head}${rows}</div></div>`;
 }
 function calMobile() {
   const d = ui.mDay;
   if (isEmptyWeek) return `<div class="rounded-2xl border border-border bg-surface">${emptyLine(L("Không ai đăng ký trong những ngày này.", "No one registered for these dates."))}</div>`;
-  return `<div class="flex flex-col gap-3" data-wf-block="4">${dayNoteCard(d)}${PERIODS.map((p) => `
-    <section class="rounded-2xl border border-border bg-surface p-4">
+  return `<div class="flex flex-col gap-3" data-wf-block="4" onclick="calBlank(event)">${dayNoteCard(d)}${PERIODS.map((p) => `
+    <section class="${cx("rounded-2xl border border-border bg-surface p-4", hlCell(d, p.i))}">
       <header class="mb-3 flex items-center gap-2"><h3 class="text-sm font-semibold">${p.code} <span class="font-normal tabular-nums text-muted">${p.from}–${p.to}</span></h3><span class="ml-auto flex items-center gap-1.5 text-xs">${cellHead(d, p.i, true)}</span>${addBtn(d, p.i)}</header>
       ${cellChips(d, p.i, "gap-x-1.5")}
     </section>`).join("")}</div>`;
@@ -516,7 +547,8 @@ function calMobile() {
 const dnoteAt = (d) => W().dnote?.[d] || null;
 const noteText = (d) => dnoteAt(d)?.text || "";
 const notePub = (d) => { const n = dnoteAt(d); return n && published() ? (n.pub ?? n.text) || "" : ""; };
-const noteDirty = (d) => { const n = dnoteAt(d); return !!n && published() && n.pub != null && n.pub !== n.text; };
+// Góp ý 12/11 (F3): sau khi công bố, sửa ghi chú là có hiệu lực ngay, không còn bước "Công bố ghi chú" riêng
+const noteDirty = () => false;
 const noteBadge = (d) => !noteText(d) && !noteDirty(d) ? "" : noteDirty(d) ? badge("warn", L("Nháp chưa công bố", "Unpublished draft")) : published() ? badge("ok", L("Đã công bố", "Published")) : badge("neutral", L("Nháp", "Draft"));
 function noteBtn(d) {
   const has = !!noteText(d);
@@ -528,12 +560,11 @@ function dayNoteCard(d) {
   if (ui.weekOff < 0 && !t) return "";
   return `<button type="button" onclick="openPop(event,'dnote',${d})" class="flex w-full cursor-pointer items-start gap-3 rounded-2xl border border-dashed border-border-strong bg-surface px-4 py-3 text-left outline-hidden hover:bg-item-hover">${ic(t ? "sticky-note" : "notebook-pen", "mt-0.5 size-4 text-muted")}<span class="min-w-0 flex-1 text-sm text-pretty">${t ? esc(t) : `<span class="text-muted">${L("Thêm ghi chú xếp lịch cho ngày này", "Add a schedule note for this day")}</span>`}</span>${noteBadge(d)}</button>`;
 }
-const onoteBtn = () => `<button type="button" onclick="openPop(event,'onote')" aria-label="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}" title="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}" class="relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${ic("notebook-pen")}${W().onote ? `<span class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-surface"></span>` : ""}</button>`;
+const onoteBtn = () => `<button type="button" onclick="toggleOnote()" aria-expanded="${!!ui.onoteOpen}" aria-label="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}" title="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}" class="relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${ic("notebook-pen")}${richText(W().onote) ? `<span class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-surface"></span>` : ""}</button>`;
 function saveDnote(d, clear) {
   const v = clear ? "" : (document.getElementById("dnote-ta")?.value || "").trim();
   const w = W(); w.dnote ||= {}; const n = w.dnote[d] || { text: "", pub: null }, before = n.text;
-  if (published() && n.pub == null) n.pub = n.text;
-  n.text = v; w.dnote[d] = n;
+  n.text = v; if (published()) n.pub = v; w.dnote[d] = n;
   if (!n.text && !n.pub) delete w.dnote[d];
   if (SANDBOX && before !== v) { SB.dnote = w.dnote; sbTick(1, 2); sbLog({ what: clear ? ["Xoá ghi chú xếp lịch", "Deleted a schedule note"] : before ? ["Sửa ghi chú xếp lịch", "Edited a schedule note"] : ["Viết ghi chú xếp lịch", "Wrote a schedule note"], day: both(() => dayFull(d)), before: before || "—", after: v || "—", draft: true }); }
   if (!noteDirty(d)) ui.pop = null;
@@ -545,19 +576,51 @@ function publishDnote(d) {
   if (SANDBOX) { SB.dnote = w.dnote; sbTick(1, 2); sbLog({ what: ["Công bố ghi chú xếp lịch", "Published a schedule note"], day: both(() => dayFull(d)), before: before || "—", after: n.text || "—" }); }
   ui.pop = null; render();
 }
-function saveOnote(clear) {
-  const v = clear ? "" : (document.getElementById("onote-ta")?.value || "").trim(), before = W().onote || "";
-  W().onote = v;
-  if (SANDBOX && v !== before) { SB.onote = v; sbTick(1, 2); sbLog({ what: ["Sửa ghi chú riêng", "Edited the owner’s note"], day: SB_WEEK, before: before || "—", after: v || "—" }); }
-  ui.pop = null; render();
+// Ghi chú riêng của chủ (góp ý 12/11 mục 6): bấm biểu tượng thì mở một khung chạy hết bề ngang, đẩy lịch tuần và panel
+// xuống dưới; đóng là trả lại như cũ. Định dạng cơ bản, sửa trực tiếp (WYSIWYG): đậm, nghiêng, gạch dưới, chấm, số.
+// Gõ tới đâu giữ tới đó; đóng khung thì ghi một dòng nhật ký nếu có đổi.
+const richText = (h) => { const x = document.createElement("div"); x.innerHTML = h || ""; return x.textContent.trim(); };
+function cleanRich(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html || ""}</div>`, "text/html"), root = doc.body.firstChild;
+  const ok = new Set(["B", "STRONG", "I", "EM", "U", "UL", "OL", "LI", "BR", "DIV", "P"]);
+  const walk = (n) => { for (const c of [...n.childNodes]) {
+    if (c.nodeType === 3) continue;
+    if (c.nodeType !== 1 || ["SCRIPT", "STYLE"].includes(c.tagName)) { c.remove(); continue; }
+    walk(c);
+    if (ok.has(c.tagName)) { for (const a of [...c.attributes]) c.removeAttribute(a.name); } else c.replaceWith(...c.childNodes);
+  } };
+  walk(root); return root.innerHTML;
 }
-// Chỉ có trong wireframe (data-wf-only, không vào trang tĩnh): ba phương án xếp chip của mục 12 để khách chọn (PRD §5.1 O7)
-function arrSwitch() {
-  if (isEmptyWeek) return "";
-  const items = [[0, L("Như hiện tại", "As now")], [1, L("PA1 · xuống cuối", "1 · Move to end")], [2, L("PA2 · gom +N", "2 · Fold into +N")], [3, L("PA3 · chia đôi ô", "3 · Split the cell")]];
-  return `<div data-wf-only class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-dashed border-primary/40 bg-primary-light px-4 py-3"><p class="min-w-0 flex-1 basis-64 text-sm text-pretty"><span class="font-medium">${L("Chọn cách xếp chip (góp ý 10/11, mục 12).", "Choose a marker arrangement (feedback 10/11, item 12).")}</span> <span class="text-foreground/80">${L("Người đăng ký nhiều ca nhưng chỉ được xếp vài ca: chip ở ca còn lại hiện thế nào.", "Someone registered for several shifts but placed in only some: how their marker shows in the others.")}</span></p><div role="group" aria-label="${L("Cách xếp chip", "Marker arrangement")}" class="flex flex-wrap gap-1.5">${items.map(([v, t]) => `<button type="button" aria-pressed="${v === ui.arr}" onclick="setArr(${v})" class="${cx("h-8 cursor-pointer whitespace-nowrap rounded-lg border px-3 text-sm font-medium outline-hidden focus-visible:ring-2 focus-visible:ring-focus", v === ui.arr ? "border-primary bg-surface text-foreground" : "border-border-strong bg-surface/70 text-foreground/75 hover:text-foreground")}">${t}</button>`).join("")}</div></div>`;
+function toggleOnote() {
+  if (ui.onoteOpen) {
+    const v = cleanRich(W().onote || ""), before = ui.onoteBefore || "";
+    W().onote = richText(v) ? v : "";
+    if (SANDBOX && W().onote !== before) { SB.onote = W().onote; sbTick(1, 2); sbLog({ what: ["Sửa ghi chú riêng", "Edited the owner’s note"], day: SB_WEEK, before: richText(before) || "—", after: richText(W().onote) || "—" }); }
+    ui.onoteOpen = false; render(); return;
+  }
+  ui.onoteOpen = true; ui.onoteBefore = W().onote || ""; ui.pop = null; render();
+  const ed = document.getElementById("onote-ed");
+  if (ed && ed.isContentEditable) { ed.focus(); const r = document.createRange(); r.selectNodeContents(ed); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 }
-function setArr(v) { ui.arr = +v; ui.unfold = new Set(); try { localStorage.setItem("wt-arr", String(ui.arr)); } catch {} render(); }
+function onoteInput(el) { W().onote = el.innerHTML; }
+function fmtOnote(cmd) {
+  const ed = document.getElementById("onote-ed"); if (!ed) return;
+  if (!ed.contains(getSelection().anchorNode)) ed.focus();
+  document.execCommand("styleWithCSS", false, false); document.execCommand(cmd, false, null);
+  onoteInput(ed); fmtState();
+}
+function fmtState() { for (const b of document.querySelectorAll("[data-fmt]")) { let on = false; try { on = document.queryCommandState(b.dataset.fmt); } catch {} b.setAttribute("aria-pressed", on); } }
+function onoteBar() {
+  if (!ui.onoteOpen) return "";
+  const ro = ui.weekOff < 0, v = W().onote || "";
+  const tools = [["bold", "bold", L("Đậm", "Bold")], ["italic", "italic", L("Nghiêng", "Italic")], ["underline", "underline", L("Gạch dưới", "Underline")], ["insertUnorderedList", "list", L("Danh sách chấm", "Bulleted list")], ["insertOrderedList", "list-ordered", L("Danh sách số", "Numbered list")]];
+  return `<section class="mb-4 rounded-2xl border border-border bg-surface" aria-label="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}">
+    <header class="flex flex-wrap items-center gap-2 border-b border-border py-1.5 pr-1.5 pl-4"><div class="min-w-0 flex-1 basis-48"><p class="text-sm font-semibold">${L("Ghi chú riêng", "Owner’s note")} · ${L("Tuần", "Week")} ${ui.weekOff < 0 ? "5–11/10" : "12–18/10"}</p><p class="text-xs text-pretty text-muted">${L("Chỉ bạn thấy. Không công bố cho nhân viên.", "Only you see it. Never shown to staff.")}</p></div>
+      ${ro ? "" : `<div role="toolbar" aria-label="${L("Định dạng", "Formatting")}" class="flex items-center gap-0.5">${tools.map(([c, i, tt]) => `<button type="button" data-fmt="${c}" onmousedown="event.preventDefault()" onclick="fmtOnote('${c}')" aria-label="${tt}" title="${tt}" aria-pressed="false" class="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground aria-pressed:bg-foreground/8 aria-pressed:text-foreground">${ic(i, "size-4")}</button>`).join("")}</div><span class="mx-1 h-5 w-px bg-border-strong"></span>`}
+      ${iconBtn("x", L("Đóng ghi chú", "Close the note"), `onclick="toggleOnote()"`, "size-9")}</header>
+    <div id="onote-ed" ${ro ? "" : `contenteditable="true"`} role="textbox" aria-multiline="true" aria-readonly="${ro}" aria-label="${L("Nội dung ghi chú riêng", "Owner’s note")}" data-placeholder="${L("Ví dụ: hỏi lại Hậu có làm thêm CA 5 được không", "e.g. ask Hậu whether they can take an extra CA 5")}" oninput="onoteInput(this)" onkeyup="fmtState()" onmouseup="fmtState()" class="wt-rich max-h-[50vh] min-h-36 overflow-y-auto px-4 py-3 text-sm/6 outline-hidden">${cleanRich(v)}</div>
+  </section>`;
+}
 
 // --- Danh sách nhân viên (FR-O11) ---
 function staffList(compact, inPop) {
@@ -822,7 +885,7 @@ function calToolbar(mobile) {
   return `<div class="mb-4 space-y-3" data-wf-block="2">
     <div class="flex min-h-10 items-center gap-3"><h1 class="text-xl font-semibold tabular-nums">${L("Tuần", "Week")} ${range}</h1>${weekBadge()}<div class="ml-auto flex items-center gap-3">${right}</div></div>
     <div class="flex flex-wrap items-center gap-3">${calNav(false)}
-    ${segmented([["day", L("Ngày", "Day")], ["3d", L("3 ngày", "3 days")], ["week", L("Tuần", "Week")]], ui.view, "setView", L("Chế độ xem", "View"))}
+    ${segmented([["day", L("Ngày", "Day")], ["week", L("Tuần", "Week")]], ui.view, "setView", L("Chế độ xem", "View"))}
     ${OPT === "b" ? `<button type="button" onclick="openPop(event,'stafflist')" aria-haspopup="dialog" aria-expanded="${ui.pop?.id === "stafflist"}" aria-label="${L("Nhân viên và bộ lọc", "Staff and filters")}" title="${L("Nhân viên và bộ lọc", "Staff and filters")}" class="relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-border-strong bg-surface text-muted outline-hidden hover:bg-button-hover hover:text-foreground aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus">${ic("list-filter")}${filtered ? `<span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-primary ring-2 ring-surface" aria-hidden="true"></span><span class="sr-only">${L(`đang lọc khác mặc định, hiện ${ui.sel.size}/${ACTIVE.length} nhân viên`, `filter changed, showing ${ui.sel.size}/${ACTIVE.length} staff`)}</span>` : ""}</button>` : ""}
     <span class="ml-auto flex items-center gap-2">${regTimesSwitch(false)}${undoBtns()}${onoteBtn()}${legend}</span></div></div>`;
 }
@@ -836,17 +899,17 @@ function screenLich() {
   const panelOpen = ui.panel && !loading && !err;
   const desktop = `
     <div class="hidden p-6 lg:block">
-      ${calToolbar(false)}${banner}
+      ${calToolbar(false)}${banner}${loading || err ? "" : onoteBar()}
       <div class="flex items-start gap-5">
         ${OPT === "b" ? "" : `<aside class="w-60 shrink-0" data-wf-block="3">${loading ? `<div class="space-y-3">${skel("w-full", "h-10")}${Array.from({ length: 10 }, (_, i) => skel(["w-3/4", "w-2/3", "w-4/5"][i % 3], "h-4")).join("")}</div>` : staffList(OPT === "d" || OPT === "e")}</aside>`}
-        <div class="min-w-0 flex-1 space-y-5">${loading || err ? "" : arrSwitch()}${grid}${loading || err ? "" : assignSection(false)}</div>
+        <div class="min-w-0 flex-1 space-y-5">${grid}${loading || err ? "" : assignSection(false)}</div>
         ${panelOpen ? `<aside class="sticky top-20 hidden max-h-[calc(100vh-6rem)] w-[22rem] shrink-0 flex-col xl:flex rounded-2xl border border-border bg-surface" data-wf-block="5">${panelBody(false)}</aside>` : ""}
       </div>
     </div>`;
   const mobile = `
     <div class="space-y-4 p-4 lg:hidden">
-      ${calToolbar(true)}${banner}
-      ${loading ? `<div class="space-y-3">${Array.from({ length: 4 }, () => `<div class="rounded-2xl border border-border bg-surface p-4 space-y-3">${skel("w-1/3")}${skel("w-full", "h-6")}</div>`).join("")}</div>` : err ? errGrid : arrSwitch() + calMobile()}
+      ${calToolbar(true)}${banner}${loading || err ? "" : onoteBar()}
+      ${loading ? `<div class="space-y-3">${Array.from({ length: 4 }, () => `<div class="rounded-2xl border border-border bg-surface p-4 space-y-3">${skel("w-1/3")}${skel("w-full", "h-6")}</div>`).join("")}</div>` : err ? errGrid : calMobile()}
       ${loading || err ? "" : assignSection(true)}
     </div>`;
   return appShell(desktop + mobile, L("Lịch tuần", "Schedule"));
@@ -1078,6 +1141,45 @@ function screenCa() {
 }
 
 // ===================================================================
+// Lịch dạng file xuất (FR-O52), dùng cho hộp Xuất lịch và màn Lịch quán của nhân viên: biệt danh trên màu vị trí, ký hiệu,
+// giờ chỉ khi khác giờ ca, nhóm như trên lịch, chú giải; ghi chú xếp lịch in dưới mỗi ngày (góp ý 12/11, F2 và M3b).
+function weekSheet({ src, base, days, notes, me }) {
+  const at = (s, d, p) => src.asg[s.id]?.[d]?.[p];
+  const people = (d, p) => STAFF.filter((s) => at(s, d, p)?.pos.length).sort((a, b) => CAT[at(a, d, p).pos[0]] - CAT[at(b, d, p).pos[0]] || a.nick.localeCompare(b.nick, "vi"));
+  const chip = (s, d, p) => { const a = at(s, d, p), n = pn(a.pos[0]), mk = marksOf(a); return `<span class="${cx("inline-flex h-5 max-w-[100%] items-center gap-1 rounded-full border px-1.5 text-[11px] font-medium whitespace-nowrap", `border-p${n}-bd bg-p${n}-bg text-p${n}-tx`, s.id === me && "ring-2 ring-zinc-900 ring-offset-1")}"><span class="truncate">${esc(s.nick)}</span>${mk ? `<span class="shrink-0 font-semibold">${mk}</span>` : ""}${a.t ? `<span class="shrink-0 font-normal tabular-nums">${a.t.from}–${a.t.to}</span>` : ""}</span>`; };
+  const nt = days.map((d) => (notes ? notes(d) : "") || "");
+  const grid = `<div class="grid ${days.length > 1 ? "min-w-[760px]" : ""}" style="grid-template-columns:52px repeat(${days.length},minmax(0,1fr))"><div></div>${days.map((d) => `<div class="border-l border-zinc-200 px-1.5 pb-1.5 text-xs font-semibold">${dayShort(d)} ${base + d}/10</div>`).join("")}
+    ${PERIODS.map((p) => `<div class="border-t border-zinc-200 px-1 py-1.5 text-[11px] font-semibold">${p.code}<span class="block font-normal tabular-nums text-zinc-500">${pTime(p.i)}</span></div>${days.map((d) => `<div class="flex min-w-0 flex-wrap content-start gap-1 border-t border-l border-zinc-200 p-1.5">${people(d, p.i).map((s) => chip(s, d, p.i)).join("")}</div>`).join("")}`).join("")}
+    ${nt.some(Boolean) ? `<div class="border-t border-zinc-200 px-1 py-1.5 text-[11px] font-semibold">${L("Ghi chú", "Notes")}</div>${nt.map((x) => `<div class="min-w-0 border-t border-l border-zinc-200 p-1.5 text-[11px] text-pretty text-zinc-700">${esc(x)}</div>`).join("")}` : ""}</div>`;
+  const legend = `<div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-zinc-200 pt-2.5 text-[11px]">${POSITIONS.map((x) => `<span class="inline-flex items-center gap-1.5">${posDot(x.id, "size-2.5")}<span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-zinc-500">${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-zinc-800">${mk}</b> ${L(vi, en)}`).join(" · ")}</span>` : ""}</span>`).join("")}${me ? `<span class="inline-flex items-center gap-1.5"><span class="h-3.5 w-6 rounded-full ring-2 ring-zinc-900 ring-offset-1"></span><span class="font-medium">${L("Ca của bạn", "Your shifts")}</span></span>` : ""}</div>`;
+  return grid + legend;
+}
+// ===================================================================
+// MÀN 4b · LỊCH QUÁN (nhân viên, góp ý 12/11 mục 3): lịch đã công bố của cả quán, như file xuất, kèm ghi chú xếp lịch.
+// Ngoại lệ thứ ba của NFR-2; chủ tắt được trong menu tài khoản. Không có lương, đi trễ, đăng ký hay giờ riêng của ai.
+// ===================================================================
+function screenQuan() {
+  const loading = S.tt === "dang-tai", err = S.tt === "loi", off = !shopOn(), notPub = S.tt === "chua-cong-bo" || (SANDBOX && SB.phase !== "published");
+  // Ngoài Trải nghiệm: tuần 5–11/10 là tuần đang làm đã công bố (như Hồ sơ của tôi); Trải nghiệm: tuần 12–18/10
+  const src = SANDBOX ? DATA : PREV_WEEK, base = SANDBOX ? 12 : 5, me = SANDBOX ? SB.me : "s7";
+  const notes = (d) => src.dnote?.[d] ? (src.dnote[d].pub ?? src.dnote[d].text) || "" : "";
+  const range = `${base}–${base + 6}/10`;
+  const box = (a, b) => `<div class="rounded-2xl border border-border bg-surface px-5 py-8 text-center"><p class="text-sm font-medium">${a}</p><p class="mt-1 text-sm text-pretty text-muted">${b}</p></div>`;
+  let body;
+  if (loading) body = `<div aria-busy="true" class="space-y-3 rounded-2xl border border-border bg-surface p-4">${Array.from({ length: 6 }, (_, i) => skel(["w-full", "w-3/4", "w-2/3"][i % 3], "h-6")).join("")}</div>`;
+  else if (err) body = `<div class="rounded-2xl border border-border bg-surface">${errorBlock(L("Không tải được lịch quán", "Couldn’t load the shop schedule"), L("Mất kết nối mạng", "Network connection lost"))}</div>`;
+  else if (off) body = box(L("Chủ quán đang tắt Lịch quán", "The owner has turned the shop schedule off"), L("Ca của bạn vẫn ở Hồ sơ của tôi.", "Your own shifts are still on My profile."));
+  else if (notPub) body = box(L(`Lịch tuần ${range} chưa công bố`, `Week ${range} isn’t published yet`), L("Chủ quán công bố xong là lịch cả quán hiện ở đây.", "The shop’s schedule appears here once the owner publishes."));
+  else {
+    const d = ui.qDay ?? 0;
+    body = `<div class="hidden overflow-x-auto rounded-2xl border border-border bg-white p-4 text-zinc-900 md:block" data-wf-block="3">${weekSheet({ src, base, days: [0, 1, 2, 3, 4, 5, 6], notes, me })}</div>
+      <div class="space-y-3 md:hidden" data-wf-block="3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${base + i}`]), d, "setQDay", L("Ngày", "Day"))}<div class="rounded-2xl border border-border bg-white p-3 text-zinc-900">${weekSheet({ src, base, days: [d], notes, me })}</div></div>`;
+  }
+  return appShell(`<div class="mx-auto w-full max-w-6xl space-y-4 p-4 sm:p-6"><div class="flex flex-wrap items-center gap-3" data-wf-block="2"><h1 class="text-xl font-semibold max-lg:sr-only">${L("Lịch quán", "Shop schedule")}</h1><span class="text-sm tabular-nums text-muted">${L("Tuần", "Week")} ${range}</span>${!off && !notPub && !loading && !err ? `<span class="ml-auto text-xs text-pretty text-muted">${L("Chỉ xem. Muốn đổi ca, nhắn chủ quán.", "View only. To swap a shift, message the owner.")}</span>` : ""}</div>${body}</div>`, L("Lịch quán", "Shop schedule"));
+}
+function setQDay(v) { ui.qDay = +v; render(); }
+
+// ===================================================================
 // MÀN 5 · NHÂN VIÊN (FR-A1–A11; lương cơ bản + lương phụ trách theo người, góp ý 16/10)
 // ===================================================================
 function screenNv() {
@@ -1222,6 +1324,7 @@ function popContent() {
     const me = ME();
     return `<div class="px-3 py-2"><p class="truncate text-sm font-medium">${me.name}</p><p class="truncate text-xs text-muted">${me.user}</p></div><hr class="my-1 border-border" />
       <div class="px-1"><p class="px-3 pt-1 pb-1 text-xs text-muted">${L("Ngôn ngữ", "Language")}</p>${[["vi", "Tiếng Việt"], ["en", "English"]].map(([v, t]) => `<a href="${link("lang", v)}" role="menuitemradio" aria-checked="${S.lang === v}" class="flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-sm outline-hidden hover:bg-item-hover">${t}${S.lang === v ? ic("check", "ml-auto size-4") : ""}</a>`).join("")}</div>
+      ${SC.role === "owner" ? `<hr class="my-1 border-border" /><div class="px-1"><button type="button" role="switch" aria-checked="${shopOn()}" onclick="toggleShop()" class="flex min-h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm outline-hidden hover:bg-item-hover"><span class="min-w-0 flex-1"><span class="block">${L("Nhân viên xem lịch cả quán", "Staff see the shop schedule")}</span><span class="block text-xs text-muted">${L("Tuần đã công bố, như file xuất", "Published weeks, as exported")}</span></span><span class="${cx("relative h-5 w-9 shrink-0 rounded-full transition-colors", shopOn() ? "bg-primary" : "bg-foreground/15")}"><span class="${cx("absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform", shopOn() && "translate-x-4")}"></span></span></button></div>` : ""}
       <hr class="my-1 border-border" /><div class="px-1"><a href="${linkMan("dn")}" class="group flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-sm outline-hidden hover:bg-rose-500/10 hover:text-rose-700">${ic("log-out", "size-4 text-muted group-hover:text-rose-700")}${L("Đăng xuất", "Sign out")}</a></div>`;
   }
   if (p.id === "filters") return filtersPanel();
@@ -1244,40 +1347,40 @@ function popContent() {
       <p class="mt-2 border-t border-border pt-2 text-xs text-pretty text-muted">${SANDBOX ? L("Chọn một ngày để tới khoảng chứa ngày đó. Tuần đang xếp là 12–18/10.", "Pick a day to jump to the range holding it. The week being scheduled is 12–18 Oct.") : L("Chọn một ngày để tới khoảng chứa ngày đó. Có dữ liệu từ 5/10; tuần đang xếp là 12–18/10.", "Pick a day to jump to the range holding it. Data starts 5 Oct; the week being scheduled is 12–18 Oct.")}</p></div>`;
   }
   if (p.id === "legend") {
-    // PRD v1.13: trạng thái nhận ra bằng hình (dấu tích, nét đứt, gạch sóng, gạch ngang), không bằng màu; ký hiệu là huy hiệu ở góc phải trên
+    // PRD v1.13 và góp ý 12/11: trạng thái nhận ra bằng hình (dấu tích, nét đứt, chấm cảnh báo, gạch ngang), không bằng màu; ký hiệu là huy hiệu ở góc phải trên
     const chipS = (cls, inner) => `<span class="relative inline-flex h-6 shrink-0 items-center justify-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap ${cls}">${inner}</span>`;
     const row = (chips, t) => `<li class="flex items-center gap-3"><span class="flex w-24 shrink-0 flex-wrap gap-1">${chips}</span><span class="text-sm text-pretty">${t}</span></li>`;
     const reg = "border-[1.5px] border-dashed border-foreground/50 bg-surface text-foreground/85";
-    const wavy = (t) => `<span class="underline decoration-wavy decoration-[1.5px] underline-offset-[3px]">${t}</span>`;
     const mkB = (t) => `<span class="pointer-events-none absolute -top-[7px] -right-1 rounded-full bg-foreground px-1 text-[9px] leading-[13px] font-bold tabular-nums text-surface ring-2 ring-surface">${t}</span>`;
     const starSvg = `<svg viewBox="0 0 24 24" class="size-3 shrink-0 fill-(--star)" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>`;
     return `<div class="space-y-3 p-4"><ul class="space-y-2.5">
-      ${row(chipS(reg, `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] tabular-nums text-muted">${L("T5", "Thu")} 08:03</span>${ic("check", "-ml-0.5 size-3 opacity-80")}Mai`), L("Đã đăng ký, chưa xếp. Mép trên là giờ lưu đăng ký lần đầu (công tắc Giờ đăng ký)", "Registered, not placed. The top edge shows when they first saved (Registration times switch)"))}
-      ${row(chipS("border-dashed border-foreground/35 bg-surface text-muted opacity-55", "Mai"), L("Chưa đăng ký gì, tính là rảnh (ẩn mặc định)", "Didn’t register, counted as free (hidden by default)"))}
-      ${row(chipS("border-[1.5px] border-foreground/60 bg-surface text-foreground", "Mai"), L("Đã xếp, chưa có vị trí", "Placed, no position yet"))}
-      ${row(chipS("border-p5-bd bg-p5-bg text-p5-tx", `Mai${mkB("2·3")}`) + chipS("border-p1-bd bg-p1-bg text-p1-tx", `Bảo${mkB("T")}`), L("Đã xếp, tô màu vị trí; huy hiệu ở góc là ký hiệu vị trí con", "Placed, filled in the position colour; the corner badge shows the sub-position marks"))}
-      ${row(chipS("border-p6-bd bg-p6-bg text-p6-tx", wavy("Mai")), L("Gạch sóng là cần chú ý: ngoài lịch rảnh, chưa có kinh nghiệm, đã tắt Phụ trách, giờ riêng chưa quyết, hoặc ngày đăng ký dưới 8 tiếng", "A wavy underline needs attention: outside availability, no experience, shift lead off, own times not decided, or a registered day under 8 hours"))}
-      ${row(chipS("border-p7-bd bg-p7-bg text-p7-tx", `<span class="line-through">Đức</span>`), L("Đã nghỉ, vẫn còn giữ ca", "Deactivated, still holding the shift"))}
-      ${row(chipS(reg, `${starSvg}Mai`), L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week"))}
-      ${row(chipS(reg, `Mai${ic("clock", "size-3 opacity-80")}`), L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)"))}
-      ${row(chipS(reg, `Mai${ic("message-square-text", "size-3 opacity-70")}`), L("Có ghi chú cho ngày này", "Has a note for this day"))}</ul>
+      ${row(chipS(reg, `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] tabular-nums text-muted">${L("T5", "Thu")} 08:03</span>${ic("check", "-ml-0.5 size-3 opacity-80")}Danh`), L("Đã đăng ký, chưa xếp. Mép trên là giờ lưu đăng ký lần đầu (công tắc Giờ đăng ký)", "Registered, not placed. The top edge shows when they first saved (Registration times switch)"))}
+      ${row(chipS("border-dashed border-foreground/35 bg-surface text-muted opacity-55", "Hào"), L("Chưa đăng ký gì, tính là rảnh (ẩn mặc định)", "Didn’t register, counted as free (hidden by default)"))}
+      ${row(chipS("border-[1.5px] border-foreground/60 bg-surface text-foreground", "Lộc"), L("Đã xếp, chưa có vị trí", "Placed, no position yet"))}
+      ${row(chipS("border-p5-bd bg-p5-bg text-p5-tx", `Thạnh${mkB("2·3")}`) + chipS("border-p1-bd bg-p1-bg text-p1-tx", `Cô${mkB("T")}`), L("Đã xếp, tô màu vị trí; huy hiệu ở góc là ký hiệu vị trí con", "Placed, filled in the position colour; the corner badge shows the sub-position marks"))}
+      ${row(chipS("border-p6-bd bg-p6-bg text-p6-tx", `TD${WARN_DOT}`), L("Chấm ở góc phải dưới là cần chú ý: ngoài lịch rảnh, chưa có kinh nghiệm, đã tắt Phụ trách, giờ riêng chưa quyết, hoặc (trên chip chưa xếp) ngày đăng ký dưới 8 tiếng", "A dot on the bottom-right corner needs attention: outside availability, no experience, shift lead off, own times not decided, or (on an unplaced marker) a registered day under 8 hours"))}
+      ${row(chipS("border-p7-bd bg-p7-bg text-p7-tx", `<span class="line-through">Toàn</span>`), L("Đã nghỉ, vẫn còn giữ ca", "Deactivated, still holding the shift"))}
+      ${row(chipS(reg, `${starSvg}Ngàn`), L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week"))}
+      ${row(chipS(reg, `Hậu${ic("clock", "size-3 opacity-80")}`), L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)"))}
+      ${row(chipS(reg, `Hậu${ic("message-square-text", "size-3 opacity-70")}`), L("Có ghi chú cho ngày này", "Has a note for this day"))}
+      ${row(`<span class="wt-hl-cold h-6 w-10 rounded-md"></span><span class="wt-hl-hot h-6 w-10 rounded-md"></span>`, L("Bấm chip chưa xếp: ô nền xanh là các ca người đó đăng ký. Bấm chip đã xếp: ô nền cam là các ca người đó đã được xếp", "Select an unplaced marker: blue cells are the shifts they registered. Select a placed one: orange cells are the shifts they’re placed in"))}
+      ${row(`<span class="inline-flex h-6 items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted">+3</span>`, L("Người đăng ký ca này nhưng đã được xếp ca khác trong ngày. Bấm để xem và đưa chip lại vào ô", "Registered for this shift but placed in another one today. Select to see them and bring a marker back"))}</ul>
       <p class="text-xs text-pretty text-muted">${L("Thứ tự trong ô: người có vị trí trước, nhóm theo thứ tự vị trí bên dưới, A–Z trong nhóm. Sau đó người chưa có vị trí: có cảnh báo trước, rồi A–Z, người thêm thủ công cuối; ca dưới giữ thứ tự của ca trên.", "Order in a cell: people with a position first, grouped in the order below, A–Z within a group. Then those without one: warnings first, then A–Z, manually added last; each shift keeps the order of the one above.")}</p>
       <div class="border-t border-border pt-3"><p class="mb-2 text-xs font-medium text-muted">${L("Vị trí và ký hiệu", "Positions and marks")}</p><ul class="space-y-1.5">${POSITIONS.map((x) => `<li class="flex items-start gap-2 text-sm">${posDot(x.id, "mt-1.5 size-2.5")}<span><span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-muted"> · ${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-foreground">${mk}</b> ${L(vi, en)}`).join(", ")}</span>` : ""}</span></li>`).join("")}</ul></div></div>`;
   }
   if (p.id === "rules") return `<div class="p-4"><p class="mb-3 text-sm font-semibold">${L("Quy tắc đi trễ", "Lateness rules")}</p><ul class="space-y-2.5 text-sm">
       ${[[`0–${RULES.grace}′`, L("Đúng giờ (ân hạn)", "On time (grace)"), "neutral"], [`${RULES.grace + 1}–${RULES.noDeductUntil}′`, L("Tính đi trễ, mất thưởng tuần", "Late, weekly bonus lost"), "warn"], [`${RULES.noDeductUntil + 1}′+`, L("Trừ gấp đôi số phút, mất thưởng", "Deduct 2× the minutes, bonus lost"), "warn"], [L("Trừ ≥ ca", "Deduction ≥ shift"), L("Bất thường, giữ lại chờ bạn xem", "Anomaly, held for your review"), "err"], [L("Vào trễ đã thống nhất", "Agreed late start"), L("Không ân hạn: từ phút 1 tính trễ và trừ gấp đôi. Về sớm theo giờ riêng vẫn có ân hạn.", "No grace: late and 2× deduction from minute 1. Own times that only end earlier keep the grace."), "warn"]].map(([a, b, t]) => `<li class="flex gap-3"><span class="w-24 shrink-0 text-xs font-medium tabular-nums ${t === "neutral" ? "text-muted" : "text-" + t}">${a}</span><span>${b}</span></li>`).join("")}</ul></div>`;
-  if (p.id === "onote") {
-    const ro = ui.weekOff < 0, v = W().onote || "", ex = "h-9 min-h-9 rounded-lg px-3";
-    return `<div class="space-y-3 p-4"><div><p class="text-sm font-semibold">${L("Ghi chú riêng", "Owner’s note")} · ${L("Tuần", "Week")} ${ui.weekOff < 0 ? "5–11/10" : "12–18/10"}</p><p class="mt-0.5 text-xs text-pretty text-muted">${L("Chỉ bạn thấy. Không công bố cho nhân viên.", "Only you see it. Never shown to staff.")}</p></div>
-      <textarea id="onote-ta" data-focus-id="onote-ta" rows="5" ${ro ? "readonly" : ""} placeholder="${L("Ví dụ: hỏi lại Linh có làm thêm CA 5 được không", "e.g. ask Linh whether she can take an extra CA 5")}" class="w-full rounded-xl border border-border-strong bg-surface px-4 py-2.5 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:text-sm">${esc(v)}</textarea>
-      ${ro ? "" : `<div class="flex justify-end gap-2">${v ? btn("ghost", L("Xoá", "Clear"), { attrs: `onclick="saveOnote(true)"`, extra: ex }) : ""}${btn("primary", L("Lưu", "Save"), { attrs: `onclick="saveOnote()"`, extra: ex })}</div>`}</div>`;
-  }
   if (p.id === "dnote") {
     const d = p.d, n = dnoteAt(d), ro = ui.weekOff < 0, t = n?.text || "", dirty = noteDirty(d), ex = "h-9 min-h-9 rounded-lg px-3";
-    return `<div class="space-y-3 p-4"><div><p class="flex items-center gap-2 text-sm font-semibold"><span class="min-w-0 flex-1">${L("Ghi chú xếp lịch", "Schedule note")} · ${dayFull(d)}</span>${noteBadge(d)}</p><p class="mt-0.5 text-xs text-pretty text-muted">${published() ? L("Mọi nhân viên có ca ngày này đang đọc được.", "Everyone working this day can read it.") : L("Công bố cùng lịch tuần. Mọi nhân viên có ca ngày này sẽ đọc được.", "Published with the week. Everyone working this day will read it.")}</p></div>
+    return `<div class="space-y-3 p-4"><div><p class="flex items-center gap-2 text-sm font-semibold"><span class="min-w-0 flex-1">${L("Ghi chú xếp lịch", "Schedule note")} · ${dayFull(d)}</span>${noteBadge(d)}</p><p class="mt-0.5 text-xs text-pretty text-muted">${published() ? L("Nhân viên đang đọc được ở Hồ sơ của tôi, Lịch quán và file xuất lịch. Lưu là cập nhật ngay.", "Staff can read it on My profile, the shop schedule and the export. Saving updates it at once.") : L("Công bố cùng lịch tuần, rồi nhân viên đọc được ở Hồ sơ của tôi, Lịch quán và file xuất lịch.", "Published with the week, then readable on My profile, the shop schedule and the export.")}</p></div>
       ${dirty ? `<p class="rounded-lg bg-foreground/5 px-3 py-2 text-xs text-pretty text-muted"><span class="font-medium text-foreground">${L("Nhân viên đang thấy:", "Staff currently see:")}</span> ${n.pub ? esc(n.pub) : L("(chưa có ghi chú)", "(no note)")}</p>` : ""}
-      <textarea id="dnote-ta" data-focus-id="dnote-ta" rows="4" ${ro ? "readonly" : ""} placeholder="${L("Ví dụ: Minh Anh kèm Thảo T ở Thu Ngân – Offline ca sáng", "e.g. Minh Anh trains Thảo T on the in-store till this morning")}" class="w-full rounded-xl border border-border-strong bg-surface px-4 py-2.5 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:text-sm">${esc(t)}</textarea>
+      <textarea id="dnote-ta" data-focus-id="dnote-ta" rows="4" ${ro ? "readonly" : ""} placeholder="${L("Ví dụ: Thạnh kèm NH ở Thu Ngân – Offline ca sáng", "e.g. Thạnh trains NH on the in-store till this morning")}" class="w-full rounded-xl border border-border-strong bg-surface px-4 py-2.5 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:text-sm">${esc(t)}</textarea>
       ${ro ? "" : `<div class="flex flex-wrap justify-end gap-2">${t ? btn("ghost", L("Xoá", "Delete"), { attrs: `onclick="saveDnote(${d},true)"`, extra: ex }) : ""}${btn(dirty ? "outline" : "primary", L("Lưu", "Save"), { attrs: `onclick="saveDnote(${d})"`, extra: ex })}${dirty ? btn("primary", L("Công bố ghi chú", "Publish note"), { icon: "send", attrs: `onclick="publishDnote(${d})"`, extra: ex }) : ""}</div>`}</div>`;
+  }
+  if (p.id === "fold") {
+    const { d, per } = p, list = foldedIn(d, per);
+    return `<div class="flex items-center gap-2 border-b border-border py-1.5 pr-1.5 pl-4"><p class="min-w-0 flex-1 text-sm font-semibold">${L("Có đăng ký", "Registered")} · ${PERIODS[per].code} · ${dayFull(d)}</p>${iconBtn("x", L("Đóng", "Close"), `onclick="closePop()"`, "size-9")}</div>
+      <ul class="max-h-[min(19rem,calc(100vh-11rem))] overflow-y-auto p-1">${list.map((s) => `<li><button type="button" onclick="revealPick('${s.id}',${d},${per})" class="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-left outline-hidden hover:bg-item-hover"><span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(s.name)}</span><span class="mt-0.5 block text-xs tabular-nums text-muted">${L("Đã xếp", "Placed")} ${runsOf(s, d).map((r) => `${PERIODS[r.from].from}–${PERIODS[r.to].to} · ${esc(posLabel(r.a.pos, r.a.sub))}`).join(", ")}</span></span></button></li>`).join("") || `<li class="px-3 py-2 text-sm text-muted">${L("Không còn ai.", "No one left.")}</li>`}</ul>`;
   }
   if (p.id === "add") {
     const { d, per } = p;
@@ -1310,15 +1413,11 @@ function dialogContent() {
     // nhóm và thứ tự như trên lịch, có chú giải. Giờ chỉ ghi khi khác giờ ca gốc.
     const e = ui.exp, base = ui.weekOff < 0 ? 5 : 12, days = e.scope === "week" ? [0, 1, 2, 3, 4, 5, 6] : [e.day];
     const title = e.scope === "week" ? L(`Lịch tuần ${base}–${base + 6}/10/2026`, `Schedule ${base}–${base + 6} Oct 2026`) : `${L(WEEK[e.day].viL, WEEK[e.day].enL)} ${base + e.day}/10/2026`;
-    const people = (d, p) => STAFF.filter((s) => asgAt(s, d, p)?.pos.length).sort((a, b) => CAT[asgAt(a, d, p).pos[0]] - CAT[asgAt(b, d, p).pos[0]] || a.nick.localeCompare(b.nick, "vi"));
-    const chip = (s, d, p) => { const a = asgAt(s, d, p), n = pn(a.pos[0]), mk = marksOf(a); return `<span class="inline-flex h-5 max-w-[100%] items-center gap-1 rounded-full border px-1.5 text-[11px] font-medium whitespace-nowrap border-p${n}-bd bg-p${n}-bg text-p${n}-tx"><span class="truncate">${esc(s.nick)}</span>${mk ? `<span class="shrink-0 font-semibold">${mk}</span>` : ""}${a.t ? `<span class="shrink-0 font-normal tabular-nums">${a.t.from}–${a.t.to}</span>` : ""}</span>`; };
-    const grid = `<div class="grid ${days.length > 1 ? "min-w-[760px]" : ""}" style="grid-template-columns:52px repeat(${days.length},minmax(0,1fr))"><div></div>${days.map((d) => `<div class="border-l border-zinc-200 px-1.5 pb-1.5 text-xs font-semibold">${dayShort(d)} ${base + d}/10</div>`).join("")}
-      ${PERIODS.map((p) => `<div class="border-t border-zinc-200 px-1 py-1.5 text-[11px] font-semibold">${p.code}<span class="block font-normal tabular-nums text-zinc-500">${pTime(p.i)}</span></div>${days.map((d) => `<div class="flex min-w-0 flex-wrap content-start gap-1 border-t border-l border-zinc-200 p-1.5">${people(d, p.i).map((s) => chip(s, d, p.i)).join("")}</div>`).join("")}`).join("")}</div>`;
-    const legend = `<div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-zinc-200 pt-2.5 text-[11px]">${POSITIONS.map((x) => `<span class="inline-flex items-center gap-1.5">${posDot(x.id, "size-2.5")}<span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-zinc-500">${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-zinc-800">${mk}</b> ${L(vi, en)}`).join(" · ")}</span>` : ""}</span>`).join("")}</div>`;
+    const sheet = weekSheet({ src: W(), base, days, notes: (d) => published() ? noteText(d) : "" });
     return `<div class="flex items-start gap-2 px-6 pt-5 pb-2"><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Xuất lịch", "Export the schedule")}</h2><p class="mt-1 text-sm text-pretty text-muted">${L("Gửi cho các bạn phụ trách qua Zalo. Chỉ tuần đã công bố, không có ca nháp. Mỗi lần xuất được ghi vào Nhật ký.", "To send to the shift leads on Zalo. Published weeks only, no draft shifts. Each export is written to the activity log.")}</p></div>${iconBtn("x", L("Đóng", "Close"), `onclick="ui.dialog=null;render()"`, "size-9")}</div>
       <div class="flex flex-wrap items-center gap-3 px-6 pt-2">${segmented([["week", L("Cả tuần", "Whole week")], ["day", L("Một ngày", "One day")]], e.scope, "setExpScope", L("Phạm vi", "Scope"))}${segmented([["img", L("Ảnh PNG", "PNG image")], ["pdf", "PDF"]], e.fmt, "setExpFmt", L("Định dạng", "Format"))}</div>
       ${e.scope === "day" ? `<div class="px-5 pt-3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${base + i}`]), e.day, "setExpDay", L("Ngày", "Day"))}</div>` : ""}
-      <div class="px-6 pt-4"><p class="mb-1.5 text-xs font-medium text-muted">${L("Xem trước", "Preview")}</p><div class="max-h-[52vh] overflow-auto rounded-xl border border-border-strong bg-white p-3 text-zinc-900"><p class="mb-2 text-sm font-semibold">Watchtower · ${title}</p>${grid}${legend}</div></div>
+      <div class="px-6 pt-4"><p class="mb-1.5 text-xs font-medium text-muted">${L("Xem trước", "Preview")}</p><div class="max-h-[52vh] overflow-auto rounded-xl border border-border-strong bg-white p-3 text-zinc-900"><p class="mb-2 text-sm font-semibold">Watchtower · ${title}</p>${sheet}</div></div>
       <div class="mt-5 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", e.fmt === "pdf" ? L("Tải PDF", "Download PDF") : L("Tải ảnh", "Download image"), { icon: "download", attrs: `onclick="${SANDBOX ? "sbExport()" : "ui.dialog=null;render()"}"`, extra: "min-h-11 md:min-h-10" })}</div>`;
   }
   if (dl.id === "removeDay") {
@@ -1360,7 +1459,7 @@ function dialogContent() {
         <div class="mx-6 mt-4 flex gap-3 rounded-xl border border-warn-bg bg-warn-bg p-3">${ic("triangle-alert", "mt-0.5 size-4 text-warn")}<p class="text-sm"><span class="font-medium text-warn">${L("Về sớm 90 phút, cần người làm thay", "Leaving 90 min early needs cover")}</span></p></div>
         <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Người làm thay 09:30–" + to, "Cover 09:30–" + to)} <span class="text-err-text">*</span></label>${selectBtn("", `<span class="font-normal text-muted">${L("Chọn người rảnh giờ này", "Choose someone free then")}</span>`, "", "w-full justify-between")}</div>
         <label class="mx-6 mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border-strong p-3">${cb({ small: false, checked: !!ui.agreedDemo, attrs: `onchange="ui.agreedDemo=!ui.agreedDemo;render()"` })}<span class="min-w-0"><span class="block text-sm font-medium">${L("Vào trễ đã thống nhất", "Agreed late arrival")}</span><span class="mt-0.5 block text-xs text-pretty text-muted">${L("Đánh dấu khi dời giờ vào trễ hơn vì đã đồng ý trong ngày (FR-O24). Ca này không có 10 phút ân hạn: trễ từ phút 1 là tính trễ và trừ gấp đôi. Giờ làm tính từ giờ vào mới.", "Tick when the start moves later because you agreed it on the day (FR-O24). No 10-minute grace: late and 2× deduction from minute 1. Hours count from the new start.")}</span></span></label>`
-      : `<div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Đổi với", "Swap with")}</label>${selectBtn("", "Lê Minh Anh · T5 15/10 · 07:00–13:00", "", "w-full justify-between")}<p class="text-xs text-muted">${L("Hai ca đổi người cho nhau trong một lần lưu.", "Both shifts change hands in one save.")}</p></div>`}
+      : `<div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Đổi với", "Swap with")}</label>${selectBtn("", "Hữu Thạnh · T5 15/10 · 07:00–13:00", "", "w-full justify-between")}<p class="text-xs text-muted">${L("Hai ca đổi người cho nhau trong một lần lưu.", "Both shifts change hands in one save.")}</p></div>`}
       <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Lý do", "Reason")} <span class="text-err-text">*</span></label><input class="${INPUT}" placeholder="${L("VD: việc gia đình, đã báo qua Zalo", "e.g. family matter, agreed on Zalo")}" /></div>
       <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Lưu", "Save"), { extra: "min-h-11 md:min-h-10" })}</div>`;
   }
@@ -1370,7 +1469,7 @@ function renderLayer() {
   const layer = document.getElementById("wt-layer");
   let html = "";
   if (ui.pop) {
-    const w = { account: 256, filters: 320, stafflist: 320, legend: 400, rules: 340, add: 300, skip: 240, datepick: 300, onote: 340, dnote: 340 }[ui.pop.id] || 280;
+    const w = { account: 256, filters: 320, stafflist: 320, legend: 400, rules: 340, add: 300, skip: 240, datepick: 300, onote: 340, dnote: 340, fold: 300 }[ui.pop.id] || 280;
     const r = ui.pop.rect; let left = ui.pop.alignRight ? r.right - w : r.left; left = Math.max(8, Math.min(left, innerWidth - w - 8));
     const inner = ui.pop.id === "skip" ? `<div class="p-1">${[L("Nghỉ phép", "On vacation"), L("Đăng ký quá ít ca", "Registered too few shifts"), L("Đã đủ người", "Enough staff already")].map((t) => `<button type="button" onclick="skipStaff('${ui.pop.sid}','${esc(t)}')" class="flex h-10 w-full cursor-pointer items-center rounded-xl px-3 text-left text-sm outline-hidden hover:bg-item-hover">${t}</button>`).join("")}</div>` : popContent();
     html += `<div class="fixed inset-0 z-[55]" onclick="closePop()"></div><div data-pop class="wt-fade fixed z-[60] max-h-[calc(100vh-1rem)] overflow-y-auto rounded-2xl border border-border bg-surface-overlay py-1 shadow-popover" style="top:${Math.min(r.bottom + 8, innerHeight - 120)}px;left:${left}px;width:${w}px">${inner}</div>`;
@@ -1584,13 +1683,12 @@ function masterToggle() { const inR = ACTIVE.filter((s) => inRange(s, visibleDay
 function invertSel() { ui.sel = new Set(ACTIVE.filter((s) => !ui.sel.has(s.id)).map((s) => s.id)); render(); }
 function optToggle(gi, oi) { const set = FG[gi].opts[oi][2]; const all = set.every((s) => ui.sel.has(s.id)); for (const s of set) all ? ui.sel.delete(s.id) : ui.sel.add(s.id); render(); }
 function optOnly(gi, oi) { ui.sel = new Set(FG[gi].opts[oi][2].map((s) => s.id)); render(); }
-// Đổi sang Ngày / 3 ngày khi đang mở panel: lấy ngày của panel làm gốc; 3 ngày giữ trong tuần (góp ý 10/11, mục 9)
+// Đổi sang Ngày khi đang mở panel: lấy ngày của panel làm gốc (góp ý 10/11, mục 9). Bỏ view 3 ngày (góp ý 12/11, mục 7).
 function setView(v) {
   const anchor = ui.panel && v !== "week" ? ui.panel.d : null;
   ui.view = v;
   if (v === "week") ui.start = 0;
-  else if (anchor != null) ui.start = v === "day" ? anchor : Math.max(0, Math.min(4, anchor - 1));
-  else if (v === "3d") ui.start = Math.min(ui.start, 4);
+  else if (anchor != null) ui.start = anchor;
   if (ui.panel && !visibleDays().includes(ui.panel.d)) ui.panel = null;
   render();
 }
@@ -1689,7 +1787,7 @@ function renderKeepFocus(el) { const id = el.dataset.focusId; const pos = el.sel
 // ===================================================================
 // Render
 // ===================================================================
-const SCREEN_FN = { lich: screenLich, tre: screenTre, ranh: screenRanh, ca: screenCa, nv: screenNv, nk: screenNk, dn: screenDn };
+const SCREEN_FN = { lich: screenLich, tre: screenTre, ranh: screenRanh, ca: screenCa, quan: screenQuan, nv: screenNv, nk: screenNk, dn: screenDn };
 function render() {
   const main = document.getElementById("wf-design");
   if (S.kho === "mobile" && !FRAME) {

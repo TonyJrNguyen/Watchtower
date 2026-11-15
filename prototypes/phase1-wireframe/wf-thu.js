@@ -8,7 +8,8 @@
 // File nạp sau wf-data.js, trước wf-app.js: thay dữ liệu mẫu bằng dữ liệu đã lưu trước khi wf-app.js dựng màn.
 // Các hàm gọi lúc chạy (sau khi trang nạp xong) dùng được mọi thứ của wf-app.js.
 
-const SB_KEY = "watchtower-wf-thu-v1";
+// v2 từ 16/11: đổi sang nhân viên thật của khách, nên dữ liệu dùng thử cũ (tên giả) không được nạp lại
+const SB_KEY = "watchtower-wf-thu-v2";
 // tt nằm ở vị trí thứ 9 của #hash (TOKEN_KEYS trong wf-app.js); không có hash thì đọc ?tt=
 const SANDBOX = (() => { const h = location.hash.slice(1); return ((/^[A-Za-z0-9._~-]+$/.test(h) && h.split(".")[8]) || new URLSearchParams(location.search).get("tt")) === "thu"; })();
 

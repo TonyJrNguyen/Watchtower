@@ -51,8 +51,11 @@ for access control.
   (NFR-11)
 - Money is always VND, with no fractional units
 - Read access must be enforced **server-side**, not just hidden in the UI
-  (NFR-2). Staff must not see another person's schedule or pay, even by
-  calling the API directly
+  (NFR-2). Staff must not see another person's pay, availability, lateness
+  or draft schedule, even by calling the API directly. The only exceptions
+  are the ones NFR-2 lists: the published shop schedule while the Owner has
+  it on (FR-S24), the published schedule note (FR-O54) and, in Phase 2, the
+  Shift Lead roster (FR-L1)
 - Every Create/Update/Delete must write an audit log entry: actor, timestamp,
   old/new values, reason if given (NFR-1). Because the system has no approval
   workflow, this log is the only evidence of why a change happened
