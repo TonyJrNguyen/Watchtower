@@ -45,18 +45,20 @@
         --neutral-bg: #f4f4f5; --neutral: #52525c;
         /* Sao vàng: đăng ký đủ mọi ca trong tuần. Viền đỏ phát sáng: ngày đăng ký thiếu giờ. */
         --star: #eab308; --glow: #ef4444;
+        /* Góp ý 12/11: chấm cảnh báo màu nóng (mục 4); tô ô của người đang chọn: đã xếp nóng, đã đăng ký lạnh (mục 1) */
+        --warn-hot: #e8481c; --hl-hot: #f97316; --hl-cold: #0ea5e9;
         --danger: #c70036; --danger-bg: rgb(255 32 86 / 0.1); --danger-bg-hover: rgb(255 32 86 / 0.15);
 
-        /* Màu VỊ TRÍ (PRD v1.11, khách đặt 18/10): tô đặc như ô trong bảng tính của quán, theo thứ tự danh mục.
+        /* Màu VỊ TRÍ (PRD v1.13, khách đổi 10/11): tô đặc như ô trong bảng tính của quán, theo thứ tự danh mục.
            Chữ trắng trên Phụ trách và Bếp, chữ tối trên các màu còn lại. Vì có xanh lá, vàng, cam, đỏ nên trạng thái
-           không bao giờ phân biệt chỉ bằng màu: dùng dấu tích, huy hiệu "!", gạch ngang tên, nhãn (FR-O42). */
-        --p1-bg: #000000; --p1-bd: #000000; --p1-tx: #ffffff; --p1-dot: #000000; /* Phụ trách */
-        --p2-bg: #ff6d01; --p2-bd: #ff6d01; --p2-tx: #1a1a1a; --p2-dot: #ff6d01; /* Thu Ngân – Offline */
-        --p3-bg: #46bdc6; --p3-bd: #46bdc6; --p3-tx: #1a1a1a; --p3-dot: #46bdc6; /* Thu Ngân – Online */
-        --p4-bg: #ff00a0; --p4-bd: #ff00a0; --p4-tx: #1a1a1a; --p4-dot: #ff00a0; /* Kiểm tra đơn */
-        --p5-bg: #34a853; --p5-bd: #34a853; --p5-tx: #1a1a1a; --p5-dot: #34a853; /* Pha chế */
+           không bao giờ phân biệt chỉ bằng màu: dùng dấu tích, viền nét đứt, gạch sóng dưới tên, gạch ngang tên, nhãn (FR-O42). */
+        --p1-bg: #666666; --p1-bd: #666666; --p1-tx: #ffffff; --p1-dot: #666666; /* Phụ trách */
+        --p2-bg: #ff9749; --p2-bd: #ff9749; --p2-tx: #1a1a1a; --p2-dot: #ff9749; /* Thu Ngân – Offline */
+        --p3-bg: #55c0c9; --p3-bd: #55c0c9; --p3-tx: #1a1a1a; --p3-dot: #55c0c9; /* Thu Ngân – Online */
+        --p4-bg: #f57bc8; --p4-bd: #f57bc8; --p4-tx: #1a1a1a; --p4-dot: #f57bc8; /* Kiểm tra đơn */
+        --p5-bg: #56be72; --p5-bd: #56be72; --p5-tx: #1a1a1a; --p5-dot: #56be72; /* Pha chế */
         --p6-bg: #fbbc04; --p6-bd: #fbbc04; --p6-tx: #1a1a1a; --p6-dot: #fbbc04; /* Phục vụ */
-        --p7-bg: #cc0100; --p7-bd: #cc0100; --p7-tx: #ffffff; --p7-dot: #cc0100; /* Bếp */
+        --p7-bg: #df564a; --p7-bd: #df564a; --p7-tx: #ffffff; --p7-dot: #df564a; /* Bếp */
 
         --radius: 0.75rem;
       }
@@ -72,6 +74,7 @@
         --ok-bg: #f4f4f5; --ok: #52525c; --warn-bg: #f4f4f5; --warn: #3f3f46; --warn-dot: #71717a;
         --err-bg: #f4f4f5; --err: #3f3f46; --err-text: #3f3f46; --err-dot: #52525b;
         --star: #71717a; --glow: #52525b;
+        --warn-hot: #3f3f46; --hl-hot: #52525b; --hl-cold: #a1a1aa;
         --danger: #3f3f46; --danger-bg: rgb(0 0 0 / 0.05); --danger-bg-hover: rgb(0 0 0 / 0.11);
         --p1-bg: #f1f1f2; --p1-bd: #d4d4d8; --p1-tx: #3f3f46; --p1-dot: #a1a1aa;
         --p2-bg: #f1f1f2; --p2-bd: #d4d4d8; --p2-tx: #3f3f46; --p2-dot: #a1a1aa;
@@ -103,6 +106,10 @@
       .wt-sheet { transition: translate 500ms cubic-bezier(0.32, 0.72, 0, 1); }
       .wt-fade { animation: wt-fade 150ms ease-out; }
       .wt-glow { border-color: var(--glow); box-shadow: 0 0 0 1px var(--glow), 0 0 16px 2px color-mix(in srgb, var(--glow) 30%, transparent); }
+      .wt-hl-hot { background: color-mix(in srgb, var(--hl-hot) 13%, var(--surface)); }
+      .wt-hl-cold { background: color-mix(in srgb, var(--hl-cold) 13%, var(--surface)); }
+      .wt-rich ul { list-style: disc; padding-left: 1.4rem; } .wt-rich ol { list-style: decimal; padding-left: 1.4rem; }
+      .wt-rich:empty::before { content: attr(data-placeholder); color: var(--muted); }
       @keyframes wt-fade { from { opacity: 0; transform: translateY(-4px); } }
       @media (prefers-reduced-motion: reduce) { .wt-sheet, .wt-fade { transition: none; animation: none; } }
     </style>
@@ -243,8 +250,8 @@
     <div id="wt-tip" role="tooltip" class="pointer-events-none fixed z-[70] hidden max-w-64 rounded-xl border border-border bg-surface-overlay px-3 py-2 text-xs shadow-popover"></div>
 
     <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-    <script src="wf-data.js?v=20261104-1"></script>
-    <script src="wf-thu.js?v=20261104-1"></script>
-    <script src="wf-app.js?v=20261104-1"></script>
+    <script src="wf-data.js?v=20261112-1"></script>
+    <script src="wf-thu.js?v=20261112-1"></script>
+    <script src="wf-app.js?v=20261116-6"></script>
   </body>
 </html>

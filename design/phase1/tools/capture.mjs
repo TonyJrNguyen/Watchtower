@@ -27,6 +27,7 @@ const SCREENS = {
   lich: { dir: "calendar", v: "b", vi: "Lịch tuần", en: "Schedule" },
   tre: { dir: "lateness", v: "a", vi: "Đi trễ", en: "Lateness" },
   ranh: { dir: "availability", v: "a", vi: "Lịch rảnh", en: "Availability" },
+  quan: { dir: "shop-schedule", v: "a", vi: "Lịch quán", en: "Shop schedule" },
   ca: { dir: "my-profile", v: "a", vi: "Hồ sơ của tôi", en: "My profile" },
   nv: { dir: "staff", v: "a", vi: "Nhân viên", en: "Staff" },
   nk: { dir: "activity-log", v: "a", vi: "Nhật ký", en: "Activity log" },
@@ -35,7 +36,7 @@ const SCREENS = {
 const STATES = {
   "du-lieu": "data", "chua-vi-tri": "no-positions", "mo-dk": "registration-open", "cong-bo": "published",
   "dang-tai": "loading", rong: "empty", loi: "error", "tuan-truoc": "previous-week", nhap: "unsaved-draft",
-  "chua-dk": "nothing-selected", khoa: "locked", "khoa-quen": "locked-not-saved", "chua-cong-bo": "not-published",
+  "chua-dk": "nothing-selected", khoa: "locked", "khoa-quen": "locked-not-saved", "chua-cong-bo": "not-published", tat: "turned-off",
 };
 const STATE_LABELS = {
   "du-lieu": ["Có dữ liệu", "With data"], "chua-vi-tri": ["Đã xếp ca, chưa giao vị trí", "Placed, no positions yet"],
@@ -43,11 +44,13 @@ const STATE_LABELS = {
   rong: ["Rỗng", "Empty"], loi: ["Lỗi", "Error"], "tuan-truoc": ["Tuần trước (chỉ xem)", "Previous week (view only)"],
   nhap: ["Có nháp chưa lưu", "Unsaved draft"], "chua-dk": ["Chưa chọn ca nào", "Nothing selected"], khoa: ["Đã khoá", "Locked"],
   "khoa-quen": ["Đã khoá, quên bấm Lưu", "Locked, not saved"], "chua-cong-bo": ["Chưa công bố", "Not published"],
+  tat: ["Chủ quán tắt Lịch quán", "Turned off by the owner"],
 };
 const STATE_LIST = {
   lich: ["du-lieu", "chua-vi-tri", "mo-dk", "cong-bo", "dang-tai", "rong", "loi"],
   tre: ["du-lieu", "tuan-truoc", "dang-tai", "rong", "loi"],
   ranh: ["du-lieu", "nhap", "chua-dk", "khoa", "khoa-quen", "dang-tai", "loi"],
+  quan: ["du-lieu", "chua-cong-bo", "tat", "dang-tai", "loi"],
   ca: ["du-lieu", "chua-cong-bo", "dang-tai", "rong", "loi"],
   nv: ["du-lieu", "dang-tai", "rong", "loi"],
   nk: ["du-lieu", "dang-tai", "rong", "loi"],
@@ -67,14 +70,17 @@ const OVERLAYS = [
   { man: "lich", file: "data-date-picker", vi: "Chọn tuần theo ngày", en: "Date picker", only: "desktop", steps: [openPanel, visibleClick(`[onclick^="openPop(event,'datepick'"]`)] },
   { man: "lich", file: "data-publish-dialog", vi: "Hộp Công bố", en: "Publish dialog", steps: [openPanel, "openDialog('publish')"] },
   { man: "lich", file: "data-remove-day-dialog", vi: "Hộp Bỏ khỏi mọi ca trong ngày", en: "Take off every shift dialog", steps: [openPanel, "ui.panel.sel = new Set(); openDialog('removeDay')"] },
+  { man: "lich", file: "data-leave-panel-dialog", vi: "Hộp Lưu thay đổi khi rời panel", en: "Unsaved panel changes dialog", steps: [openPanel, "togglePeriod(4); closePanel()"] },
   { man: "lich", tt: "cong-bo", file: "published-edit-shift-dialog", vi: "Hộp Sửa ca (đã công bố)", en: "Edit shift dialog (published)", steps: [openPanel, "openDialog('shift')"] },
   { man: "lich", tt: "cong-bo", file: "published-export-dialog", vi: "Hộp Xuất lịch", en: "Export dialog", steps: [openPanel, "openDialog('export')"] },
+  { man: "lich", file: "data-schedule-note", vi: "Ghi chú xếp lịch của ngày", en: "Schedule note for a day", only: "desktop", steps: [openPanel, visibleClick(`[onclick^="openPop(event,'dnote',1"]`)] },
+  { man: "lich", file: "data-owner-note", vi: "Ghi chú riêng của tuần (mở rộng)", en: "Owner’s note for the week (open, full width)", steps: [openPanel, "toggleOnote()"] },
+  { man: "lich", file: "data-folded-list", vi: "Danh sách +N: có đăng ký, đã xếp ca khác", en: "+N list: registered, placed elsewhere", only: "desktop", steps: [visibleClick(`[onclick^="openPop(event,'fold'"]`)] },
   { man: "lich", file: "data-panel-sheet", vi: "Panel người (điện thoại)", en: "Person panel (phone)", only: "mobile", steps: [openPanel] },
   { man: "lich", file: "data-staff-sheet", vi: "Danh sách nhân viên (điện thoại)", en: "Staff list (phone)", only: "mobile", steps: ["ui.sheet = 'staff'; render()"] },
   { man: "tre", file: "data-anomaly-dialog", vi: "Hộp Ca bất thường", en: "Anomaly dialog", steps: [visibleClick(`[onclick*="openDialog('anomaly'"]`)] },
   { man: "ranh", file: "data-custom-times", vi: "Sửa giờ riêng", en: "Custom times editor", steps: ["toggleCustom(WEEK.findIndex((_, d) => ui.custom[d]))"] },
   { man: "nv", file: "data-edit-drawer", vi: "Sửa nhân viên", en: "Edit staff member", steps: ["ui.staffEdit = 's1'; render()"] },
-  { man: "nv", file: "data-edit-drawer-limit", vi: "Sửa nhân viên: chọn vị trí thứ ba", en: "Edit staff member: a third usual position", steps: ["ui.staffEdit = 's12'; render(); toggleStaffPos('pc')"] },
 ];
 
 const pages = [];
@@ -160,7 +166,7 @@ await browser.close();
 writeFileSync(join(root, "tools", "pages.json"), JSON.stringify({ screens: SCREENS, pages: manifest }, null, 2) + "\n");
 
 // index.html: every page, grouped by screen
-const ROLE = { lich: "Owner", tre: "Owner", nv: "Owner", nk: "Owner", ranh: "Staff", ca: "Staff", dn: "Everyone" };
+const ROLE = { lich: "Owner", tre: "Owner", nv: "Owner", nk: "Owner", ranh: "Staff", quan: "Staff", ca: "Staff", dn: "Everyone" };
 const chev = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4 shrink-0 text-muted" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>`;
 const tag = (t) => `<span class="inline-flex h-6 shrink-0 items-center rounded-full bg-neutral-bg px-2.5 text-xs font-medium text-neutral">${t}</span>`;
 const row = (x) => `<li><a href="${x.file}" class="flex min-h-12 items-center gap-3 px-4 py-2.5 outline-hidden hover:bg-surface-hover focus-visible:bg-surface-hover">

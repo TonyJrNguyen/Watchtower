@@ -179,7 +179,7 @@ Phần còn lại:
 
 | Tuần | Công việc |
 |---|---|
-| 1 | Quý khách xác nhận **tám quy tắc đề xuất** phát sinh khi làm bản mẫu (xem mục 10) và cách hiển thị lương tạm tính |
+| 1 | Quý khách xác nhận **tám quy tắc đề xuất** phát sinh khi làm bản mẫu (xem mục 11) và cách hiển thị lương tạm tính |
 | 1–2 | Chọn công nghệ, chuẩn bị hạ tầng, môi trường phát triển, cơ chế sao lưu và diễn tập phục hồi dữ liệu |
 | 2 | Hợp đồng và phạm vi Giai đoạn 1, thời gian phản hồi hỗ trợ |
 
@@ -374,7 +374,30 @@ Sau thời gian bảo hành, việc hỗ trợ được thực hiện theo hợp
 
 ---
 
-## 9. NGOÀI PHẠM VI
+## 9. SỞ HỮU TRÍ TUỆ, MÃ NGUỒN VÀ DỮ LIỆU
+
+> **Bản nháp ngày 08/11/2026, đang chờ luật sư xem xét.** Chưa thống nhất với Quý khách; câu chữ chính thức sẽ ghi trong hợp đồng.
+
+**9.1 Quyền sở hữu.** Chúng tôi giữ quyền sở hữu mã nguồn, thiết kế, tài liệu kỹ thuật của hệ thống và các thành phần dùng lại được bên trong, kể cả những thành phần chúng tôi đã làm trước hoặc ngoài dự án này. Việc thanh toán chi phí xây dựng không chuyển giao quyền sở hữu này.
+
+**9.2 Quyền sử dụng của Quý khách.** Khi thanh toán đủ từng giai đoạn, Quý khách có **quyền sử dụng vĩnh viễn, không độc quyền** đối với những gì giai đoạn đó bàn giao, để vận hành chính doanh nghiệp của mình:
+- không giới hạn số người dùng, số tài khoản nhân viên hay số thiết bị, và không có phí bản quyền hằng năm;
+- quyền sử dụng vẫn còn nếu Quý khách ngừng hợp đồng bảo trì, miễn là hệ thống tiếp tục chạy trên hạ tầng do Quý khách hoặc chúng tôi cung cấp;
+- Quý khách không bán lại hệ thống, không cấp quyền sử dụng cho bên khác, và không cung cấp hệ thống cho doanh nghiệp khác.
+
+**9.3 Dữ liệu của Quý khách.** Mọi dữ liệu nhập vào hệ thống — hồ sơ nhân viên, đăng ký ca, lịch làm, mức lương, ghi nhận đi trễ và nhật ký thao tác — thuộc về Quý khách, bất kể ai sở hữu mã nguồn. Chúng tôi chỉ dùng dữ liệu này để vận hành và hỗ trợ hệ thống, và dữ liệu được lưu trên máy chủ đặt tại Việt Nam. Bất cứ lúc nào, kể cả khi hợp đồng kết thúc, Quý khách có thể yêu cầu xuất toàn bộ dữ liệu ở định dạng thông dụng (CSV hoặc Excel), bàn giao trong vòng 10 ngày làm việc.
+
+**9.4 Bàn giao mã nguồn.** Chúng tôi bàn giao mã nguồn cho Quý khách nếu:
+- (a) chúng tôi ngừng cung cấp dịch vụ bảo trì cho hệ thống, hoặc ngừng hoạt động; hoặc
+- (b) chúng tôi không thực hiện việc bảo trì đã thỏa thuận tại mục 6.2 và không khắc phục trong vòng 30 ngày kể từ khi nhận thông báo bằng văn bản của Quý khách.
+
+Nội dung bàn giao gồm mã nguồn ở phiên bản mới nhất đang chạy, hướng dẫn biên dịch và triển khai, cấu trúc cơ sở dữ liệu và các script chuyển đổi dữ liệu, trong vòng 15 ngày làm việc kể từ khi phát sinh điều kiện trên. Từ đó Quý khách, hoặc một đơn vị do Quý khách chọn, được quyền sửa đổi và bảo trì mã nguồn để tiếp tục vận hành doanh nghiệp của mình. Các giới hạn về bán lại ở mục 9.2 vẫn áp dụng, và chúng tôi vẫn giữ quyền sở hữu.
+
+**9.5 Thành phần của bên thứ ba.** Hệ thống dùng các thành phần mã nguồn mở có giấy phép dễ dãi (ví dụ MIT, BSD, Apache-2.0), cho phép dùng thương mại mà không phải công khai mã nguồn của chúng tôi. Mỗi thành phần giữ giấy phép riêng của nó. Hợp đồng có phụ lục liệt kê các thành phần này.
+
+---
+
+## 10. NGOÀI PHẠM VI
 
 Những nội dung sau **không** nằm trong dự án. Chúng tôi liệt kê rõ để tránh hiểu nhầm về sau:
 
@@ -391,7 +414,7 @@ Những nội dung sau **không** nằm trong dự án. Chúng tôi liệt kê r
 
 ---
 
-## 10. TRÁCH NHIỆM CỦA QUÝ KHÁCH
+## 11. TRÁCH NHIỆM CỦA QUÝ KHÁCH
 
 Để dự án đúng tiến độ, chúng tôi cần Quý khách:
 
@@ -410,7 +433,7 @@ Chậm trễ ở các mục trên sẽ kéo dài tiến độ tương ứng.
 
 ---
 
-## 11. RỦI RO VÀ GIẢ ĐỊNH
+## 12. RỦI RO VÀ GIẢ ĐỊNH
 
 Chúng tôi nêu thẳng những điểm chưa chắc chắn, thay vì để Quý khách phát hiện ở giữa dự án.
 
@@ -428,7 +451,7 @@ Chúng tôi nêu thẳng những điểm chưa chắc chắn, thay vì để Qu�
 
 ---
 
-## 12. BƯỚC TIẾP THEO
+## 13. BƯỚC TIẾP THEO
 
 | # | Việc cần làm | Ai thực hiện |
 |---|---|---|

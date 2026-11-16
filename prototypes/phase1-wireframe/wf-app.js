@@ -17,6 +17,7 @@ const SCREENS = {
   tre: { vi: "Đi trễ", role: "owner", options: ["a", "b"], rec: "a", states: ["du-lieu", "tuan-truoc", "dang-tai", "rong", "loi", "thu"] },
   ranh: { vi: "Lịch rảnh", role: "staff", options: ["a", "b"], rec: "a", states: ["du-lieu", "nhap", "chua-dk", "khoa", "khoa-quen", "dang-tai", "loi", "thu"] },
   ca: { vi: "Hồ sơ của tôi", role: "staff", options: ["a"], rec: "a", states: ["du-lieu", "chua-cong-bo", "dang-tai", "rong", "loi", "thu"] },
+  quan: { vi: "Lịch quán", role: "staff", options: ["a"], rec: "a", states: ["du-lieu", "chua-cong-bo", "tat", "dang-tai", "loi", "thu"] },
   nv: { vi: "Nhân viên", role: "owner", options: ["a"], rec: "a", states: ["du-lieu", "dang-tai", "rong", "loi", "thu"] },
   nk: { vi: "Nhật ký", role: "owner", options: ["a"], rec: "a", states: ["du-lieu", "dang-tai", "rong", "loi", "thu"] },
   dn: { vi: "Đăng nhập", role: "none", options: ["a"], rec: "a", states: ["du-lieu", "loi", "thu"] },
@@ -24,7 +25,7 @@ const SCREENS = {
 const STATE_LABEL = {
   "du-lieu": "Có dữ liệu", "mo-dk": "Đăng ký đang mở", "cong-bo": "Đã công bố", "dang-tai": "Đang tải", rong: "Rỗng", loi: "Lỗi",
   "tuan-truoc": "Tuần trước (chỉ xem)", "chua-dk": "Chưa chọn ca nào", khoa: "Đã khoá", "chua-cong-bo": "Chưa công bố",
-  "chua-vi-tri": "Đã xếp ca, chưa giao vị trí", nhap: "Có nháp chưa lưu", "khoa-quen": "Đã khoá, quên bấm Lưu",
+  "chua-vi-tri": "Đã xếp ca, chưa giao vị trí", tat: "Chủ quán tắt Lịch quán", nhap: "Có nháp chưa lưu", "khoa-quen": "Đã khoá, quên bấm Lưu",
   // wf-thu.js: chỉ có dữ liệu nhân viên, khách tự đi hết một vòng; giữ qua các màn
   thu: "Trải nghiệm từ đầu (chỉ có nhân viên)",
 };
@@ -64,12 +65,13 @@ const INPUT = "h-11 w-full rounded-xl border border-border-strong bg-surface px-
 const TONE = { ok: "bg-ok-bg text-ok", warn: "bg-warn-bg text-warn", err: "bg-err-bg text-err", neutral: "bg-neutral-bg text-neutral" };
 const badge = (tone, text, icon) =>
   `<span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ring-black/5 ${TONE[tone]}">${icon ? ic(icon, "size-3.5") : '<span class="size-1.5 rounded-full bg-current"></span>'}${text}</span>`;
+// Ô chọn là một nút (role="checkbox") vẽ theo dữ liệu của trang, không dùng <input type="checkbox">. Bấm cả hàng vẫn được vì
+// label chuyển cú bấm sang nút. attrs vẫn viết onchange như trước, ở đây đổi thành onclick; mọi handler là "đảo trạng thái".
+// (12/11/2026: checkbox mất trên link artifact là do trình chặn quảng cáo của trình duyệt ẩn đi, không phải lỗi trang.)
 function cb({ checked = false, indet = false, disabled = false, attrs = "", small = true } = {}) {
-  const size = small ? "size-4 rounded" : "size-5 rounded-md";
-  return `<span class="relative inline-flex shrink-0"><input type="checkbox" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""} ${indet ? 'data-indet="1"' : ""} ${attrs}
-    class="peer ${size} cursor-pointer appearance-none border-[1.5px] border-border-strong bg-surface outline-hidden transition-colors not-checked:not-indeterminate:hover:border-foreground checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:opacity-50" />
-    <i data-lucide="check" class="pointer-events-none absolute inset-0 m-auto ${small ? "size-3" : "size-3.5"} stroke-[3] text-primary-foreground opacity-0 peer-checked:opacity-100"></i>
-    <i data-lucide="minus" class="pointer-events-none absolute inset-0 m-auto ${small ? "size-3" : "size-3.5"} stroke-[3] text-primary-foreground opacity-0 peer-indeterminate:opacity-100"></i></span>`;
+  const px = small ? 16 : 20, icon = small ? "size-3" : "size-3.5", on = checked || indet;
+  return `<button type="button" role="checkbox" aria-checked="${indet ? "mixed" : checked}" ${disabled ? "disabled" : ""} ${attrs.replace(/onchange=/g, "onclick=")}
+    class="${cx("relative inline-flex shrink-0 cursor-pointer items-center justify-center border-[1.5px] p-0 outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-focus disabled:cursor-not-allowed disabled:opacity-50", small ? "rounded" : "rounded-md", on ? "border-primary bg-primary text-primary-foreground" : "border-foreground/30 bg-surface")}" style="width:${px}px;height:${px}px">${on ? `<i data-lucide="${checked ? "check" : "minus"}" class="pointer-events-none ${icon} stroke-[3]"></i>` : ""}</button>`;
 }
 const segmented = (items, current, onclick, label) =>
   `<div role="tablist" aria-label="${esc(label)}" class="inline-flex w-fit max-w-[100%] shrink-0 gap-1 rounded-xl bg-foreground/5 p-1 shadow-(--shadow-segment-track)">${items
@@ -106,8 +108,8 @@ const rateFor = (s, pid) => (isLead(pid) && s.lead ? s.lead : s.base);
 // PRD v1.10 (chờ khách ký): s.q là vị trí thường đảm nhiệm, tối đa hai (hệ thống tự học từ lịch đã công bố, chủ sửa tay được),
 // cộng "pt" khi bật công tắc Phụ trách. Cảnh báo và bộ lọc không đọc s.q mà đọc vị trí có kinh nghiệm: trên 50 giờ đã công bố
 // trong toàn bộ lịch sử, hoặc chủ tick tay (s.exp; dữ liệu mẫu không có thì lấy s.q). Phụ trách đi theo công tắc, không theo kinh nghiệm.
-const USUAL_MAX = 2;
-const expOf = (s) => s.exp || s.q.filter((x) => !isLead(x));
+// Kinh nghiệm = vị trí thường đảm nhiệm, không giới hạn số lượng (PRD v1.13, ADR 0029)
+const expOf = (s) => s.q.filter((x) => !isLead(x));
 const lacksExp = (s, pid) => !isLead(pid) && !expOf(s).includes(pid);
 const leadOff = (s, a) => a.pos.some(isLead) && !canLeadShift(s);
 const flagPos = (s, a) => a.pos.some((x) => lacksExp(s, x)) || leadOff(s, a);
@@ -122,7 +124,8 @@ const pTime = (p) => `${PERIODS[p].from.slice(0, 2)}–${PERIODS[p].to.slice(0, 
 // Thứ tự danh mục (PRD §3.3), dùng để nhóm chip theo vị trí trong ô (FR-O49)
 const CAT = Object.fromEntries(POSITIONS.map((p, i) => [p.id, i]));
 // Ký hiệu vị trí con trên chip (PRD §3.3): hai vị trí con hiện cả hai, "M·T"
-const marksOf = (a) => (a?.pos.length ? a.sub.map((x) => POS[a.pos[0]].subs.find((y) => y[0] === x)?.[3]).filter(Boolean).join("·") : "");
+// Ký hiệu theo thứ tự trong danh mục ("1·3"), không theo thứ tự bấm
+const marksOf = (a) => (a?.pos.length ? POS[a.pos[0]].subs.filter((y) => a.sub.includes(y[0])).map((y) => y[3]).join("·") : "");
 // Giờ lưu đăng ký (FR-S23): phút kể từ T5 00:00 → "T5 08:03"
 const regT = (m) => `${m < 1440 ? L("T5", "Thu") : L("T6", "Fri")} ${String(Math.floor((m % 1440) / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 const REG_RANK = Object.keys(REG_SAVE).sort((a, b) => REG_SAVE[a].first - REG_SAVE[b].first);
@@ -143,7 +146,7 @@ const ui = {
   rosterDay: 2, mDay: 2, sheet: null, posPick: [], subPick: [], skipped: new Map(),
   lateDay: 2, lateEdit: null, lateVal: "", staffEdit: null, drawer: false, shiftTab: "time",
   // Lịch tuần: undo/redo chỉ trong phiên (hist/fut), người thêm thủ công theo thứ tự thêm (manual), mục panel đang thu (secClosed)
-  hist: [], fut: [], manual: new Map(), seq: 0, secClosed: new Set(), saveAs: "reg", panelMsg: "", needCopied: false,
+  hist: [], fut: [], manual: new Map(), seq: 0, secClosed: new Set(["shifts", "pos", "reason"]) /* mặc định thu gọn cả ba mục (Tony 16/11) */, saveAs: "reg", panelMsg: "", panelReason: "", needCopied: false,
   // Giờ đăng ký trên chip (FR-S23, bật mặc định), hộp Xuất lịch (FR-O52), lọc nhật ký
   regTimes: true, exp: { scope: "week", day: 2, fmt: "img" }, hideDraft: false,
   // Lịch rảnh: bản nháp (ranh, custom, notes) và bản đã Lưu (…Saved). Chủ quán chỉ thấy bản đã Lưu.
@@ -162,6 +165,9 @@ if (S.tt === "cong-bo") {
   ui.skipped.set("s17", L("Đăng ký quá ít ca", "Registered too few shifts"));
 }
 // Số người cần theo ngày × ca × vị trí (FR-O1), sửa được ở mục Phân công; tổng hiện ở đầu ô lịch.
+// Phương án xếp chip đang xem (mục 12) và các ô "+N" đã mở; nhớ trong trình duyệt để khung mobile dùng chung
+// Chip đã gỡ khỏi +N bằng popup (góp ý 12/11 mục 5): chỉ hiện khi panel còn mở cho đúng người và ngày đó
+ui.reveal = null; ui.onoteOpen = false;
 const needFrom = (n) => { const o = Object.fromEntries(POSITIONS.map((p) => [p.id, 0])); NEED_FILL.slice(0, n).forEach((id) => o[id]++); return o; };
 ui.need = NEED.map((row) => row.map(needFrom));
 const PREV_NEED = NEED.map((row) => row.map((n, p) => needFrom(n + (p === 4 ? 1 : 0))));
@@ -208,6 +214,9 @@ const inRange = (s, days) => days.some((d) => PERIODS.some((p) => canWork(s, d, 
 const regHours = (s) => { const t = typeOf(s); if (t === "none") return { days: 7, h: null }; if (t === "all") return { days: 7, h: 7 * dayHours([0, 1, 2, 3, 4]) }; let days = 0, h = 0; for (let d = 0; d < 7; d++) { const r = W().reg[s.id][d]; if (r) { days++; h += dayHours(r, customAt(s, d)); } } return { days, h }; };
 const regDays8 = (s) => { if (typeOf(s) !== "some") return 7; let n = 0; for (let d = 0; d < 7; d++) { const r = W().reg[s.id][d]; if (r && !dayUnder(r, customAt(s, d))) n++; } return n; };
 const isShort = (s) => typeOf(s) === "some" && regDays8(s) < RULES.minDays;
+// Ngày đăng ký dưới mức tối thiểu theo luật FR-S3 (trọn CA 5 không tính), dù cả tuần đủ giờ: cảnh báo trên chip (góp ý 10/11, mục 14)
+const regList = (s, d) => PERIODS.filter((p) => regKind(s, d, p.i) === "reg").map((p) => p.i);
+const shortDay = (s, d) => typeOf(s) === "some" && dayUnder(regList(s, d), customAt(s, d));
 function runsOf(s, d, day = W().asg[s.id][d]) {
   const runs = [];
   for (let p = 0; p < 5; p++) {
@@ -315,6 +324,7 @@ const REASONS = {
       cons: ["Trên điện thoại mỗi ô chỉ khoảng 42px, dễ chạm nhầm", "Giờ ca nằm ở cột trái, xa ô đang chạm"], fit: "Nhân viên đăng ký trên máy tính.",
       tips: ["Ô to hơn", "Thêm giờ vào từng ô"] },
   },
+  quan: { a: { name: "A · Lịch cả quán như file xuất", rec: true, why: "Nhân viên thấy lịch đã công bố của cả quán để tự đổi ca cho nhau (góp ý 12/11, mục 3): cùng nội dung với file xuất lịch, thêm ghi chú xếp lịch của từng ngày. Chủ bật hay tắt được.", pros: ["Không còn phải chờ chủ dán ảnh lịch vào nhóm", "Luôn là bản mới nhất, kể cả khi chủ sửa sau khi công bố"], cons: ["Thêm một ngoại lệ của luật riêng tư NFR-2"], fit: "Quán hay đổi ca cho nhau.", tips: ["Chỉ hiện ngày có ca của mình"] } },
   ca: { a: { name: "A · Ca theo ngày", rec: true, why: "Một màn duy nhất bố cục mặc định: tuần này theo ngày, ca hôm nay đánh dấu, tổng giờ và lương ước tính trên cùng.", pros: ["Đọc trong năm giây"], cons: ["Không xem được tuần trước quá một tuần"], fit: "Nhân viên mở xem nhanh.", tips: ["Bỏ lương ước tính"] } },
   nv: { a: { name: "A · Bảng nhân viên + panel hồ sơ", rec: true, why: "Bố cục mặc định của bảng quản lý: tìm, bảng, bấm một dòng mở hồ sơ trượt từ phải.", pros: ["Mật khẩu là một ô trong hồ sơ (FR-A7)", "Lương cơ bản và lương phụ trách đặt theo từng người, thấy ngay trên bảng"], cons: ["Bảng rộng, dưới 1024px thành dòng"], fit: "Quản lý khoảng 40 tài khoản.", tips: ["Thêm cột biệt danh"] } },
   nk: { a: { name: "A · Bảng nhật ký", rec: true, why: "Bố cục mặc định: lọc theo người và loại việc, mỗi dòng ai, lúc nào, trước → sau, lý do.", pros: ["Trả lời được vì sao một ca đã đổi"], cons: ["Dòng dài, mobile thành thẻ"], fit: "Tra lại khi có thắc mắc.", tips: ["Nhóm theo ngày"] } },
@@ -338,8 +348,16 @@ function buildReason() {
 // Khung app
 // ===================================================================
 const OWNER_NAV = () => [["lich", "calendar-days", L("Lịch tuần", "Schedule")], ["tre", "alarm-clock", L("Đi trễ", "Lateness")], ["nv", "users", L("Nhân viên", "Staff")], ["nk", "history", L("Nhật ký", "Activity log")]];
-const STAFF_NAV = () => [["ranh", "calendar-check", L("Lịch rảnh", "Availability")], ["ca", "circle-user-round", L("Hồ sơ của tôi", "My profile")]];
-const ME = () => (SC.role === "owner" ? { name: "Trương Hữu Phúc", user: "phuc.owner", init: "P" } : SANDBOX ? { name: ST[SB.me].name, user: ST[SB.me].user, init: ST[SB.me].nick[0] } : { name: "Huỳnh Ngọc Trâm", user: "tram.huynh", init: "T" });
+const STAFF_NAV = () => [["ranh", "calendar-check", L("Lịch rảnh", "Availability")], ...(shopOn() ? [["quan", "calendar-range", L("Lịch quán", "Shop schedule")]] : []), ["ca", "circle-user-round", L("Hồ sơ của tôi", "My profile")]];
+// Công tắc của chủ: nhân viên xem được lịch cả quán (góp ý 12/11 mục 3, khách đã đồng ý; bật sẵn)
+const shopOn = () => (S.tt === "tat" ? false : SANDBOX ? SB.shopView !== false : ui.shopView !== false);
+function toggleShop() {
+  const on = !shopOn();
+  if (SANDBOX) { SB.shopView = on; sbTick(1, 1); sbLog({ what: ["Đổi cài đặt Lịch quán", "Changed the shop schedule setting"], before: on ? ["Tắt", "Off"] : ["Bật", "On"], after: on ? ["Bật", "On"] : ["Tắt", "Off"] }); }
+  else ui.shopView = on;
+  render();
+}
+const ME = () => (SC.role === "owner" ? { name: "Trương Hữu Phúc", user: "phuc.owner", init: "P" } : SANDBOX ? { name: ST[SB.me].name, user: ST[SB.me].user, init: ST[SB.me].nick[0] } : { name: ST.s7.name, user: ST.s7.user, init: ST.s7.nick[0] });
 function appShell(content, title) {
   const nav = SC.role === "owner" ? OWNER_NAV() : STAFF_NAV();
   const me = ME();
@@ -392,29 +410,40 @@ function tipFor(s, d, p) {
     else if (a.pos.some((x) => lacksExp(s, x))) lines.push(`<span class="text-warn">${L("Chưa có kinh nghiệm vị trí này", "No experience in this position")}</span>`);
     if (s.left) lines.push(`<span class="text-err">${L("Đã nghỉ, cần người thay", "Left, needs someone")}</span>`);
   } else lines.push(k === "reg" ? L("Đã đăng ký, chưa xếp", "Registered, not placed") : L("Chưa đăng ký, tính là rảnh", "Didn’t register, counted as free"));
+  // Ngày đăng ký dưới 8 tiếng: chỉ cảnh báo trên chip chưa xếp (Tony 16/11, F1)
+  if (!s.left && !a && shortDay(s, d)) lines.push(`<span class="text-warn">${L("Ngày đăng ký dưới 8 tiếng", "Registered day under 8 hours")}</span>`);
   if (!a && regSave(s)) lines.push(`<span class="tabular-nums text-muted">${L(`Đăng ký thứ ${regRank(s) + 1} · lưu lần đầu ${regT(regSave(s).first)}`, `Registered ${ord(regRank(s) + 1)} · first saved ${regT(regSave(s).first)}`)}</span>`);
   if (customPending(s, d, p)) lines.push(`<span class="text-warn tabular-nums">${L(`Đăng ký giờ riêng ${cu.from}–${cu.to}, chưa quyết`, `Asked for own times ${cu.from}–${cu.to}, not decided`)}</span>`);
   if (note) lines.push(`<span class="text-muted">${L("Ghi chú", "Note")}: ${esc(note)}</span>`);
   return lines.join("<br>");
 }
-// PRD v1.11 (FR-O42): có vị trí thì tô đặc màu vị trí, kèm ký hiệu vị trí con. Vì màu vị trí có xanh lá, vàng, cam, đỏ,
-// trạng thái không phân biệt bằng màu: đã đăng ký chưa xếp = chip xám có dấu tích (mép trên là giờ lưu đăng ký lần đầu,
-// công tắc "Giờ đăng ký" tắt được); cảnh báo = huy hiệu "!"; người đã nghỉ còn ca = biệt danh gạch ngang.
+// PRD v1.13 (FR-O42, góp ý 10/11): có vị trí thì tô đặc màu vị trí; ký hiệu vị trí con là huy hiệu đặc ở góc phải trên.
+// Trạng thái không phân biệt bằng màu: đã đăng ký chưa xếp = chip nền trong, viền nét đứt, có dấu tích (mép trên bên trái là
+// giờ lưu đăng ký lần đầu, công tắc "Giờ đăng ký" tắt được); người đã nghỉ còn ca = gạch ngang.
+// Cảnh báo (góp ý 12/11 mục 4, thay gạch sóng): chấm màu nóng ở góc phải dưới, đối diện huy hiệu ký hiệu, cỡ bằng nửa huy hiệu.
+const WARN_DOT = `<span class="pointer-events-none absolute -right-0.5 -bottom-[3px] size-[7px] rounded-full bg-(--warn-hot) ring-2 ring-surface"></span>`;
 function marker(s, d, p) {
   const a = asgAt(s, d, p); const k = regKind(s, d, p);
   let style;
   if (a) style = a.pos.length ? `border-p${pn(a.pos[0])}-bd bg-p${pn(a.pos[0])}-bg text-p${pn(a.pos[0])}-tx` : "border-[1.5px] border-foreground/60 bg-surface text-foreground";
-  else if (k === "reg") style = "border-foreground/10 bg-foreground/[0.07] text-foreground/80";
-  // Không đăng ký gì: nét đứt và mờ hẳn, để tách khỏi người đã đăng ký (góp ý 10/10)
+  else if (k === "reg") style = "border-[1.5px] border-dashed border-foreground/50 bg-surface text-foreground/85";
+  // Không đăng ký gì: nét đứt mảnh, mờ hẳn, không dấu tích, để tách khỏi người đã đăng ký (góp ý 10/10)
   else style = "border-dashed border-foreground/35 bg-surface text-muted opacity-55";
-  const warn = !s.left && ((a && (k === "no" || flagPos(s, a))) || customPending(s, d, p));
+  const warn = !s.left && ((a && (k === "no" || flagPos(s, a))) || customPending(s, d, p) || (!a && shortDay(s, d)));
   const selected = ui.panel && ui.panel.sid === s.id && ui.panel.d === d;
   // Ghi chú theo ngày: biểu tượng chỉ ở chip đầu tiên của người đó trong ngày, không lặp ở mọi ca
   const noteHere = noteAt(s, d) && PERIODS.find((pp) => shownIn(d, pp.i).includes(s))?.i === p;
   const solid = !!a?.pos.length, mk = marksOf(a);
   const rs = !a && k === "reg" && ui.regTimes ? regSave(s) : null;
   const star = typeOf(s) === "all" ? `<svg viewBox="0 0 24 24" class="${solid ? "size-3 shrink-0 fill-current" : "size-3 shrink-0 fill-(--star) text-(--star)"}" aria-label="${L("Đăng ký mọi ca", "Every shift")}"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>` : "";
-  return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="openPanel('${s.id}',${d},${p})" class="${cx("relative inline-flex h-6 max-w-[100%] cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && "ring-2 ring-primary ring-offset-1 ring-offset-surface")}">${rs ? `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] font-medium tabular-nums text-muted">${regT(rs.first)}</span>` : ""}${!a && k === "reg" ? ic("check", "-ml-0.5 size-3 opacity-80") : ""}${star}<span class="${cx("truncate", s.left && "line-through")}">${esc(s.nick)}</span>${mk ? `<span class="shrink-0 font-semibold">${mk}</span>` : ""}${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${warn ? `<span class="absolute -top-1 -right-1 grid size-3.5 place-items-center rounded-full bg-warn text-[9px] leading-none font-bold text-white ring-2 ring-surface" aria-label="${L("Cần chú ý", "Needs attention")}">!</span>` : ""}</button>`;
+  return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="markerClick('${s.id}',${d},${p})" aria-pressed="${!!selected}" class="${cx("relative inline-flex h-6 max-w-[100%] cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && (ui.panel.ctx === p ? "ring-[3px] ring-primary ring-offset-1 ring-offset-surface" : "ring-2 ring-primary/45 ring-offset-1 ring-offset-surface"))}">${rs ? `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] font-medium tabular-nums text-muted">${regT(rs.first)}</span>` : ""}${!a && k === "reg" ? ic("check", "-ml-0.5 size-3 opacity-80") : ""}${star}<span class="${cx("truncate", s.left && "line-through")}">${esc(s.nick)}</span>${warn ? `${WARN_DOT}<span class="sr-only">${L("Cần chú ý", "Needs attention")}</span>` : ""}${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${mk ? `<span class="pointer-events-none absolute -top-[7px] -right-1 rounded-full bg-foreground px-1 text-[9px] leading-[13px] font-bold tabular-nums text-surface ring-2 ring-surface">${mk}</span>` : ""}</button>`;
+}
+// Bấm lại chip của ca ngữ cảnh thì đóng panel; chip khác của cùng người cùng ngày thì đổi ca ngữ cảnh; chip khác thì
+// chuyển panel, hỏi trước nếu còn thay đổi chưa lưu (góp ý 10/11 mục 11, ADR 0031)
+function markerClick(sid, d, p) {
+  const P = ui.panel;
+  if (P && P.sid === sid && P.d === d) return P.ctx === p ? closePanel() : panelCtx(p);
+  leavePanel(() => openPanel(sid, d, p));
 }
 // --- Thứ tự chip trong một ngày (FR-O49) ---
 // Người đã có vị trí lên trước, nhóm theo thứ tự danh mục, A–Z theo biệt danh trong nhóm (khách chốt 1/11); cảnh báo không
@@ -425,6 +454,8 @@ function marker(s, d, p) {
 function shownIn(d, p) { return STAFF.filter((s) => (s.left ? !!asgAt(s, d, p) : ui.sel.has(s.id) && (canWork(s, d, p) || asgAt(s, d, p)))); }
 const orderWarn = (s, d, p) => { const a = asgAt(s, d, p); return !!s.left || !!(a && flagPos(s, a)) || customPending(s, d, p); };
 const isManual = (s, d, p) => !!asgAt(s, d, p) && regKind(s, d, p) === "no";
+// Đăng ký ca này nhưng được xếp ca khác trong ngày (góp ý 10/11, mục 12)
+const isElsewhere = (s, d, p) => !asgAt(s, d, p) && regKind(s, d, p) !== "no" && PERIODS.some((q) => q.i !== p && asgAt(s, d, q.i));
 function dayOrder(d) {
   const az = (a, b) => a.nick.localeCompare(b.nick, "vi");
   const seq = (s, p) => ui.manual.get(`${s.id}|${d}|${p}`) ?? -1;
@@ -438,13 +469,45 @@ function dayOrder(d) {
     prev = [...inherit(warn), ...inherit(rest), ...manual];
     const pos0 = (s) => asgAt(s, d, p)?.pos[0];
     const grouped = list.filter(pos0).sort((a, b) => CAT[pos0(a)] - CAT[pos0(b)] || az(a, b));
-    out.push([...grouped, ...prev.filter((s) => !pos0(s))]);
+    const cell = [...grouped, ...prev.filter((s) => !pos0(s))];
+    // Người đã được xếp ca khác trong ngày xuống cuối ô (rồi gom vào +N, xem cellChips)
+    out.push([...cell.filter((s) => !isElsewhere(s, d, p)), ...cell.filter((s) => isElsewhere(s, d, p))]);
   }
   return out;
 }
 const cellPeople = (d, p) => dayOrder(d)[p];
-// Giờ đăng ký nằm trên mép trên chip, nên hàng chip cần thêm khoảng cách dọc khi công tắc bật
-const peopleCls = (gap = "gap-x-1") => (ui.regTimes && !isEmptyWeek && ui.weekOff === 0 ? `flex flex-wrap ${gap} gap-y-2.5 pt-1.5` : `flex flex-wrap ${gap} gap-y-1`);
+// Chip của một ô. Người đăng ký ca này nhưng đã được xếp ca khác trong ngày được gom vào "+N" (Tony chốt 12/11, mục 5,
+// đóng O7): rê chuột thấy danh sách, bấm mở popup như Thêm (không ô tìm, có nút đóng). Bấm một người trong popup thì chip
+// hiện lại trong ô và mở panel với ca này; Lưu mà có xếp ca này thì chip ở lại, không thì đóng panel hay bấm chip người khác
+// là chip về lại +N.
+function revealed(s, d, p) {
+  const R = ui.reveal, P = ui.panel;
+  if (R && (!P || P.sid !== R.sid || P.d !== R.d)) { ui.reveal = null; return false; }
+  return !!R && R.sid === s.id && R.d === d && R.p === p;
+}
+const foldedIn = (d, p) => cellPeople(d, p).filter((s) => isElsewhere(s, d, p) && !revealed(s, d, p));
+function cellChips(d, p, gap) {
+  const list = cellPeople(d, p), chips = (xs) => xs.map((s) => marker(s, d, p)).join("");
+  const away = foldedIn(d, p);
+  if (!away.length) return `<div class="${peopleCls(gap)}">${chips(list)}</div>`;
+  const names = away.map((s) => esc(s.name)).join("<br>");
+  const mine = ui.panel && ui.panel.d === d && away.some((s) => s.id === ui.panel.sid);
+  return `<div class="${peopleCls(gap)}">${chips(list.filter((s) => !away.includes(s)))}<button type="button" onclick="openPop(event,'fold',${d},${p})" aria-haspopup="dialog" data-tip="${esc(`${L("Đã được xếp ca khác trong ngày:", "Placed in another shift today:")}<br>${names}`)}" aria-label="${L(`${away.length} người đã được xếp ca khác`, `${away.length} placed elsewhere`)}" class="${cx("inline-flex h-6 cursor-pointer items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted outline-hidden hover:text-foreground", mine && "ring-2 ring-(--hl-cold) ring-offset-1 ring-offset-surface")}">+${away.length}</button></div>`;
+}
+// Góp ý 12/11 mục 5, Tony chốt 16/11: bấm vùng trống trên lịch thì đóng panel (còn thay đổi chưa lưu thì vẫn hỏi), chip gỡ từ +N về lại
+function calBlank(e) { if (ui.panel && !e.target.closest("button, a, input, textarea, select, label, [role=dialog]")) closePanel(); }
+function revealPick(sid, d, p) { ui.pop = null; leavePanel(() => { openPanel(sid, d, p); ui.reveal = { sid, d, p }; render(); }); }
+// Góp ý 12/11 mục 1, Tony chốt 16/11 (theo chip vừa bấm): chip đang chọn chưa được xếp thì tô xanh (màu lạnh) mọi ca người đó
+// đăng ký (hay rảnh vì không đăng ký gì); chip đã được xếp thì tô cam (màu nóng) mọi ca người đó đã được xếp. Chỉ tô nền, không viền.
+function hlCell(d, p) {
+  const P = ui.panel; if (!P || !ST[P.sid]) return "";
+  const s = ST[P.sid];
+  const hot = P.ctx != null ? !!asgAt(s, P.d, P.ctx) : PERIODS.some((q) => asgAt(s, P.d, q.i));
+  if (hot) return asgAt(s, d, p) ? "wt-hl-hot" : "";
+  return !s.left && regKind(s, d, p) !== "no" ? "wt-hl-cold" : "";
+}
+// Giờ đăng ký (trái) và huy hiệu ký hiệu (phải) nằm trên mép trên chip, nên hàng chip luôn có khoảng cách dọc
+const peopleCls = (gap = "gap-x-1.5") => (!isEmptyWeek ? `flex flex-wrap ${gap} gap-y-2.5 pt-1.5` : `flex flex-wrap ${gap} gap-y-1`);
 function cellHead(d, p, mobile) {
   const placed = placedCount(d, p), need = needTotal(d, p), free = freeCount(d, p);
   const short = placed < need;
@@ -457,24 +520,106 @@ function calGrid() {
   if (OPT === "c") {
     const rows = days.map((d) => {
       const pl = PERIODS.reduce((a, p) => a + placedCount(d, p.i), 0), nd = PERIODS.reduce((a, p) => a + needTotal(d, p.i), 0);
-      return `<div class="border-t border-border-strong px-3 py-3"><p class="text-sm font-semibold">${dayShort(d)} <span class="tabular-nums">${WEEK[d].date}/10</span></p><p class="${cx("mt-0.5 text-xs tabular-nums", pl < nd ? "text-warn" : "text-muted")}">${pl}/${nd}</p></div>` +
-        PERIODS.map((p) => `<div class="min-w-0 border-t border-l border-border-strong p-2"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div><div class="${peopleCls()}">${cellPeople(d, p.i).map((s) => marker(s, d, p.i)).join("")}</div></div>`).join("");
+      return `<div class="border-t border-border-strong px-3 py-3"><div class="flex items-start gap-1"><button type="button" onclick="goDay(${d})" class="-mx-1 cursor-pointer rounded-lg px-1 text-left text-sm font-semibold outline-hidden hover:bg-foreground/5">${dayShort(d)} <span class="tabular-nums">${WEEK[d].date}/10</span></button>${noteBtn(d)}</div><p class="${cx("mt-0.5 text-xs tabular-nums", pl < nd ? "text-warn" : "text-muted")}">${pl}/${nd}</p></div>` +
+        PERIODS.map((p) => `<div class="${cx("min-w-0 border-t border-l border-border-strong p-2", hlCell(d, p.i))}"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div>${cellChips(d, p.i)}</div>`).join("");
     }).join("");
-    return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4"><div class="grid" style="grid-template-columns:76px repeat(5,minmax(0,1fr))"><div></div>${PERIODS.map((p) => `<div class="border-l border-border-strong px-2 py-2.5"><p class="text-sm font-semibold">${p.code}</p><p class="text-xs tabular-nums text-muted">${p.from}–${p.to}</p></div>`).join("")}${rows}</div></div>`;
+    return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4" onclick="calBlank(event)"><div class="grid" style="grid-template-columns:76px repeat(5,minmax(0,1fr))"><div></div>${PERIODS.map((p) => `<div class="border-l border-border-strong px-2 py-2.5"><p class="text-sm font-semibold">${p.code}</p><p class="text-xs tabular-nums text-muted">${p.from}–${p.to}</p></div>`).join("")}${rows}</div></div>`;
   }
-  const head = days.map((d) => `<div class="border-l border-border-strong px-2 py-2"><p class="text-xs text-muted">${dayShort(d)}</p><p class="text-base font-semibold tabular-nums">${WEEK[d].date}</p></div>`).join("");
+  // Bấm ngày trên header thì mở view Ngày của ngày đó (góp ý 10/11, mục 9); nút bên cạnh là ghi chú xếp lịch của ngày (FR-O54)
+  const head = days.map((d) => `<div class="flex items-start gap-1 border-l border-border-strong px-2 py-2"><button type="button" onclick="goDay(${d})" ${ui.view === "day" ? "disabled" : ""} title="${ui.view === "day" ? "" : L("Xem ngày này", "View this day")}" class="-mx-1 min-w-0 flex-1 cursor-pointer rounded-lg px-1 text-left outline-hidden hover:bg-foreground/5 disabled:cursor-default disabled:hover:bg-transparent"><p class="text-xs text-muted">${dayShort(d)}</p><p class="text-base font-semibold tabular-nums">${WEEK[d].date}</p></button>${noteBtn(d)}</div>`).join("");
   const rows = PERIODS.map((p) => `<div class="border-t border-border-strong px-2.5 py-2"><p class="text-xs font-semibold">${p.code}</p><p class="text-xs tabular-nums text-muted">${pTime(p.i)}</p></div>` +
-    days.map((d) => `<div class="min-w-0 border-t border-l border-border-strong p-2"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div><div class="${peopleCls()}">${cellPeople(d, p.i).map((s) => marker(s, d, p.i)).join("")}</div></div>`).join("")).join("");
-  return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4"><div class="grid" style="grid-template-columns:56px repeat(${days.length},minmax(0,1fr))"><div></div>${head}${rows}</div></div>`;
+    days.map((d) => `<div class="${cx("min-w-0 border-t border-l border-border-strong p-2", hlCell(d, p.i))}"><div class="mb-1.5 flex items-start gap-1 text-xs"><div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5">${cellHead(d, p.i)}</div>${addBtn(d, p.i)}</div>${cellChips(d, p.i)}</div>`).join("")).join("");
+  return `<div class="overflow-hidden rounded-2xl border border-border bg-surface" data-wf-block="4" onclick="calBlank(event)"><div class="grid" style="grid-template-columns:56px repeat(${days.length},minmax(0,1fr))"><div></div>${head}${rows}</div></div>`;
 }
 function calMobile() {
   const d = ui.mDay;
   if (isEmptyWeek) return `<div class="rounded-2xl border border-border bg-surface">${emptyLine(L("Không ai đăng ký trong những ngày này.", "No one registered for these dates."))}</div>`;
-  return `<div class="flex flex-col gap-3" data-wf-block="4">${PERIODS.map((p) => `
-    <section class="rounded-2xl border border-border bg-surface p-4">
+  return `<div class="flex flex-col gap-3" data-wf-block="4" onclick="calBlank(event)">${dayNoteCard(d)}${PERIODS.map((p) => `
+    <section class="${cx("rounded-2xl border border-border bg-surface p-4", hlCell(d, p.i))}">
       <header class="mb-3 flex items-center gap-2"><h3 class="text-sm font-semibold">${p.code} <span class="font-normal tabular-nums text-muted">${p.from}–${p.to}</span></h3><span class="ml-auto flex items-center gap-1.5 text-xs">${cellHead(d, p.i, true)}</span>${addBtn(d, p.i)}</header>
-      <div class="${peopleCls("gap-x-1.5")}">${cellPeople(d, p.i).map((s) => marker(s, d, p.i)).join("")}</div>
+      ${cellChips(d, p.i, "gap-x-1.5")}
     </section>`).join("")}</div>`;
+}
+
+// --- Ghi chú (góp ý 10/11, mục 10) ---
+// Ghi chú xếp lịch theo ngày (FR-O54): công bố cùng tuần, mọi nhân viên có ca ngày đó đọc được. Sửa sau khi công bố là bản nháp
+// tới khi chủ bấm "Công bố ghi chú". Ghi chú riêng của chủ cho tuần (FR-O53): chỉ chủ thấy.
+const dnoteAt = (d) => W().dnote?.[d] || null;
+const noteText = (d) => dnoteAt(d)?.text || "";
+const notePub = (d) => { const n = dnoteAt(d); return n && published() ? (n.pub ?? n.text) || "" : ""; };
+// Góp ý 12/11 (F3): sau khi công bố, sửa ghi chú là có hiệu lực ngay, không còn bước "Công bố ghi chú" riêng
+const noteDirty = () => false;
+const noteBadge = (d) => !noteText(d) && !noteDirty(d) ? "" : noteDirty(d) ? badge("warn", L("Nháp chưa công bố", "Unpublished draft")) : published() ? badge("ok", L("Đã công bố", "Published")) : badge("neutral", L("Nháp", "Draft"));
+function noteBtn(d) {
+  const has = !!noteText(d);
+  if (ui.weekOff < 0 && !has) return "";
+  return `<button type="button" onclick="openPop(event,'dnote',${d})" aria-label="${L("Ghi chú xếp lịch", "Schedule note")} ${dayShort(d)}" data-tip="${esc(has ? esc(noteText(d)) : L("Thêm ghi chú xếp lịch", "Add a schedule note"))}" class="${cx("relative inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg outline-hidden hover:bg-foreground/8", has ? "text-foreground" : "text-muted/70 hover:text-foreground")}">${ic(has ? "sticky-note" : "notebook-pen", "size-3.5")}${noteDirty(d) ? `<span class="absolute top-1 right-1 size-1.5 rounded-full bg-warn"></span>` : ""}</button>`;
+}
+function dayNoteCard(d) {
+  const t = noteText(d);
+  if (ui.weekOff < 0 && !t) return "";
+  return `<button type="button" onclick="openPop(event,'dnote',${d})" class="flex w-full cursor-pointer items-start gap-3 rounded-2xl border border-dashed border-border-strong bg-surface px-4 py-3 text-left outline-hidden hover:bg-item-hover">${ic(t ? "sticky-note" : "notebook-pen", "mt-0.5 size-4 text-muted")}<span class="min-w-0 flex-1 text-sm text-pretty">${t ? esc(t) : `<span class="text-muted">${L("Thêm ghi chú xếp lịch cho ngày này", "Add a schedule note for this day")}</span>`}</span>${noteBadge(d)}</button>`;
+}
+const onoteBtn = () => `<button type="button" onclick="toggleOnote()" aria-expanded="${!!ui.onoteOpen}" aria-label="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}" title="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}" class="relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${ic("notebook-pen")}${richText(W().onote) ? `<span class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-surface"></span>` : ""}</button>`;
+function saveDnote(d, clear) {
+  const v = clear ? "" : (document.getElementById("dnote-ta")?.value || "").trim();
+  const w = W(); w.dnote ||= {}; const n = w.dnote[d] || { text: "", pub: null }, before = n.text;
+  n.text = v; if (published()) n.pub = v; w.dnote[d] = n;
+  if (!n.text && !n.pub) delete w.dnote[d];
+  if (SANDBOX && before !== v) { SB.dnote = w.dnote; sbTick(1, 2); sbLog({ what: clear ? ["Xoá ghi chú xếp lịch", "Deleted a schedule note"] : before ? ["Sửa ghi chú xếp lịch", "Edited a schedule note"] : ["Viết ghi chú xếp lịch", "Wrote a schedule note"], day: both(() => dayFull(d)), before: before || "—", after: v || "—", draft: true }); }
+  if (!noteDirty(d)) ui.pop = null;
+  render();
+}
+function publishDnote(d) {
+  const w = W(), n = w.dnote[d], before = n.pub; n.pub = n.text;
+  if (!n.text) delete w.dnote[d];
+  if (SANDBOX) { SB.dnote = w.dnote; sbTick(1, 2); sbLog({ what: ["Công bố ghi chú xếp lịch", "Published a schedule note"], day: both(() => dayFull(d)), before: before || "—", after: n.text || "—" }); }
+  ui.pop = null; render();
+}
+// Ghi chú riêng của chủ (góp ý 12/11 mục 6): bấm biểu tượng thì mở một khung chạy hết bề ngang, đẩy lịch tuần và panel
+// xuống dưới; đóng là trả lại như cũ. Định dạng cơ bản, sửa trực tiếp (WYSIWYG): đậm, nghiêng, gạch dưới, chấm, số.
+// Gõ tới đâu giữ tới đó; đóng khung thì ghi một dòng nhật ký nếu có đổi.
+const richText = (h) => { const x = document.createElement("div"); x.innerHTML = h || ""; return x.textContent.trim(); };
+function cleanRich(html) {
+  const doc = new DOMParser().parseFromString(`<div>${html || ""}</div>`, "text/html"), root = doc.body.firstChild;
+  const ok = new Set(["B", "STRONG", "I", "EM", "U", "UL", "OL", "LI", "BR", "DIV", "P"]);
+  const walk = (n) => { for (const c of [...n.childNodes]) {
+    if (c.nodeType === 3) continue;
+    if (c.nodeType !== 1 || ["SCRIPT", "STYLE"].includes(c.tagName)) { c.remove(); continue; }
+    walk(c);
+    if (ok.has(c.tagName)) { for (const a of [...c.attributes]) c.removeAttribute(a.name); } else c.replaceWith(...c.childNodes);
+  } };
+  walk(root); return root.innerHTML;
+}
+function toggleOnote() {
+  if (ui.onoteOpen) {
+    const v = cleanRich(W().onote || ""), before = ui.onoteBefore || "";
+    W().onote = richText(v) ? v : "";
+    if (SANDBOX && W().onote !== before) { SB.onote = W().onote; sbTick(1, 2); sbLog({ what: ["Sửa ghi chú riêng", "Edited the owner’s note"], day: SB_WEEK, before: richText(before) || "—", after: richText(W().onote) || "—" }); }
+    ui.onoteOpen = false; render(); return;
+  }
+  ui.onoteOpen = true; ui.onoteBefore = W().onote || ""; ui.pop = null; render();
+  const ed = document.getElementById("onote-ed");
+  if (ed && ed.isContentEditable) { ed.focus(); const r = document.createRange(); r.selectNodeContents(ed); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+}
+function onoteInput(el) { W().onote = el.innerHTML; }
+function fmtOnote(cmd) {
+  const ed = document.getElementById("onote-ed"); if (!ed) return;
+  if (!ed.contains(getSelection().anchorNode)) ed.focus();
+  document.execCommand("styleWithCSS", false, false); document.execCommand(cmd, false, null);
+  onoteInput(ed); fmtState();
+}
+function fmtState() { for (const b of document.querySelectorAll("[data-fmt]")) { let on = false; try { on = document.queryCommandState(b.dataset.fmt); } catch {} b.setAttribute("aria-pressed", on); } }
+function onoteBar() {
+  if (!ui.onoteOpen) return "";
+  const ro = ui.weekOff < 0, v = W().onote || "";
+  const tools = [["bold", "bold", L("Đậm", "Bold")], ["italic", "italic", L("Nghiêng", "Italic")], ["underline", "underline", L("Gạch dưới", "Underline")], ["insertUnorderedList", "list", L("Danh sách chấm", "Bulleted list")], ["insertOrderedList", "list-ordered", L("Danh sách số", "Numbered list")]];
+  return `<section class="mb-4 rounded-2xl border border-border bg-surface" aria-label="${L("Ghi chú riêng của tuần", "Owner’s note for the week")}">
+    <header class="flex flex-wrap items-center gap-2 border-b border-border py-1.5 pr-1.5 pl-4"><div class="min-w-0 flex-1 basis-48"><p class="text-sm font-semibold">${L("Ghi chú riêng", "Owner’s note")} · ${L("Tuần", "Week")} ${ui.weekOff < 0 ? "5–11/10" : "12–18/10"}</p><p class="text-xs text-pretty text-muted">${L("Chỉ bạn thấy. Không công bố cho nhân viên.", "Only you see it. Never shown to staff.")}</p></div>
+      ${ro ? "" : `<div role="toolbar" aria-label="${L("Định dạng", "Formatting")}" class="flex items-center gap-0.5">${tools.map(([c, i, tt]) => `<button type="button" data-fmt="${c}" onmousedown="event.preventDefault()" onclick="fmtOnote('${c}')" aria-label="${tt}" title="${tt}" aria-pressed="false" class="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground aria-pressed:bg-foreground/8 aria-pressed:text-foreground">${ic(i, "size-4")}</button>`).join("")}</div><span class="mx-1 h-5 w-px bg-border-strong"></span>`}
+      ${iconBtn("x", L("Đóng ghi chú", "Close the note"), `onclick="toggleOnote()"`, "size-9")}</header>
+    <div id="onote-ed" ${ro ? "" : `contenteditable="true"`} role="textbox" aria-multiline="true" aria-readonly="${ro}" aria-label="${L("Nội dung ghi chú riêng", "Owner’s note")}" data-placeholder="${L("Ví dụ: hỏi lại Hậu có làm thêm CA 5 được không", "e.g. ask Hậu whether they can take an extra CA 5")}" oninput="onoteInput(this)" onkeyup="fmtState()" onmouseup="fmtState()" class="wt-rich max-h-[50vh] min-h-36 overflow-y-auto px-4 py-3 text-sm/6 outline-hidden">${cleanRich(v)}</div>
+  </section>`;
 }
 
 // --- Danh sách nhân viên (FR-O11) ---
@@ -569,11 +714,14 @@ function filtersPanel() {
 
 // --- Panel người × ngày (FR-O43) ---
 function panelBody(mobile) {
-  const { sid, d } = ui.panel; const s = ST[sid];
+  panelFresh();
+  const { sid, d } = ui.panel; const s = ST[sid]; const P = ui.panel;
   const days = visibleDays();
   const st = placedStats(s), rg = regHours(s);
   const ro = readOnly(); const pub = published();
   const sel = ui.panel.sel;
+  const ds = ro ? [] : panelDiff(), dsBy = Object.fromEntries(ds.map((x) => [x.p, x])), tgt = ro ? [] : panelTarget();
+  const chg = (k) => { const [vi, en, c] = { add: ["+ thêm", "+ add", "bg-ok-bg text-ok"], rem: ["− bỏ", "− off", "bg-danger-bg text-danger"], mod: ["~ đổi", "~ change", "bg-warn-bg text-warn"], sug: ["+ gợi ý", "+ suggested", "text-ok ring-1 ring-ok/50 ring-inset"] }[k]; return `<span class="rounded-md px-1.5 text-[11px] leading-5 font-semibold whitespace-nowrap ${c}">${L(vi, en)}</span>`; };
   const cu = customAt(s, d), note = noteAt(s, d);
   const periodRow = (p) => {
     const a = asgAt(s, d, p.i), k = regKind(s, d, p.i);
@@ -585,33 +733,42 @@ function panelBody(mobile) {
     const c = k === "reg" ? cu?.[p.i] : null;
     const cuTag = c ? `<span class="${cx("inline-flex items-center gap-1 text-xs font-medium tabular-nums", a ? "text-muted" : "text-warn")}">${ic("clock", "size-3.5")}${L("Giờ riêng", "Own times")} ${c.from}–${c.to}${a ? "" : L(" · chưa quyết", " · not decided")}</span>` : "";
     const placedT = a?.t ? `<span class="text-xs tabular-nums text-muted">${L("xếp", "placed")} ${a.t.from}–${a.t.to}${hm(a.t.from) > hm(p.from) ? L(" · vào trễ đã thống nhất", " · agreed late start") : ""}</span>` : "";
-    return `<label class="${cx("flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5", !ro && "cursor-pointer hover:bg-item-hover")}">
-      ${ro ? "" : cb({ checked: sel.has(p.i), attrs: `onchange="togglePeriod(${p.i})"` })}
-      <span class="min-w-0 flex-1"><span class="block text-sm font-medium">${p.code} <span class="font-normal tabular-nums text-muted">${p.from}–${p.to}</span></span>
-        <span class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">${kTag}${cuTag}</span></span>
-      <span class="flex max-w-[50%] min-w-0 flex-col items-end gap-1">${right}${placedT}</span></label>`;
+    const on = sel.has(p.i), x = dsBy[p.i], isCtx = !ro && P.ctx === p.i;
+    // Dấu thay đổi: ca Lưu sẽ thêm, bỏ hay đổi; gợi ý lúc mở panel từ ca chưa xếp
+    const badge = ro ? "" : P.suggested === p.i && !P.edited && on && !a ? chg("sug") : x ? chg(x.type) : "";
+    const outside = !ro && on && !a && k === "no" ? `<span class="mt-1 block text-xs text-warn">${L("Ngoài lịch rảnh: chỉ cảnh báo, không tạo đăng ký.", "Outside availability: a flag only, no registration is created.")}</span>` : "";
+    return `<div class="${cx("flex min-h-12 items-center gap-3 rounded-xl px-2 py-1.5", isCtx ? "bg-primary-light ring-1 ring-primary ring-inset" : !ro && "hover:bg-item-hover")}">
+      ${ro ? "" : cb({ checked: on, attrs: `aria-label="${p.code}" onchange="togglePeriod(${p.i})"` })}
+      <span class="${cx("min-w-0 flex-1", !ro && "cursor-pointer")}" ${ro ? "" : `onclick="panelCtx(${p.i})"`}><span class="block text-sm font-medium">${p.code} <span class="font-normal tabular-nums text-muted">${p.from}–${p.to}</span></span>
+        <span class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">${kTag}${cuTag}</span>${outside}</span>
+      <span class="flex max-w-[50%] min-w-0 flex-col items-end gap-1">${right}${placedT}${badge}</span></div>`;
   };
   // Mục đóng/mở như nhóm trong Bộ lọc (góp ý 10/10); trạng thái thu giữ qua các lần vẽ lại
   const sec = (key, title, body, extra = "") => {
     const open = !ui.secClosed.has(key);
     return `<section><div class="flex items-center gap-2"><button type="button" aria-expanded="${open}" onclick="toggleSec('${key}')" class="-ml-2 flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-left text-sm font-semibold outline-hidden hover:bg-item-hover">${ic("chevron-down", cx("size-4 text-muted transition-transform", !open && "-rotate-90"))}${title}</button>${open ? extra : ""}</div>${open ? `<div class="mt-1">${body}</div>` : ""}</section>`;
   };
-  const cuSel = [...sel].sort().filter((p) => regKind(s, d, p) === "reg" && cu?.[p]);
+  // Xếp theo giờ đăng ký hay giờ ca gốc: chỉ hỏi cho ca mới tick, ca đã xếp giữ giờ của nó
+  const cuSel = [...sel].sort().filter((p) => regKind(s, d, p) === "reg" && cu?.[p] && !P.initial[p]);
   const posChips = POSITIONS.filter((p) => !p.lead || canLeadShift(s)).map((p) => {
     const on = ui.posPick.includes(p.id);
-    return `<button type="button" role="radio" aria-checked="${on}" onclick="pickPos('${p.id}')" title="${lacksExp(s, p.id) ? L("Chưa có kinh nghiệm", "No experience") : ""}" class="${cx("relative inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${lacksExp(s, p.id) ? `<span class="grid size-3.5 place-items-center rounded-full bg-warn text-[9px] leading-none font-bold text-white" aria-label="${L("Chưa có kinh nghiệm", "No experience")}">!</span>` : ""}</button>`;
+    return `<button type="button" role="radio" aria-checked="${on}" ${tgt.length ? "" : "disabled"} onclick="pickPos('${p.id}')" title="${lacksExp(s, p.id) ? L("Chưa có kinh nghiệm", "No experience") : ""}" class="${cx("relative inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors disabled:cursor-not-allowed disabled:opacity-50", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${lacksExp(s, p.id) ? `<span class="grid size-3.5 place-items-center rounded-full bg-warn text-[9px] leading-none font-bold text-white" aria-label="${L("Chưa có kinh nghiệm", "No experience")}">!</span>` : ""}</button>`;
   }).join("");
   const subRows = ui.posPick.filter((pid) => POS[pid].subs.length).map((pid) => `<div class="flex flex-wrap items-center gap-1.5"><span class="mr-1 text-xs text-muted">${posName(pid)}:</span>${POS[pid].subs.map(([id, vi, en, mk]) => { const on = ui.subPick.includes(id); return `<button type="button" aria-pressed="${on}" onclick="pickSub('${id}')" class="${cx("inline-flex h-7 cursor-pointer items-center gap-1 rounded-full px-2.5 text-xs font-medium outline-hidden", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${L(vi, en)}${mk ? `<span class="font-semibold text-muted">${mk}</span>` : ""}</button>`; }).join("")}</div>`).join("");
   const dayIdx = days.indexOf(d);
   const nothing = sel.size === 0;
-  const quick = ro ? "" : `<span class="-mr-1.5 flex text-xs">${[["reg", L("Ca đăng ký", "Registered")], ["all", L("Tất cả", "All")], ["none", L("Bỏ chọn", "None")]].map(([k, t]) => `<button type="button" onclick="quickSel('${k}')" class="inline-flex h-8 cursor-pointer items-center px-1.5 text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${t}</button>`).join("")}</span>`;
-  const shiftsBody = `<div class="flex flex-col gap-0.5">${PERIODS.map(periodRow).join("")}</div>
-    ${!ro && nothing ? `<p class="px-2 pt-1.5 text-xs text-muted">${L("Không chọn ca nào: Lưu hay Bỏ khỏi ca đều là bỏ khỏi mọi ca trong ngày.", "No shift selected: Save or Take off removes them from every shift this day.")}</p>` : ""}
+  const quick = ro ? "" : `<span class="-mr-1.5 flex text-xs">${[["reg", L("+ Ca đăng ký", "+ Registered")], ["all", L("Tất cả", "All")], ["none", L("Bỏ hết", "Clear all")]].map(([k, t]) => `<button type="button" onclick="quickSel('${k}')" class="inline-flex h-8 cursor-pointer items-center px-1.5 text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${t}</button>`).join("")}</span>`;
+  const shiftsBody = `${ro ? "" : `<p class="px-2 pb-1 text-xs text-muted">${L("Ô tick là các ca người này làm sau khi Lưu. Bấm vào một dòng để chọn ca nhận vị trí.", "Ticked shifts are the ones they work after Save. Select a row to choose the shift that gets the position.")}</p>`}<div class="flex flex-col gap-0.5">${PERIODS.map(periodRow).join("")}</div>
+    ${!ro && nothing ? `<p class="px-2 pt-1.5 text-xs text-muted">${L("Không tick ca nào: Lưu là bỏ khỏi mọi ca trong ngày.", "Nothing ticked: Save takes them off every shift this day.")}</p>` : ""}
     ${!ro && cuSel.length ? `<div class="mt-3 space-y-1.5 px-2"><p class="text-xs text-muted">${L("Xếp theo", "Place by")} · <span class="tabular-nums">${cuSel.map((p) => `${PERIODS[p].code} ${cu[p].from}–${cu[p].to}`).join(", ")}</span></p>${segmented([["reg", L("Giờ đăng ký", "Their times")], ["std", L("Giờ ca gốc", "Standard times")]], ui.saveAs, "setSaveAs", L("Xếp theo", "Place by"))}${ui.saveAs === "reg" && cuSel.some((p) => hm(cu[p].from) > hm(PERIODS[p].from)) ? `<p class="text-xs text-pretty text-muted">${L("Giờ vào trễ hơn ca là vào trễ đã thống nhất: không có 10 phút ân hạn, trễ từ phút 1 là tính trễ và trừ gấp đôi.", "A start later than the period is an agreed late start: no 10-minute grace, late and 2× deduction from minute 1.")}</p>` : ""}</div>` : ""}`;
-  const posBody = `<div class="space-y-2.5"><div role="radiogroup" aria-label="${L("Vị trí", "Position")}" class="flex flex-wrap gap-1.5">${posChips}</div>${subRows}
+  // Vị trí áp cho ca ngữ cảnh và ca mới tick; ca đã xếp khác giữ vị trí của nó (ADR 0031)
+  const tgtLine = ro ? "" : tgt.length
+    ? `<p class="text-xs text-muted">${L("Áp cho", "Applies to")}: <span class="font-medium text-foreground">${tgt.map((q) => PERIODS[q].code).join(", ")}</span>${sel.size > tgt.length ? L(". Ca đã xếp khác giữ vị trí của nó.", ". Other held shifts keep theirs.") : ""}</p>${sel.size > tgt.length ? `<button type="button" onclick="applyAllPos()" class="cursor-pointer text-xs font-medium text-primary underline underline-offset-4 outline-hidden focus-visible:ring-2 focus-visible:ring-focus">${L(`Áp cho mọi ca đã chọn (${sel.size})`, `Apply to every ticked shift (${sel.size})`)}</button>` : ""}`
+    : `<p class="text-xs text-muted">${L("Bấm vào một ca đang tick, hoặc tick ca mới, để gán vị trí.", "Select a ticked shift, or tick a new one, to give a position.")}</p>`;
+  const posBody = `<div class="space-y-2.5">${tgtLine}<div role="radiogroup" aria-label="${L("Vị trí", "Position")}" class="flex flex-wrap gap-1.5">${posChips}</div>${subRows}
         ${missingSub().length ? `<p class="text-xs text-muted">${L(`${POS[missingSub()[0]].vi}: chọn ${POS[missingSub()[0]].subs.map((x) => x[1]).join(" hoặc ")}.`, `${POS[missingSub()[0]].en}: choose ${POS[missingSub()[0]].subs.map((x) => x[2]).join(" or ")}.`)}</p>` : ""}
-        ${ui.posPick.length ? "" : pub ? `<p class="flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${L("Ca đã công bố phải có vị trí.", "A published shift needs a position.")}</p>` : `<p class="text-xs text-muted">${L("Không chọn vị trí: Lưu là xếp vào ca, chưa có vị trí.", "No position: Save places them without one.")}</p>`}</div>`;
-  const reasonBody = `<label class="block"><span class="sr-only">${L("Lý do", "Reason")}</span><input id="panel-reason" class="${INPUT}" placeholder="${L("VD: đã thống nhất qua Zalo", "e.g. agreed on Zalo")}" /></label>`;
+        ${ui.posPick.length || !tgt.length ? "" : pub ? `<p class="flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${L("Ca đã công bố phải có vị trí.", "A published shift needs a position.")}</p>` : `<p class="text-xs text-muted">${L("Không chọn vị trí: Lưu là xếp vào ca, chưa có vị trí.", "No position: Save places them without one.")}</p>`}</div>`;
+  const reasonBody = `<label class="block"><span class="sr-only">${L("Lý do", "Reason")}</span><input id="panel-reason" class="${INPUT}" value="${esc(ui.panelReason || "")}" oninput="ui.panelReason=this.value" placeholder="${L("VD: đã thống nhất qua Zalo", "e.g. agreed on Zalo")}" /></label>`;
   return `
     <div class="${cx("flex items-start gap-2 border-b border-border px-5 pt-4 pb-3", mobile && "pt-3")}">
       <div class="min-w-0 flex-1">
@@ -638,11 +795,13 @@ function panelBody(mobile) {
       ${sec("reason", `${L("Lý do", "Reason")} <span class="font-normal text-muted">${pub ? "" : L("(không bắt buộc)", "(optional)")}</span>`, reasonBody)}`}
     </div>
     ${ro ? "" : `<div class="border-t border-border px-5 py-3">
-      ${ui.panelMsg ? `<p role="alert" class="mb-2 flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${ui.panelMsg}</p>` : ""}
-      <div class="flex items-center gap-2">
-      ${pub ? btn("outline", L("Sửa giờ ca", "Edit shift times"), { icon: "clock", attrs: `onclick="openDialog('shift')"`, extra: "px-3" }) : btn("danger", L("Bỏ khỏi ca", "Take off"), { attrs: `onclick="panelAct('remove')"`, extra: "px-4" })}
+      ${ui.panelMsg ? `<p role="alert" class="mb-2 flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${ui.panelMsg}</p>` : panelDirty() || P.added ? `<p class="mb-2 text-xs text-muted">${[panelDirty() ? L("Có thay đổi chưa lưu.", "Unsaved changes.") : "", P.added ? L(`Vừa thêm vào ${PERIODS[P.added.p].code}: Huỷ sẽ bỏ ra, đóng panel thì vẫn giữ.`, `Just added to ${PERIODS[P.added.p].code}: Cancel takes it back, closing keeps it.`) : ""].filter(Boolean).join(" ")}</p>` : ""}
+      <div class="flex flex-wrap items-center gap-2">
+      ${pub ? btn("outline", L("Sửa giờ ca", "Edit shift times"), { icon: "clock", attrs: `onclick="openDialog('shift')"`, extra: "px-3" }) : ""}
       <div class="ml-auto flex gap-2">
-        ${btn("primary", L("Lưu", "Save"), { attrs: `onclick="panelAct('save')"`, extra: "px-5" })}
+        ${btn("ghost", L("Huỷ", "Cancel"), { attrs: `onclick="cancelPanel()"`, extra: "px-3" })}
+        ${ds.length ? btn("outline", L("Đặt lại", "Reset"), { attrs: `onclick="resetPanel()"`, extra: "px-3" }) : ""}
+        ${btn("primary", L("Lưu", "Save") + (ds.length ? ` <span class="tabular-nums opacity-80">${[["add", "+"], ["rem", "−"], ["mod", "~"]].map(([k2, sg]) => [sg, ds.filter((q) => q.type === k2).length]).filter(([, n]) => n).map(([sg, n]) => sg + n).join(" ")}</span>` : ""), { attrs: `onclick="panelSave()"`, extra: "px-5" })}
       </div></div></div>`}`;
 }
 
@@ -718,7 +877,7 @@ function calToolbar(mobile) {
   const filtered = ui.sel.size !== DEFAULT_SEL.size || [...ui.sel].some((id) => !DEFAULT_SEL.has(id));
   if (mobile) {
     return `<div class="flex flex-col gap-3" data-wf-block="2">
-      <div class="flex items-center gap-2"><h1 class="sr-only">${L("Tuần", "Week")} ${range}</h1>${weekBadge()}<span class="ml-auto flex items-center gap-1">${regTimesSwitch(true)}${undoBtns()}${legend}</span></div>
+      <div class="flex items-center gap-2"><h1 class="sr-only">${L("Tuần", "Week")} ${range}</h1>${weekBadge()}<span class="ml-auto flex items-center gap-1">${regTimesSwitch(true)}${undoBtns()}${onoteBtn()}${legend}</span></div>
       <div class="flex items-center justify-between gap-1">${calNav(true)}</div>
       ${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${w.date}`]), ui.mDay, "setMDay", L("Ngày", "Day"))}
       <div class="flex items-center gap-2">${btn("outline", `${L("Nhân viên", "Staff")} <span class="tabular-nums text-muted">${ui.sel.size}</span>`, { icon: "users", attrs: `onclick="ui.sheet='staff';render()"`, extra: "whitespace-nowrap px-3" })}<span class="ml-auto flex items-center gap-2">${regOpen() ? right : published() ? exportBtn("px-3") : btn("primary", L("Công bố", "Publish") + (n ? ` <span class="rounded-full bg-primary-foreground px-1.5 text-xs font-semibold tabular-nums text-primary">${n}</span>` : ""), { icon: "send", attrs: `onclick="openDialog('publish')"`, extra: "whitespace-nowrap px-3" })}</span></div></div>`;
@@ -726,9 +885,9 @@ function calToolbar(mobile) {
   return `<div class="mb-4 space-y-3" data-wf-block="2">
     <div class="flex min-h-10 items-center gap-3"><h1 class="text-xl font-semibold tabular-nums">${L("Tuần", "Week")} ${range}</h1>${weekBadge()}<div class="ml-auto flex items-center gap-3">${right}</div></div>
     <div class="flex flex-wrap items-center gap-3">${calNav(false)}
-    ${segmented([["day", L("Ngày", "Day")], ["3d", L("3 ngày", "3 days")], ["week", L("Tuần", "Week")]], ui.view, "setView", L("Chế độ xem", "View"))}
+    ${segmented([["day", L("Ngày", "Day")], ["week", L("Tuần", "Week")]], ui.view, "setView", L("Chế độ xem", "View"))}
     ${OPT === "b" ? `<button type="button" onclick="openPop(event,'stafflist')" aria-haspopup="dialog" aria-expanded="${ui.pop?.id === "stafflist"}" aria-label="${L("Nhân viên và bộ lọc", "Staff and filters")}" title="${L("Nhân viên và bộ lọc", "Staff and filters")}" class="relative inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-border-strong bg-surface text-muted outline-hidden hover:bg-button-hover hover:text-foreground aria-expanded:border-focus aria-expanded:ring-2 aria-expanded:ring-focus">${ic("list-filter")}${filtered ? `<span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-primary ring-2 ring-surface" aria-hidden="true"></span><span class="sr-only">${L(`đang lọc khác mặc định, hiện ${ui.sel.size}/${ACTIVE.length} nhân viên`, `filter changed, showing ${ui.sel.size}/${ACTIVE.length} staff`)}</span>` : ""}</button>` : ""}
-    <span class="ml-auto flex items-center gap-2">${regTimesSwitch(false)}${undoBtns()}${legend}</span></div></div>`;
+    <span class="ml-auto flex items-center gap-2">${regTimesSwitch(false)}${undoBtns()}${onoteBtn()}${legend}</span></div></div>`;
 }
 function screenLich() {
   const loading = S.tt === "dang-tai", err = S.tt === "loi";
@@ -740,7 +899,7 @@ function screenLich() {
   const panelOpen = ui.panel && !loading && !err;
   const desktop = `
     <div class="hidden p-6 lg:block">
-      ${calToolbar(false)}${banner}
+      ${calToolbar(false)}${banner}${loading || err ? "" : onoteBar()}
       <div class="flex items-start gap-5">
         ${OPT === "b" ? "" : `<aside class="w-60 shrink-0" data-wf-block="3">${loading ? `<div class="space-y-3">${skel("w-full", "h-10")}${Array.from({ length: 10 }, (_, i) => skel(["w-3/4", "w-2/3", "w-4/5"][i % 3], "h-4")).join("")}</div>` : staffList(OPT === "d" || OPT === "e")}</aside>`}
         <div class="min-w-0 flex-1 space-y-5">${grid}${loading || err ? "" : assignSection(false)}</div>
@@ -749,7 +908,7 @@ function screenLich() {
     </div>`;
   const mobile = `
     <div class="space-y-4 p-4 lg:hidden">
-      ${calToolbar(true)}${banner}
+      ${calToolbar(true)}${banner}${loading || err ? "" : onoteBar()}
       ${loading ? `<div class="space-y-3">${Array.from({ length: 4 }, () => `<div class="rounded-2xl border border-border bg-surface p-4 space-y-3">${skel("w-1/3")}${skel("w-full", "h-6")}</div>`).join("")}</div>` : err ? errGrid : calMobile()}
       ${loading || err ? "" : assignSection(true)}
     </div>`;
@@ -948,6 +1107,8 @@ function screenRanh() {
 // ===================================================================
 // MÀN 4 · CA CỦA TÔI (FR-S11)
 // ===================================================================
+// Ghi chú xếp lịch đã công bố của ngày có ca (FR-O54, FR-S11)
+const schedNoteLine = (t) => (t ? `<p class="flex gap-1.5 rounded-lg bg-foreground/5 px-3 py-2 text-sm text-pretty text-foreground/85">${ic("sticky-note", "mt-0.5 size-3.5 text-muted")}<span><span class="text-muted">${L("Ghi chú của chủ quán:", "Note from the owner:")}</span> ${esc(t)}</span></p>` : "");
 function screenCa() {
   const loading = S.tt === "dang-tai", err = S.tt === "loi", notPub = S.tt === "chua-cong-bo" || (SANDBOX && SB.phase !== "published");
   // Trải nghiệm: chỉ có tuần 12–18/10, là "tuần sau" tới khi tuần bắt đầu; ca lấy từ lịch đã công bố
@@ -968,7 +1129,7 @@ function screenCa() {
   else body = `<ul class="overflow-hidden rounded-2xl border border-border bg-surface divide-y divide-border" data-wf-block="5">${(SANDBOX ? WEEK : LATE_WEEK).map((w, d) => {
     const list = shiftsAll.filter((x) => x.d === d); const today = d === (SANDBOX ? SB.day : 2);
     return `<li class="flex gap-4 px-5 py-4"><div class="w-14 shrink-0"><p class="${cx("text-xs", today ? "font-semibold text-primary" : "text-muted")}">${today ? L("Hôm nay", "Today") : L(w.vi, w.en)}</p><p class="text-lg font-semibold tabular-nums">${w.date}</p></div>
-      <div class="min-w-0 flex-1 space-y-2 pt-0.5">${list.length ? list.map((x) => { const t = lateTier(x, x.arrive); const paid = paidH(x.from, x.to), clock = (toMin(x.to) - toMin(x.from)) / 60; return `<div><p class="text-sm font-semibold tabular-nums">${x.from} – ${x.to}${paid !== clock ? ` <span class="text-xs font-normal text-muted">· ${L(`tính ${fmtH(paid)} giờ`, `paid ${fmtH(paid)}h`)}</span>` : ""}</p>${(x.parts || [x]).map((y) => `<p class="mt-0.5 flex items-center gap-1.5 text-sm text-foreground/80">${posDot(y.pos)}${x.parts ? `<span class="tabular-nums text-muted">${y.from}–${y.to}</span>` : ""}<span class="min-w-0">${esc(posLabel([y.pos], [y.sub]))}</span></p>`).join("")}${t ? `<p class="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted"><span class="tabular-nums">${L(`Đến ${x.arrive} · trễ ${t.late} phút`, `Arrived ${x.arrive} · ${t.late} min late`)}</span>${badge(t.tone, t.t, t.icon)}</p>` : ""}</div>`; }).join("") : `<p class="pt-1 text-sm text-muted">${L("Nghỉ", "Off")}</p>`}</div></li>`;
+      <div class="min-w-0 flex-1 space-y-2 pt-0.5">${list.length ? list.map((x) => { const t = lateTier(x, x.arrive); const paid = paidH(x.from, x.to), clock = (toMin(x.to) - toMin(x.from)) / 60; return `<div><p class="text-sm font-semibold tabular-nums">${x.from} – ${x.to}${paid !== clock ? ` <span class="text-xs font-normal text-muted">· ${L(`tính ${fmtH(paid)} giờ`, `paid ${fmtH(paid)}h`)}</span>` : ""}</p>${(x.parts || [x]).map((y) => `<p class="mt-0.5 flex items-center gap-1.5 text-sm text-foreground/80">${posDot(y.pos)}${x.parts ? `<span class="tabular-nums text-muted">${y.from}–${y.to}</span>` : ""}<span class="min-w-0">${esc(posLabel([y.pos], [y.sub]))}</span></p>`).join("")}${t ? `<p class="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted"><span class="tabular-nums">${L(`Đến ${x.arrive} · trễ ${t.late} phút`, `Arrived ${x.arrive} · ${t.late} min late`)}</span>${badge(t.tone, t.t, t.icon)}</p>` : ""}</div>`; }).join("") : `<p class="pt-1 text-sm text-muted">${L("Nghỉ", "Off")}</p>`}${schedNoteLine(list.length ? (SANDBOX ? notePub(d) : MY_SCHED_NOTES[d] || "") : "")}</div></li>`;
   }).join("")}</ul>`;
   const sum = loading || err || notPub || empty ? "" : `<div class="grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-surface" data-wf-block="3">
     ${[[L("Ca", "Shifts"), shiftsAll.length], [L("Giờ", "Hours"), fmtH(hours)], [L("Lương ước tính", "Est. pay"), vnd(pay)]].map(([k, v]) => `<div class="px-4 py-3"><p class="text-xs text-muted">${k}</p><p class="mt-0.5 text-base font-semibold tabular-nums">${v}</p></div>`).join("")}</div>
@@ -978,6 +1139,45 @@ function screenCa() {
   const posCard = loading || err ? "" : `<section class="rounded-2xl border border-border bg-surface" data-wf-block="4"><header class="px-5 pt-4 pb-2"><h2 class="text-base font-semibold">${L("Vị trí đã làm", "Positions worked")}</h2><p class="mt-0.5 text-xs text-pretty text-muted">${L("Các ca bạn đã làm, từ khi dùng hệ thống.", "Shifts you’ve worked since the app started.")}</p></header><div class="flex flex-wrap gap-1.5 px-5 pb-4">${mine.length ? mine.map(([pid, h]) => `<span class="inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/5 px-3 text-sm font-medium">${posDot(pid)}${posName(pid)}${hrsTag(h)}</span>`).join("") : `<p class="text-sm text-muted">${L("Chưa có ca nào đã làm.", "No shifts worked yet.")}</p>`}</div></section>`;
   return appShell(`<div class="mx-auto w-full max-w-2xl space-y-4 p-4 sm:p-6"><div class="flex flex-wrap items-center gap-3" data-wf-block="2"><h1 class="text-xl font-semibold max-lg:sr-only">${L("Hồ sơ của tôi", "My profile")}</h1><span class="ml-auto">${tabs}</span></div>${sum}${posCard}${body}</div>`, L("Hồ sơ của tôi", "My profile"));
 }
+
+// ===================================================================
+// Lịch dạng file xuất (FR-O52), dùng cho hộp Xuất lịch và màn Lịch quán của nhân viên: biệt danh trên màu vị trí, ký hiệu,
+// giờ chỉ khi khác giờ ca, nhóm như trên lịch, chú giải; ghi chú xếp lịch in dưới mỗi ngày (góp ý 12/11, F2 và M3b).
+function weekSheet({ src, base, days, notes, me }) {
+  const at = (s, d, p) => src.asg[s.id]?.[d]?.[p];
+  const people = (d, p) => STAFF.filter((s) => at(s, d, p)?.pos.length).sort((a, b) => CAT[at(a, d, p).pos[0]] - CAT[at(b, d, p).pos[0]] || a.nick.localeCompare(b.nick, "vi"));
+  const chip = (s, d, p) => { const a = at(s, d, p), n = pn(a.pos[0]), mk = marksOf(a); return `<span class="${cx("inline-flex h-5 max-w-[100%] items-center gap-1 rounded-full border px-1.5 text-[11px] font-medium whitespace-nowrap", `border-p${n}-bd bg-p${n}-bg text-p${n}-tx`, s.id === me && "ring-2 ring-zinc-900 ring-offset-1")}"><span class="truncate">${esc(s.nick)}</span>${mk ? `<span class="shrink-0 font-semibold">${mk}</span>` : ""}${a.t ? `<span class="shrink-0 font-normal tabular-nums">${a.t.from}–${a.t.to}</span>` : ""}</span>`; };
+  const nt = days.map((d) => (notes ? notes(d) : "") || "");
+  const grid = `<div class="grid ${days.length > 1 ? "min-w-[760px]" : ""}" style="grid-template-columns:52px repeat(${days.length},minmax(0,1fr))"><div></div>${days.map((d) => `<div class="border-l border-zinc-200 px-1.5 pb-1.5 text-xs font-semibold">${dayShort(d)} ${base + d}/10</div>`).join("")}
+    ${PERIODS.map((p) => `<div class="border-t border-zinc-200 px-1 py-1.5 text-[11px] font-semibold">${p.code}<span class="block font-normal tabular-nums text-zinc-500">${pTime(p.i)}</span></div>${days.map((d) => `<div class="flex min-w-0 flex-wrap content-start gap-1 border-t border-l border-zinc-200 p-1.5">${people(d, p.i).map((s) => chip(s, d, p.i)).join("")}</div>`).join("")}`).join("")}
+    ${nt.some(Boolean) ? `<div class="border-t border-zinc-200 px-1 py-1.5 text-[11px] font-semibold">${L("Ghi chú", "Notes")}</div>${nt.map((x) => `<div class="min-w-0 border-t border-l border-zinc-200 p-1.5 text-[11px] text-pretty text-zinc-700">${esc(x)}</div>`).join("")}` : ""}</div>`;
+  const legend = `<div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-zinc-200 pt-2.5 text-[11px]">${POSITIONS.map((x) => `<span class="inline-flex items-center gap-1.5">${posDot(x.id, "size-2.5")}<span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-zinc-500">${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-zinc-800">${mk}</b> ${L(vi, en)}`).join(" · ")}</span>` : ""}</span>`).join("")}${me ? `<span class="inline-flex items-center gap-1.5"><span class="h-3.5 w-6 rounded-full ring-2 ring-zinc-900 ring-offset-1"></span><span class="font-medium">${L("Ca của bạn", "Your shifts")}</span></span>` : ""}</div>`;
+  return grid + legend;
+}
+// ===================================================================
+// MÀN 4b · LỊCH QUÁN (nhân viên, góp ý 12/11 mục 3): lịch đã công bố của cả quán, như file xuất, kèm ghi chú xếp lịch.
+// Ngoại lệ thứ ba của NFR-2; chủ tắt được trong menu tài khoản. Không có lương, đi trễ, đăng ký hay giờ riêng của ai.
+// ===================================================================
+function screenQuan() {
+  const loading = S.tt === "dang-tai", err = S.tt === "loi", off = !shopOn(), notPub = S.tt === "chua-cong-bo" || (SANDBOX && SB.phase !== "published");
+  // Ngoài Trải nghiệm: tuần 5–11/10 là tuần đang làm đã công bố (như Hồ sơ của tôi); Trải nghiệm: tuần 12–18/10
+  const src = SANDBOX ? DATA : PREV_WEEK, base = SANDBOX ? 12 : 5, me = SANDBOX ? SB.me : "s7";
+  const notes = (d) => src.dnote?.[d] ? (src.dnote[d].pub ?? src.dnote[d].text) || "" : "";
+  const range = `${base}–${base + 6}/10`;
+  const box = (a, b) => `<div class="rounded-2xl border border-border bg-surface px-5 py-8 text-center"><p class="text-sm font-medium">${a}</p><p class="mt-1 text-sm text-pretty text-muted">${b}</p></div>`;
+  let body;
+  if (loading) body = `<div aria-busy="true" class="space-y-3 rounded-2xl border border-border bg-surface p-4">${Array.from({ length: 6 }, (_, i) => skel(["w-full", "w-3/4", "w-2/3"][i % 3], "h-6")).join("")}</div>`;
+  else if (err) body = `<div class="rounded-2xl border border-border bg-surface">${errorBlock(L("Không tải được lịch quán", "Couldn’t load the shop schedule"), L("Mất kết nối mạng", "Network connection lost"))}</div>`;
+  else if (off) body = box(L("Chủ quán đang tắt Lịch quán", "The owner has turned the shop schedule off"), L("Ca của bạn vẫn ở Hồ sơ của tôi.", "Your own shifts are still on My profile."));
+  else if (notPub) body = box(L(`Lịch tuần ${range} chưa công bố`, `Week ${range} isn’t published yet`), L("Chủ quán công bố xong là lịch cả quán hiện ở đây.", "The shop’s schedule appears here once the owner publishes."));
+  else {
+    const d = ui.qDay ?? 0;
+    body = `<div class="hidden overflow-x-auto rounded-2xl border border-border bg-white p-4 text-zinc-900 md:block" data-wf-block="3">${weekSheet({ src, base, days: [0, 1, 2, 3, 4, 5, 6], notes, me })}</div>
+      <div class="space-y-3 md:hidden" data-wf-block="3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${base + i}`]), d, "setQDay", L("Ngày", "Day"))}<div class="rounded-2xl border border-border bg-white p-3 text-zinc-900">${weekSheet({ src, base, days: [d], notes, me })}</div></div>`;
+  }
+  return appShell(`<div class="mx-auto w-full max-w-6xl space-y-4 p-4 sm:p-6"><div class="flex flex-wrap items-center gap-3" data-wf-block="2"><h1 class="text-xl font-semibold max-lg:sr-only">${L("Lịch quán", "Shop schedule")}</h1><span class="text-sm tabular-nums text-muted">${L("Tuần", "Week")} ${range}</span>${!off && !notPub && !loading && !err ? `<span class="ml-auto text-xs text-pretty text-muted">${L("Chỉ xem. Muốn đổi ca, nhắn chủ quán.", "View only. To swap a shift, message the owner.")}</span>` : ""}</div>${body}</div>`, L("Lịch quán", "Shop schedule"));
+}
+function setQDay(v) { ui.qDay = +v; render(); }
 
 // ===================================================================
 // MÀN 5 · NHÂN VIÊN (FR-A1–A11; lương cơ bản + lương phụ trách theo người, góp ý 16/10)
@@ -1012,43 +1212,64 @@ function staffForm() {
   const isNew = ui.staffEdit === "new"; const s = isNew ? { name: "", nick: "", phone: "", q: [], user: "", base: null, lead: null, pw: null } : ST[ui.staffEdit];
   // Bản nháp của form: vị trí thường đảm nhiệm và công tắc Phụ trách đổi được, chỉ lưu khi bấm Lưu
   if (!ui.sd || ui.sd.id !== ui.staffEdit) ui.sd = { id: ui.staffEdit, q: s.q.slice() };
-  const q = ui.sd.q, canLead = q.includes("pt");
+  const q = ui.sd.q, canLead = q.includes("pt"), f = ui.sd.f || {};
   const field = (label, input, hint) => `<div class="space-y-1.5"><label class="block w-fit text-sm font-medium">${label}</label>${input}${hint ? `<p class="text-xs text-muted">${hint}</p>` : ""}</div>`;
   const money = (v, label, ph = "0", id = "", bad = false) => `<label class="relative block"><span class="sr-only">${label}</span><input ${id ? `id="${id}" oninput="ui.sd.err='';this.classList.remove('border-err-text')"` : ""} value="${v ? v.toLocaleString("vi-VN") : ""}" placeholder="${ph}" inputmode="numeric" class="${cx(INPUT, "pr-16 text-right tabular-nums", bad && "border-err-text")}" /><span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-sm text-muted">đ/${L("giờ", "h")}</span></label>`;
   const chips = POSITIONS.filter((p) => !p.lead).map((p) => { const on = q.includes(p.id); return `<button type="button" aria-pressed="${on}" onclick="toggleStaffPos('${p.id}')" class="${cx("inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${hrsTag(hrsAt(s, p.id))}</button>`; }).join("");
   const sw = `<button type="button" role="switch" aria-checked="${canLead}" aria-labelledby="lead-label" onclick="toggleStaffPos('pt')" class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-muted/40 p-0.5 outline-hidden before:absolute before:-inset-2 transition-colors hover:bg-muted/60 aria-checked:bg-primary aria-checked:hover:bg-primary-hover"><span class="size-5 rounded-full bg-surface shadow-sm transition-transform group-aria-checked:translate-x-5 group-aria-checked:bg-primary-foreground motion-reduce:transition-none"></span></button>`;
   return `<div class="flex items-center gap-2 border-b border-border px-4 pt-4 pb-3">${iconBtn("x", L("Đóng", "Close"), `onclick="closeStaff()"`, "size-9")}<h2 class="min-w-0 flex-1 truncate text-lg font-semibold">${isNew ? L("Thêm nhân viên", "Add staff") : esc(s.name)}</h2></div>
     <div class="flex-1 space-y-5 overflow-y-auto px-6 py-6">
-      ${field(`${L("Họ tên", "Full name")} <span class="text-err-text">*</span>`, `<input class="${INPUT}" value="${esc(s.name)}" />`)}
-      ${field(L("Biệt danh", "Nickname"), `<input class="${INPUT}" value="${esc(s.nick)}" placeholder="${L("Tự đề xuất: tên + chữ đầu của họ", "Suggested: given name + family initial")}" />`)}
-      ${field(L("Điện thoại", "Phone"), `<input class="${INPUT} tabular-nums" value="${esc(s.phone)}" inputmode="tel" />`)}
+      ${field(`${L("Họ tên", "Full name")} <span class="text-err-text">*</span>`, `<input id="sf-name" class="${cx(INPUT, ui.sd.nameErr && "border-err-text")}" value="${esc(f.name ?? s.name)}" />${ui.sd.nameErr ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.nameErr}</p>` : ""}`)}
+      ${field(L("Biệt danh", "Nickname"), `<input id="sf-nick" class="${INPUT}" value="${esc(f.nick ?? s.nick)}" placeholder="${L("Tự đề xuất: tên + chữ đầu của họ", "Suggested: given name + family initial")}" />`)}
+      ${field(L("Điện thoại", "Phone"), `<input id="sf-phone" class="${INPUT} tabular-nums" value="${esc(f.phone ?? s.phone)}" inputmode="tel" />`)}
       <fieldset class="space-y-2"><legend class="mb-2 text-sm font-medium">${L("Vị trí thường đảm nhiệm", "Usual positions")}</legend><div class="flex flex-wrap gap-1.5">${chips}</div>${ui.sd.cap ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.cap}</p>` : ""}</fieldset>
       <fieldset class="space-y-4"><legend class="mb-2 text-sm font-medium">${L("Lương giờ", "Hourly rate")}</legend>
-        <div class="sm:w-1/2 sm:pr-1.5">${field(`${L("Cơ bản", "Base")} <span class="text-err-text">*</span>`, money(s.base, L("Lương cơ bản", "Base rate")))}</div>
+        <div class="sm:w-1/2 sm:pr-1.5">${field(`${L("Cơ bản", "Base")} <span class="text-err-text">*</span>`, money(f.base ?? s.base, L("Lương cơ bản", "Base rate"), "0", "base-rate"))}</div>
         <div class="flex items-center justify-between gap-4"><p id="lead-label" class="flex items-baseline gap-1.5 text-sm font-medium">${L("Phụ trách", "Shift Lead")}${hrsTag(hrsAt(s, "pt"))}</p>${sw}</div>
-        ${canLead ? `<div class="space-y-1.5 sm:w-1/2 sm:pr-1.5">${field(`${L("Lương phụ trách", "Lead rate")} <span class="text-err-text">*</span>`, money(s.lead, L("Lương phụ trách", "Lead rate"), "0", "lead-rate", ui.sd.err))}${ui.sd.err ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.err}</p>` : ""}</div>` : ""}</fieldset>
+        ${canLead ? `<div class="space-y-1.5 sm:w-1/2 sm:pr-1.5">${field(`${L("Lương phụ trách", "Lead rate")} <span class="text-err-text">*</span>`, money(f.lead ?? s.lead, L("Lương phụ trách", "Lead rate"), "0", "lead-rate", ui.sd.err))}${ui.sd.err ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.err}</p>` : ""}</div>` : ""}</fieldset>
       <div class="space-y-4 border-t border-border pt-5"><h3 class="text-sm font-semibold">${L("Đăng nhập", "Sign-in")}</h3>
-        ${field(L("Tên đăng nhập", "Username"), `<input class="${INPUT} font-mono" value="${esc(s.user)}" />`)}
+        ${field(L("Tên đăng nhập", "Username"), `<input id="sf-user" class="${INPUT} font-mono" value="${esc(f.user ?? s.user)}" />`)}
         ${field(L("Mật khẩu", "Password"), `<div class="flex gap-2"><input class="${INPUT} font-mono" placeholder="${L("Gõ hoặc tạo mật khẩu mới", "Type or generate a new password")}" />${btn("outline", L("Tạo", "Generate"), { icon: "wand-sparkles", extra: "min-h-11 md:min-h-10 shrink-0" })}</div>`, s.pw ? L(`Đặt lần cuối ${s.pw}. Mật khẩu chỉ hiện tới khi đóng hồ sơ.`, `Last set ${s.pw}. Shown only until you close this record.`) : L("Chưa có mật khẩu. Đặt xong thì gửi cho nhân viên qua Zalo.", "No password yet. Send it to them on Zalo once set."))}
       </div>
       ${isNew || s.left ? "" : `<div class="border-t border-border pt-5"><div class="flex items-center justify-between gap-4"><div><p class="text-sm font-medium">${L("Vô hiệu hoá tài khoản", "Deactivate account")}</p><p class="mt-1 text-sm text-muted">${L("Mất quyền đăng nhập, giữ lịch sử. Ca tương lai được giữ lại và báo cần người thay.", "Revokes sign-in, keeps history. Future shifts stay and are flagged for cover.")}</p></div>${btn("danger", L("Vô hiệu hoá", "Deactivate"), { extra: "shrink-0" })}</div></div>`}
     </div>
     <div class="flex justify-end gap-2 border-t border-border px-6 py-4">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="closeStaff()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", isNew ? L("Tạo tài khoản", "Create account") : L("Lưu", "Save"), { attrs: `onclick="saveStaff()"`, extra: "min-h-11 md:min-h-10" })}</div>`;
 }
-// Tối đa hai vị trí thường đảm nhiệm (FR-A12), không tính Phụ trách: chip thứ ba không thêm được, báo lý do thay vì khoá nút
+// Vị trí thường đảm nhiệm không giới hạn số lượng (PRD v1.13, góp ý 10/11 mục 8)
+// Giữ chữ đã gõ trong form khi vẽ lại (bấm chip vị trí, công tắc Phụ trách, báo lỗi)
+function grabStaffForm() { const v = (id) => document.getElementById(id)?.value; if (ui.sd) ui.sd.f = { name: v("sf-name"), nick: v("sf-nick"), phone: v("sf-phone"), user: v("sf-user"), base: v("base-rate"), lead: v("lead-rate") }; }
 function toggleStaffPos(id) {
+  grabStaffForm();
   const q = ui.sd.q, i = q.indexOf(id);
   ui.sd.err = ""; ui.sd.cap = "";
   if (i >= 0) q.splice(i, 1);
-  else if (!isLead(id) && q.filter((x) => !isLead(x)).length >= USUAL_MAX) ui.sd.cap = L("Tối đa 2 vị trí thường đảm nhiệm. Bỏ một vị trí trước khi chọn vị trí khác.", "At most 2 usual positions. Remove one before choosing another.");
   else q.push(id);
   render();
 }
-// Lưu (chỉ đổi dữ liệu mẫu): bật Phụ trách mà chưa nhập lương phụ trách thì báo ngay tại ô, không lưu
+// Lưu (chỉ đổi dữ liệu mẫu): bật Phụ trách mà chưa nhập lương phụ trách thì báo ngay tại ô, không lưu.
+// Thêm nhân viên tạo người mới thật trong dữ liệu mẫu, đăng nhập và dùng thử được như người có sẵn (góp ý 10/11, mục 7).
 function saveStaff() {
-  const lead = ui.sd.q.includes("pt") ? Number((document.getElementById("lead-rate")?.value || "").replace(/\D/g, "")) : null;
+  const val = (id) => (document.getElementById(id)?.value || "").trim();
+  const num = (id) => Number(val(id).replace(/\D/g, "")) || null;
+  const keep = () => { const s = ui.staffEdit === "new" ? null : ST[ui.staffEdit]; return s; };
+  grabStaffForm();
+  const name = val("sf-name");
+  if (!name) { ui.sd.nameErr = L("Nhập họ tên.", "Enter a full name."); return render(); }
+  ui.sd.nameErr = "";
+  const lead = ui.sd.q.includes("pt") ? num("lead-rate") : null;
   if (ui.sd.q.includes("pt") && !lead) { ui.sd.err = L("Nhập lương phụ trách, hoặc tắt Phụ trách.", "Enter a lead rate, or turn Shift Lead off."); return render(); }
-  if (ui.staffEdit !== "new") { const s = ST[ui.staffEdit], q0 = s.q.slice(), lead0 = s.lead; Object.assign(s, { q: ui.sd.q.slice(), lead }); if (SANDBOX) sbStaffSaved(s, q0, lead0); }
+  const parts = name.split(/\s+/), given = parts[parts.length - 1];
+  const nickOf = () => { const taken = new Set(ACTIVE.filter((x) => x !== keep()).map((x) => x.nick.toLowerCase())); return taken.has(given.toLowerCase()) ? `${given} ${parts[0][0]}` : given; };
+  const fields = { name, nick: val("sf-nick") || nickOf(), phone: val("sf-phone"), user: val("sf-user"), base: num("base-rate") || 0 };
+  if (ui.staffEdit === "new") {
+    const s = addStaffRecord({ id: "n" + Date.now().toString(36), ...fields, q: ui.sd.q.slice(), lead, type: "none", pw: fields.user ? "08/10/2026" : null });
+    ui.sel.add(s.id);
+    if (SANDBOX) sbStaffAdded(s);
+  } else {
+    const s = ST[ui.staffEdit], q0 = s.q.slice(), lead0 = s.lead;
+    Object.assign(s, { ...fields, q: ui.sd.q.slice(), lead });
+    if (SANDBOX) sbStaffSaved(s, q0, lead0);
+  }
   closeStaff();
 }
 function closeStaff() { ui.staffEdit = null; ui.sd = null; render(); }
@@ -1103,6 +1324,7 @@ function popContent() {
     const me = ME();
     return `<div class="px-3 py-2"><p class="truncate text-sm font-medium">${me.name}</p><p class="truncate text-xs text-muted">${me.user}</p></div><hr class="my-1 border-border" />
       <div class="px-1"><p class="px-3 pt-1 pb-1 text-xs text-muted">${L("Ngôn ngữ", "Language")}</p>${[["vi", "Tiếng Việt"], ["en", "English"]].map(([v, t]) => `<a href="${link("lang", v)}" role="menuitemradio" aria-checked="${S.lang === v}" class="flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-sm outline-hidden hover:bg-item-hover">${t}${S.lang === v ? ic("check", "ml-auto size-4") : ""}</a>`).join("")}</div>
+      ${SC.role === "owner" ? `<hr class="my-1 border-border" /><div class="px-1"><button type="button" role="switch" aria-checked="${shopOn()}" onclick="toggleShop()" class="flex min-h-10 w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm outline-hidden hover:bg-item-hover"><span class="min-w-0 flex-1"><span class="block">${L("Nhân viên xem lịch cả quán", "Staff see the shop schedule")}</span><span class="block text-xs text-muted">${L("Tuần đã công bố, như file xuất", "Published weeks, as exported")}</span></span><span class="${cx("relative h-5 w-9 shrink-0 rounded-full transition-colors", shopOn() ? "bg-primary" : "bg-foreground/15")}"><span class="${cx("absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow transition-transform", shopOn() && "translate-x-4")}"></span></span></button></div>` : ""}
       <hr class="my-1 border-border" /><div class="px-1"><a href="${linkMan("dn")}" class="group flex h-10 w-full items-center gap-2.5 rounded-xl px-3 text-sm outline-hidden hover:bg-rose-500/10 hover:text-rose-700">${ic("log-out", "size-4 text-muted group-hover:text-rose-700")}${L("Đăng xuất", "Sign out")}</a></div>`;
   }
   if (p.id === "filters") return filtersPanel();
@@ -1125,27 +1347,41 @@ function popContent() {
       <p class="mt-2 border-t border-border pt-2 text-xs text-pretty text-muted">${SANDBOX ? L("Chọn một ngày để tới khoảng chứa ngày đó. Tuần đang xếp là 12–18/10.", "Pick a day to jump to the range holding it. The week being scheduled is 12–18 Oct.") : L("Chọn một ngày để tới khoảng chứa ngày đó. Có dữ liệu từ 5/10; tuần đang xếp là 12–18/10.", "Pick a day to jump to the range holding it. Data starts 5 Oct; the week being scheduled is 12–18 Oct.")}</p></div>`;
   }
   if (p.id === "legend") {
-    // PRD v1.11: trạng thái nhận ra bằng hình (dấu tích, "!", gạch ngang, nét đứt), không bằng màu
+    // PRD v1.13 và góp ý 12/11: trạng thái nhận ra bằng hình (dấu tích, nét đứt, chấm cảnh báo, gạch ngang), không bằng màu; ký hiệu là huy hiệu ở góc phải trên
     const chipS = (cls, inner) => `<span class="relative inline-flex h-6 shrink-0 items-center justify-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap ${cls}">${inner}</span>`;
     const row = (chips, t) => `<li class="flex items-center gap-3"><span class="flex w-24 shrink-0 flex-wrap gap-1">${chips}</span><span class="text-sm text-pretty">${t}</span></li>`;
-    const reg = "border-foreground/10 bg-foreground/[0.07] text-foreground/80";
-    const bang = `<span class="absolute -top-1 -right-1 grid size-3.5 place-items-center rounded-full bg-warn text-[9px] leading-none font-bold text-white ring-2 ring-surface">!</span>`;
+    const reg = "border-[1.5px] border-dashed border-foreground/50 bg-surface text-foreground/85";
+    const mkB = (t) => `<span class="pointer-events-none absolute -top-[7px] -right-1 rounded-full bg-foreground px-1 text-[9px] leading-[13px] font-bold tabular-nums text-surface ring-2 ring-surface">${t}</span>`;
     const starSvg = `<svg viewBox="0 0 24 24" class="size-3 shrink-0 fill-(--star)" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>`;
     return `<div class="space-y-3 p-4"><ul class="space-y-2.5">
-      ${row(chipS(reg, `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] tabular-nums text-muted">${L("T5", "Thu")} 08:03</span>${ic("check", "-ml-0.5 size-3 opacity-80")}Mai`), L("Đã đăng ký, chưa xếp. Mép trên là giờ lưu đăng ký lần đầu (công tắc Giờ đăng ký)", "Registered, not placed. The top edge shows when they first saved (Registration times switch)"))}
-      ${row(chipS("border-dashed border-foreground/35 bg-surface text-muted opacity-55", "Mai"), L("Chưa đăng ký gì, tính là rảnh (ẩn mặc định)", "Didn’t register, counted as free (hidden by default)"))}
-      ${row(chipS("border-[1.5px] border-foreground/60 bg-surface text-foreground", "Mai"), L("Đã xếp, chưa có vị trí", "Placed, no position yet"))}
-      ${row(chipS("border-p5-bd bg-p5-bg text-p5-tx", `Mai<span class="font-semibold">M·T</span>`) + chipS("border-p1-bd bg-p1-bg text-p1-tx", `Bảo<span class="font-semibold">Tr</span>`), L("Đã xếp, tô màu vị trí; chữ đậm là ký hiệu vị trí con", "Placed, filled in the position colour; bold letters are the sub-position marks"))}
-      ${row(chipS("border-p6-bd bg-p6-bg text-p6-tx", `Mai${bang}`), L("Cần chú ý: ngoài lịch rảnh, chưa có kinh nghiệm, đã tắt Phụ trách, hoặc giờ riêng chưa quyết", "Needs attention: outside availability, no experience, shift lead off, or own times not decided"))}
-      ${row(chipS("border-p7-bd bg-p7-bg text-p7-tx", `<span class="line-through">Đức</span>`), L("Đã nghỉ, vẫn còn giữ ca", "Deactivated, still holding the shift"))}
-      ${row(chipS(reg, `${starSvg}Mai`), L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week"))}
-      ${row(chipS(reg, `Mai${ic("clock", "size-3 opacity-80")}`), L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)"))}
-      ${row(chipS(reg, `Mai${ic("message-square-text", "size-3 opacity-70")}`), L("Có ghi chú cho ngày này", "Has a note for this day"))}</ul>
+      ${row(chipS(reg, `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] tabular-nums text-muted">${L("T5", "Thu")} 08:03</span>${ic("check", "-ml-0.5 size-3 opacity-80")}Danh`), L("Đã đăng ký, chưa xếp. Mép trên là giờ lưu đăng ký lần đầu (công tắc Giờ đăng ký)", "Registered, not placed. The top edge shows when they first saved (Registration times switch)"))}
+      ${row(chipS("border-dashed border-foreground/35 bg-surface text-muted opacity-55", "Hào"), L("Chưa đăng ký gì, tính là rảnh (ẩn mặc định)", "Didn’t register, counted as free (hidden by default)"))}
+      ${row(chipS("border-[1.5px] border-foreground/60 bg-surface text-foreground", "Lộc"), L("Đã xếp, chưa có vị trí", "Placed, no position yet"))}
+      ${row(chipS("border-p5-bd bg-p5-bg text-p5-tx", `Thạnh${mkB("2·3")}`) + chipS("border-p1-bd bg-p1-bg text-p1-tx", `Cô${mkB("T")}`), L("Đã xếp, tô màu vị trí; huy hiệu ở góc là ký hiệu vị trí con", "Placed, filled in the position colour; the corner badge shows the sub-position marks"))}
+      ${row(chipS("border-p6-bd bg-p6-bg text-p6-tx", `TD${WARN_DOT}`), L("Chấm ở góc phải dưới là cần chú ý: ngoài lịch rảnh, chưa có kinh nghiệm, đã tắt Phụ trách, giờ riêng chưa quyết, hoặc (trên chip chưa xếp) ngày đăng ký dưới 8 tiếng", "A dot on the bottom-right corner needs attention: outside availability, no experience, shift lead off, own times not decided, or (on an unplaced marker) a registered day under 8 hours"))}
+      ${row(chipS("border-p7-bd bg-p7-bg text-p7-tx", `<span class="line-through">Toàn</span>`), L("Đã nghỉ, vẫn còn giữ ca", "Deactivated, still holding the shift"))}
+      ${row(chipS(reg, `${starSvg}Ngàn`), L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week"))}
+      ${row(chipS(reg, `Hậu${ic("clock", "size-3 opacity-80")}`), L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)"))}
+      ${row(chipS(reg, `Hậu${ic("message-square-text", "size-3 opacity-70")}`), L("Có ghi chú cho ngày này", "Has a note for this day"))}
+      ${row(`<span class="wt-hl-cold h-6 w-10 rounded-md"></span><span class="wt-hl-hot h-6 w-10 rounded-md"></span>`, L("Bấm chip chưa xếp: ô nền xanh là các ca người đó đăng ký. Bấm chip đã xếp: ô nền cam là các ca người đó đã được xếp", "Select an unplaced marker: blue cells are the shifts they registered. Select a placed one: orange cells are the shifts they’re placed in"))}
+      ${row(`<span class="inline-flex h-6 items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted">+3</span>`, L("Người đăng ký ca này nhưng đã được xếp ca khác trong ngày. Bấm để xem và đưa chip lại vào ô", "Registered for this shift but placed in another one today. Select to see them and bring a marker back"))}</ul>
       <p class="text-xs text-pretty text-muted">${L("Thứ tự trong ô: người có vị trí trước, nhóm theo thứ tự vị trí bên dưới, A–Z trong nhóm. Sau đó người chưa có vị trí: có cảnh báo trước, rồi A–Z, người thêm thủ công cuối; ca dưới giữ thứ tự của ca trên.", "Order in a cell: people with a position first, grouped in the order below, A–Z within a group. Then those without one: warnings first, then A–Z, manually added last; each shift keeps the order of the one above.")}</p>
       <div class="border-t border-border pt-3"><p class="mb-2 text-xs font-medium text-muted">${L("Vị trí và ký hiệu", "Positions and marks")}</p><ul class="space-y-1.5">${POSITIONS.map((x) => `<li class="flex items-start gap-2 text-sm">${posDot(x.id, "mt-1.5 size-2.5")}<span><span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-muted"> · ${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-foreground">${mk}</b> ${L(vi, en)}`).join(", ")}</span>` : ""}</span></li>`).join("")}</ul></div></div>`;
   }
   if (p.id === "rules") return `<div class="p-4"><p class="mb-3 text-sm font-semibold">${L("Quy tắc đi trễ", "Lateness rules")}</p><ul class="space-y-2.5 text-sm">
       ${[[`0–${RULES.grace}′`, L("Đúng giờ (ân hạn)", "On time (grace)"), "neutral"], [`${RULES.grace + 1}–${RULES.noDeductUntil}′`, L("Tính đi trễ, mất thưởng tuần", "Late, weekly bonus lost"), "warn"], [`${RULES.noDeductUntil + 1}′+`, L("Trừ gấp đôi số phút, mất thưởng", "Deduct 2× the minutes, bonus lost"), "warn"], [L("Trừ ≥ ca", "Deduction ≥ shift"), L("Bất thường, giữ lại chờ bạn xem", "Anomaly, held for your review"), "err"], [L("Vào trễ đã thống nhất", "Agreed late start"), L("Không ân hạn: từ phút 1 tính trễ và trừ gấp đôi. Về sớm theo giờ riêng vẫn có ân hạn.", "No grace: late and 2× deduction from minute 1. Own times that only end earlier keep the grace."), "warn"]].map(([a, b, t]) => `<li class="flex gap-3"><span class="w-24 shrink-0 text-xs font-medium tabular-nums ${t === "neutral" ? "text-muted" : "text-" + t}">${a}</span><span>${b}</span></li>`).join("")}</ul></div>`;
+  if (p.id === "dnote") {
+    const d = p.d, n = dnoteAt(d), ro = ui.weekOff < 0, t = n?.text || "", dirty = noteDirty(d), ex = "h-9 min-h-9 rounded-lg px-3";
+    return `<div class="space-y-3 p-4"><div><p class="flex items-center gap-2 text-sm font-semibold"><span class="min-w-0 flex-1">${L("Ghi chú xếp lịch", "Schedule note")} · ${dayFull(d)}</span>${noteBadge(d)}</p><p class="mt-0.5 text-xs text-pretty text-muted">${published() ? L("Nhân viên đang đọc được ở Hồ sơ của tôi, Lịch quán và file xuất lịch. Lưu là cập nhật ngay.", "Staff can read it on My profile, the shop schedule and the export. Saving updates it at once.") : L("Công bố cùng lịch tuần, rồi nhân viên đọc được ở Hồ sơ của tôi, Lịch quán và file xuất lịch.", "Published with the week, then readable on My profile, the shop schedule and the export.")}</p></div>
+      ${dirty ? `<p class="rounded-lg bg-foreground/5 px-3 py-2 text-xs text-pretty text-muted"><span class="font-medium text-foreground">${L("Nhân viên đang thấy:", "Staff currently see:")}</span> ${n.pub ? esc(n.pub) : L("(chưa có ghi chú)", "(no note)")}</p>` : ""}
+      <textarea id="dnote-ta" data-focus-id="dnote-ta" rows="4" ${ro ? "readonly" : ""} placeholder="${L("Ví dụ: Thạnh kèm NH ở Thu Ngân – Offline ca sáng", "e.g. Thạnh trains NH on the in-store till this morning")}" class="w-full rounded-xl border border-border-strong bg-surface px-4 py-2.5 text-base text-foreground outline-hidden transition-colors placeholder:text-muted focus:border-focus focus:ring-2 focus:ring-focus md:text-sm">${esc(t)}</textarea>
+      ${ro ? "" : `<div class="flex flex-wrap justify-end gap-2">${t ? btn("ghost", L("Xoá", "Delete"), { attrs: `onclick="saveDnote(${d},true)"`, extra: ex }) : ""}${btn(dirty ? "outline" : "primary", L("Lưu", "Save"), { attrs: `onclick="saveDnote(${d})"`, extra: ex })}${dirty ? btn("primary", L("Công bố ghi chú", "Publish note"), { icon: "send", attrs: `onclick="publishDnote(${d})"`, extra: ex }) : ""}</div>`}</div>`;
+  }
+  if (p.id === "fold") {
+    const { d, per } = p, list = foldedIn(d, per);
+    return `<div class="flex items-center gap-2 border-b border-border py-1.5 pr-1.5 pl-4"><p class="min-w-0 flex-1 text-sm font-semibold">${L("Có đăng ký", "Registered")} · ${PERIODS[per].code} · ${dayFull(d)}</p>${iconBtn("x", L("Đóng", "Close"), `onclick="closePop()"`, "size-9")}</div>
+      <ul class="max-h-[min(19rem,calc(100vh-11rem))] overflow-y-auto p-1">${list.map((s) => `<li><button type="button" onclick="revealPick('${s.id}',${d},${per})" class="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-left outline-hidden hover:bg-item-hover"><span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(s.name)}</span><span class="mt-0.5 block text-xs tabular-nums text-muted">${L("Đã xếp", "Placed")} ${runsOf(s, d).map((r) => `${PERIODS[r.from].from}–${PERIODS[r.to].to} · ${esc(posLabel(r.a.pos, r.a.sub))}`).join(", ")}</span></span></button></li>`).join("") || `<li class="px-3 py-2 text-sm text-muted">${L("Không còn ai.", "No one left.")}</li>`}</ul>`;
+  }
   if (p.id === "add") {
     const { d, per } = p;
     const q = (ui.addQ || "").toLowerCase();
@@ -1156,7 +1392,7 @@ function popContent() {
     const tag = (s) => asgAt(s, d, per) ? L("Đã có ca này", "Already in this shift") : regKind(s, d, per) === "reg" ? L("Đã đăng ký", "Registered") : regKind(s, d, per) === "free" ? L("Rảnh, chưa đăng ký", "Free, not registered") : "";
     return `<div class="border-b border-border p-2"><label class="relative block"><i data-lucide="search" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"></i><input data-focus-id="add-q" value="${esc(ui.addQ || "")}" oninput="ui.addQ=this.value;renderKeepFocus(this)" placeholder="${L("Tìm nhân viên", "Find staff")}" class="h-10 w-full rounded-xl bg-transparent pr-3 pl-9 text-sm outline-hidden placeholder:text-muted" /></label></div>
       <p class="px-4 pt-2 pb-1 text-xs text-muted">${PERIODS[per].code} · ${dayFull(d)} · ${q ? L("Kết quả tìm", "Search results") : L("Người không đăng ký ca này", "Didn’t register this shift")} · ${L("theo thứ tự đăng ký", "by registration order")}</p>
-      <ul class="max-h-[min(19rem,calc(100vh-11rem))] overflow-y-auto p-1">${list.map((s) => { const runs = runsOf(s, d); return `<li><button type="button" onclick="addPick('${s.id}',${d},${per})" class="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-left outline-hidden hover:bg-item-hover"><span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(s.name)}</span><span class="mt-0.5 flex items-center gap-1.5 text-xs text-muted">${s.q.map((x) => posDot(x, "size-1.5")).join("")}${runs.length ? L("Hôm nay ", "Today ") + runs.map((r) => `${PERIODS[r.from].from.slice(0, 2)}–${PERIODS[r.to].to.slice(0, 2)}`).join(", ") : L("Chưa có ca hôm nay", "No shift today")}</span></span><span class="flex shrink-0 flex-col items-end gap-0.5 text-xs text-muted">${regSave(s) ? `<span class="tabular-nums">${regT(regSave(s).first)}</span>` : ""}${q && tag(s) ? `<span>${tag(s)}</span>` : ""}</span></button></li>`; }).join("") || `<li class="px-3 py-4 text-center text-sm text-muted">${L("Không tìm thấy nhân viên nào", "No staff found")}</li>`}</ul>`;
+      <ul class="max-h-[min(19rem,calc(100vh-11rem))] overflow-y-auto p-1">${list.map((s) => { const runs = runsOf(s, d); return `<li><button type="button" onclick="addPick('${s.id}',${d},${per})" class="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-left outline-hidden hover:bg-item-hover"><span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium">${esc(s.name)}</span><span class="mt-0.5 flex items-center gap-1.5 text-xs text-muted">${s.q.map((x) => posDot(x, "size-1.5")).join("")}${runs.length ? L("Hôm nay ", "Today ") + runs.map((r) => `${PERIODS[r.from].from.slice(0, 2)}–${PERIODS[r.to].to.slice(0, 2)}`).join(", ") : ""}</span></span><span class="flex shrink-0 flex-col items-end gap-0.5 text-xs text-muted">${regSave(s) ? `<span class="tabular-nums">${regT(regSave(s).first)}</span>` : ""}${q && tag(s) ? `<span>${tag(s)}</span>` : ""}</span></button></li>`; }).join("") || `<li class="px-3 py-4 text-center text-sm text-muted">${L("Không tìm thấy nhân viên nào", "No staff found")}</li>`}</ul>`;
   }
   return "";
 }
@@ -1167,7 +1403,7 @@ function dialogContent() {
     return `<div class="flex items-start gap-2 px-6 pt-5 pb-2"><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Công bố lịch tuần 12–18/10?", "Publish week 12–18 Oct?")}</h2><p class="mt-2 text-sm/6 text-pretty text-muted">${ok ? L("Nhân viên sẽ thấy ca của mình ngay. Sau đó mỗi thay đổi có hiệu lực ngay, không công bố lại.", "Staff see their shifts right away. Later changes apply immediately; no re-publishing.") : L("Xong các mục dưới đây thì công bố được.", "Resolve the items below to publish.")}</p></div>${iconBtn("x", L("Đóng", "Close"), `onclick="ui.dialog=null;render()"`, "size-9")}</div>
       <div class="max-h-[55vh] space-y-5 overflow-y-auto px-6 py-4">
         ${g.noShift.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Chưa có ca nào", "No shift at all")} <span class="font-normal text-muted">${g.noShift.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noShift.map((s) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 text-sm">${esc(s.name)}</span>${btn("outline", L("Xếp", "Place"), { attrs: `onclick="gatePlace('${s.id}')"`, extra: "h-8 min-h-8 rounded-lg px-3" })}<button type="button" onclick="openPop(event,'skip','${s.id}')" class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg px-2.5 text-sm font-medium text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${L("Bỏ qua tuần này", "Skip this week")}${ic("chevron-down", "size-3.5")}</button></li>`).join("")}</ul></section>` : ""}
-        ${g.noPos.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Ca chưa có vị trí", "Shifts with no position")} <span class="font-normal text-muted">${g.noPos.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noPos.map(({ s, d, r }) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 text-sm">${esc(s.name)} <span class="text-muted tabular-nums">· ${dayFull(d)} · ${PERIODS[r.from].from}–${PERIODS[r.to].to}</span></span>${btn("outline", L("Gán vị trí", "Give position"), { attrs: `onclick="ui.dialog=null;openPanel('${s.id}',${d},${r.from})"`, extra: "h-8 min-h-8 rounded-lg px-3" })}</li>`).join("")}</ul></section>` : ""}
+        ${g.noPos.length ? `<section><h3 class="mb-2 text-sm font-semibold">${L("Ca chưa có vị trí", "Shifts with no position")} <span class="font-normal text-muted">${g.noPos.length}</span></h3><ul class="divide-y divide-border rounded-xl border border-border">${g.noPos.map(({ s, d, r }) => `<li class="flex items-center gap-3 px-3 py-2"><span class="min-w-0 flex-1 text-sm">${esc(s.name)} <span class="text-muted tabular-nums">· ${dayFull(d)} · ${PERIODS[r.from].from}–${PERIODS[r.to].to}</span></span>${btn("outline", L("Gán vị trí", "Give position"), { attrs: `onclick="ui.dialog=null;leavePanel(()=>openPanel('${s.id}',${d},${r.from}))"`, extra: "h-8 min-h-8 rounded-lg px-3" })}</li>`).join("")}</ul></section>` : ""}
         ${[...ui.skipped].length ? `<p class="text-sm text-muted">${L("Đã bỏ qua", "Skipped")}: ${[...ui.skipped].map(([id, r]) => `${esc(ST[id].name)} (${r})`).join(", ")}</p>` : ""}
       </div>
       <div class="flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Công bố", "Publish"), { attrs: `${ok ? "" : "disabled"} onclick="${SANDBOX ? "sbPublish()" : `location.href='${link("tt", "cong-bo")}'`}"`, extra: "min-h-11 md:min-h-10" })}</div>`;
@@ -1177,29 +1413,32 @@ function dialogContent() {
     // nhóm và thứ tự như trên lịch, có chú giải. Giờ chỉ ghi khi khác giờ ca gốc.
     const e = ui.exp, base = ui.weekOff < 0 ? 5 : 12, days = e.scope === "week" ? [0, 1, 2, 3, 4, 5, 6] : [e.day];
     const title = e.scope === "week" ? L(`Lịch tuần ${base}–${base + 6}/10/2026`, `Schedule ${base}–${base + 6} Oct 2026`) : `${L(WEEK[e.day].viL, WEEK[e.day].enL)} ${base + e.day}/10/2026`;
-    const people = (d, p) => STAFF.filter((s) => asgAt(s, d, p)?.pos.length).sort((a, b) => CAT[asgAt(a, d, p).pos[0]] - CAT[asgAt(b, d, p).pos[0]] || a.nick.localeCompare(b.nick, "vi"));
-    const chip = (s, d, p) => { const a = asgAt(s, d, p), n = pn(a.pos[0]), mk = marksOf(a); return `<span class="inline-flex h-5 max-w-[100%] items-center gap-1 rounded-full border px-1.5 text-[11px] font-medium whitespace-nowrap border-p${n}-bd bg-p${n}-bg text-p${n}-tx"><span class="truncate">${esc(s.nick)}</span>${mk ? `<span class="shrink-0 font-semibold">${mk}</span>` : ""}${a.t ? `<span class="shrink-0 font-normal tabular-nums">${a.t.from}–${a.t.to}</span>` : ""}</span>`; };
-    const grid = `<div class="grid ${days.length > 1 ? "min-w-[760px]" : ""}" style="grid-template-columns:52px repeat(${days.length},minmax(0,1fr))"><div></div>${days.map((d) => `<div class="border-l border-zinc-200 px-1.5 pb-1.5 text-xs font-semibold">${dayShort(d)} ${base + d}/10</div>`).join("")}
-      ${PERIODS.map((p) => `<div class="border-t border-zinc-200 px-1 py-1.5 text-[11px] font-semibold">${p.code}<span class="block font-normal tabular-nums text-zinc-500">${pTime(p.i)}</span></div>${days.map((d) => `<div class="flex min-w-0 flex-wrap content-start gap-1 border-t border-l border-zinc-200 p-1.5">${people(d, p.i).map((s) => chip(s, d, p.i)).join("")}</div>`).join("")}`).join("")}</div>`;
-    const legend = `<div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t border-zinc-200 pt-2.5 text-[11px]">${POSITIONS.map((x) => `<span class="inline-flex items-center gap-1.5">${posDot(x.id, "size-2.5")}<span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-zinc-500">${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-zinc-800">${mk}</b> ${L(vi, en)}`).join(" · ")}</span>` : ""}</span>`).join("")}</div>`;
+    const sheet = weekSheet({ src: W(), base, days, notes: (d) => published() ? noteText(d) : "" });
     return `<div class="flex items-start gap-2 px-6 pt-5 pb-2"><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Xuất lịch", "Export the schedule")}</h2><p class="mt-1 text-sm text-pretty text-muted">${L("Gửi cho các bạn phụ trách qua Zalo. Chỉ tuần đã công bố, không có ca nháp. Mỗi lần xuất được ghi vào Nhật ký.", "To send to the shift leads on Zalo. Published weeks only, no draft shifts. Each export is written to the activity log.")}</p></div>${iconBtn("x", L("Đóng", "Close"), `onclick="ui.dialog=null;render()"`, "size-9")}</div>
       <div class="flex flex-wrap items-center gap-3 px-6 pt-2">${segmented([["week", L("Cả tuần", "Whole week")], ["day", L("Một ngày", "One day")]], e.scope, "setExpScope", L("Phạm vi", "Scope"))}${segmented([["img", L("Ảnh PNG", "PNG image")], ["pdf", "PDF"]], e.fmt, "setExpFmt", L("Định dạng", "Format"))}</div>
       ${e.scope === "day" ? `<div class="px-5 pt-3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${base + i}`]), e.day, "setExpDay", L("Ngày", "Day"))}</div>` : ""}
-      <div class="px-6 pt-4"><p class="mb-1.5 text-xs font-medium text-muted">${L("Xem trước", "Preview")}</p><div class="max-h-[52vh] overflow-auto rounded-xl border border-border-strong bg-white p-3 text-zinc-900"><p class="mb-2 text-sm font-semibold">Watchtower · ${title}</p>${grid}${legend}</div></div>
+      <div class="px-6 pt-4"><p class="mb-1.5 text-xs font-medium text-muted">${L("Xem trước", "Preview")}</p><div class="max-h-[52vh] overflow-auto rounded-xl border border-border-strong bg-white p-3 text-zinc-900"><p class="mb-2 text-sm font-semibold">Watchtower · ${title}</p>${sheet}</div></div>
       <div class="mt-5 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", e.fmt === "pdf" ? L("Tải PDF", "Download PDF") : L("Tải ảnh", "Download image"), { icon: "download", attrs: `onclick="${SANDBOX ? "sbExport()" : "ui.dialog=null;render()"}"`, extra: "min-h-11 md:min-h-10" })}</div>`;
   }
   if (dl.id === "removeDay") {
     const s = ST[ui.panel.sid], d = ui.panel.d, runs = runsOf(s, d);
     return `<div class="flex items-start gap-4 px-6 pt-6"><div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-danger-bg">${ic("calendar-x-2", "size-5 text-danger")}</div><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold text-balance">${L(`Bỏ ${s.name} khỏi mọi ca ngày ${dayFull(d)}?`, `Take ${s.name} off every shift on ${dayFull(d)}?`)}</h2>
-      <p class="mt-2 text-sm/6 text-muted">${L("Chưa chọn ca nào nên Lưu được hiểu là bỏ khỏi ca. Các ca sẽ bỏ:", "No shift is selected, so this removes them. Shifts to remove:")}</p>
+      <p class="mt-2 text-sm/6 text-muted">${L("Không tick ca nào nên Lưu là bỏ khỏi mọi ca. Các ca sẽ bỏ:", "Nothing is ticked, so Save takes them off. Shifts to remove:")}</p>
       <ul class="mt-2 space-y-1 text-sm">${runs.map((r) => { const t = runTime(r); return `<li class="tabular-nums">${t.from}–${t.to} · ${esc(posLabel(r.a.pos, r.a.sub))}</li>`; }).join("")}</ul>${published() ? "" : `<p class="mt-2 text-xs text-muted">${L("Bấm Hoàn tác (Ctrl+Z) nếu bỏ nhầm.", "Use Undo (Ctrl+Z) if this was a mistake.")}</p>`}</div></div>
       <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("danger", L("Bỏ khỏi mọi ca", "Take off every shift"), { attrs: `onclick="removeDay()"`, extra: "min-h-11 md:min-h-10" })}</div>`;
+  }
+  if (dl.id === "leavePanel") {
+    const s = ST[ui.panel.sid], ds = panelDiff();
+    return `<div class="flex items-start gap-4 px-6 pt-6"><div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-light">${ic("save", "size-5 text-primary")}</div><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold text-balance">${L(`Lưu thay đổi của ${s.name}?`, `Save the changes for ${s.name}?`)}</h2>
+      <p class="mt-2 text-sm/6 text-muted">${L(`Panel ngày ${dayFull(ui.panel.d)} còn thay đổi chưa lưu:`, `The panel for ${dayFull(ui.panel.d)} has unsaved changes:`)}</p>
+      <ul class="mt-2 space-y-1 text-sm tabular-nums">${ds.map((x) => `<li>${esc(diffLine(x))}</li>`).join("")}</ul></div></div>
+      <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("ghost", L("Ở lại", "Stay"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10 sm:mr-auto" })}${btn("secondary", L("Bỏ thay đổi", "Discard"), { attrs: `onclick="leaveDiscard()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Lưu", "Save"), { attrs: `onclick="leaveSave()"`, extra: "min-h-11 md:min-h-10" })}</div>`;
   }
   if (dl.id === "anomaly") {
     const sh = TODAY_SHIFTS[dl.arg]; const s = ST[sh.sid]; const t = lateTier(sh, sh.arrive);
     const opts = [[L("Xác nhận đến đúng giờ", "Confirm on time"), L("Bỏ cả trừ giờ lẫn tính trễ", "Clears deduction and late flag")], [L(`Trừ đủ ${t.late * 2} phút`, `Deduct full ${t.late * 2} min`), ""], [L("Trừ ít hơn", "Deduct less"), ""], [L("Sửa giờ đến", "Correct arrival time"), ""], [L("Không đi làm", "Didn’t work"), L("Ca này 0 giờ, không tính lương", "Shift counts 0 hours, unpaid")]];
     return `<div class="flex items-start gap-4 px-6 pt-6"><div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-err-bg">${ic("triangle-alert", "size-5 text-err")}</div><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Ca bất thường", "Anomaly")}</h2><p class="mt-2 text-sm/6 text-muted"><span class="font-medium text-foreground">${esc(s.name)}</span> · ${sh.from}–${sh.to} · ${L(`đến ${sh.arrive}, trễ ${t.late} phút. Khoản trừ ${t.late * 2} phút dài hơn cả ca, nên chưa trừ gì.`, `arrived ${sh.arrive}, ${t.late} min late. The ${t.late * 2}-minute deduction exceeds the shift, so nothing was applied.`)}</p></div></div>
-      <fieldset class="space-y-1 px-6 pt-5"><legend class="sr-only">${L("Cách xử lý", "Resolution")}</legend>${opts.map(([a, b], i) => `<label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"><input type="radio" name="an" value="${i}" ${i === 0 ? "checked" : ""} class="mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-full border-[1.5px] border-border-strong bg-surface outline-hidden checked:border-[6px] checked:border-primary" /><span><span class="block text-sm font-medium">${a}</span>${b ? `<span class="block text-xs text-muted">${b}</span>` : ""}</span></label>`).join("")}</fieldset>
+      <fieldset class="space-y-1 px-6 pt-5"><legend class="sr-only">${L("Cách xử lý", "Resolution")}</legend>${opts.map(([a, b], i) => `<label class="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-item-hover"><button type="button" role="radio" aria-checked="${i === (ui.anPick || 0)}" data-an="${i}" onclick="pickAn(${i})" class="${cx("mt-0.5 shrink-0 cursor-pointer rounded-full bg-surface p-0 outline-hidden focus-visible:ring-2 focus-visible:ring-focus", i === (ui.anPick || 0) ? "border-[6px] border-primary" : "border-[1.5px] border-foreground/30")}" style="width:20px;height:20px"></button><span><span class="block text-sm font-medium">${a}</span>${b ? `<span class="block text-xs text-muted">${b}</span>` : ""}</span></label>`).join("")}</fieldset>
       <div class="space-y-1.5 px-6 pt-3"><label class="block w-fit text-sm font-medium">${L("Lý do", "Reason")} <span class="text-err-text">*</span></label><input id="an-reason" class="${INPUT}" placeholder="${L("VD: máy chấm công hỏng lúc giao ca", "e.g. device was down at changeover")}" /></div>
       <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Lưu cách xử lý", "Save resolution"), { attrs: SANDBOX ? `onclick="sbResolve(${dl.arg})"` : "", extra: "min-h-11 md:min-h-10" })}</div>`;
   }
@@ -1219,8 +1458,8 @@ function dialogContent() {
       ${ui.shiftTab === "time" ? `<div class="grid grid-cols-2 gap-3 px-6 pt-4"><div class="space-y-1.5"><label class="block text-sm font-medium">${L("Từ", "From")}</label><input class="${INPUT} tabular-nums" value="${from}" /></div><div class="space-y-1.5"><label class="block text-sm font-medium">${L("Đến", "To")}</label><input class="${INPUT} tabular-nums border-focus ring-2 ring-focus" value="09:30" /></div></div>
         <div class="mx-6 mt-4 flex gap-3 rounded-xl border border-warn-bg bg-warn-bg p-3">${ic("triangle-alert", "mt-0.5 size-4 text-warn")}<p class="text-sm"><span class="font-medium text-warn">${L("Về sớm 90 phút, cần người làm thay", "Leaving 90 min early needs cover")}</span></p></div>
         <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Người làm thay 09:30–" + to, "Cover 09:30–" + to)} <span class="text-err-text">*</span></label>${selectBtn("", `<span class="font-normal text-muted">${L("Chọn người rảnh giờ này", "Choose someone free then")}</span>`, "", "w-full justify-between")}</div>
-        <label class="mx-6 mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border-strong p-3">${cb({ small: false })}<span class="min-w-0"><span class="block text-sm font-medium">${L("Vào trễ đã thống nhất", "Agreed late arrival")}</span><span class="mt-0.5 block text-xs text-pretty text-muted">${L("Đánh dấu khi dời giờ vào trễ hơn vì đã đồng ý trong ngày (FR-O24). Ca này không có 10 phút ân hạn: trễ từ phút 1 là tính trễ và trừ gấp đôi. Giờ làm tính từ giờ vào mới.", "Tick when the start moves later because you agreed it on the day (FR-O24). No 10-minute grace: late and 2× deduction from minute 1. Hours count from the new start.")}</span></span></label>`
-      : `<div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Đổi với", "Swap with")}</label>${selectBtn("", "Lê Minh Anh · T5 15/10 · 07:00–13:00", "", "w-full justify-between")}<p class="text-xs text-muted">${L("Hai ca đổi người cho nhau trong một lần lưu.", "Both shifts change hands in one save.")}</p></div>`}
+        <label class="mx-6 mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-border-strong p-3">${cb({ small: false, checked: !!ui.agreedDemo, attrs: `onchange="ui.agreedDemo=!ui.agreedDemo;render()"` })}<span class="min-w-0"><span class="block text-sm font-medium">${L("Vào trễ đã thống nhất", "Agreed late arrival")}</span><span class="mt-0.5 block text-xs text-pretty text-muted">${L("Đánh dấu khi dời giờ vào trễ hơn vì đã đồng ý trong ngày (FR-O24). Ca này không có 10 phút ân hạn: trễ từ phút 1 là tính trễ và trừ gấp đôi. Giờ làm tính từ giờ vào mới.", "Tick when the start moves later because you agreed it on the day (FR-O24). No 10-minute grace: late and 2× deduction from minute 1. Hours count from the new start.")}</span></span></label>`
+      : `<div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Đổi với", "Swap with")}</label>${selectBtn("", "Hữu Thạnh · T5 15/10 · 07:00–13:00", "", "w-full justify-between")}<p class="text-xs text-muted">${L("Hai ca đổi người cho nhau trong một lần lưu.", "Both shifts change hands in one save.")}</p></div>`}
       <div class="space-y-1.5 px-6 pt-4"><label class="block text-sm font-medium">${L("Lý do", "Reason")} <span class="text-err-text">*</span></label><input class="${INPUT}" placeholder="${L("VD: việc gia đình, đã báo qua Zalo", "e.g. family matter, agreed on Zalo")}" /></div>
       <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", L("Lưu", "Save"), { extra: "min-h-11 md:min-h-10" })}</div>`;
   }
@@ -1230,7 +1469,7 @@ function renderLayer() {
   const layer = document.getElementById("wt-layer");
   let html = "";
   if (ui.pop) {
-    const w = { account: 256, filters: 320, stafflist: 320, legend: 400, rules: 340, add: 300, skip: 240, datepick: 300 }[ui.pop.id] || 280;
+    const w = { account: 256, filters: 320, stafflist: 320, legend: 400, rules: 340, add: 300, skip: 240, datepick: 300, onote: 340, dnote: 340, fold: 300 }[ui.pop.id] || 280;
     const r = ui.pop.rect; let left = ui.pop.alignRight ? r.right - w : r.left; left = Math.max(8, Math.min(left, innerWidth - w - 8));
     const inner = ui.pop.id === "skip" ? `<div class="p-1">${[L("Nghỉ phép", "On vacation"), L("Đăng ký quá ít ca", "Registered too few shifts"), L("Đã đủ người", "Enough staff already")].map((t) => `<button type="button" onclick="skipStaff('${ui.pop.sid}','${esc(t)}')" class="flex h-10 w-full cursor-pointer items-center rounded-xl px-3 text-left text-sm outline-hidden hover:bg-item-hover">${t}</button>`).join("")}</div>` : popContent();
     html += `<div class="fixed inset-0 z-[55]" onclick="closePop()"></div><div data-pop class="wt-fade fixed z-[60] max-h-[calc(100vh-1rem)] overflow-y-auto rounded-2xl border border-border bg-surface-overlay py-1 shadow-popover" style="top:${Math.min(r.bottom + 8, innerHeight - 120)}px;left:${left}px;width:${w}px">${inner}</div>`;
@@ -1252,71 +1491,164 @@ function renderLayer() {
 function openPop(e, id, a, b) {
   e.stopPropagation();
   const r = e.currentTarget.getBoundingClientRect();
-  ui.pop = { id, rect: r, alignRight: ["account", "legend", "rules", "filters", "skip"].includes(id) && r.left > innerWidth / 2, d: a, per: b, sid: a };
+  ui.pop = { id, rect: r, alignRight: ["account", "legend", "rules", "filters", "skip", "onote"].includes(id) && r.left > innerWidth / 2, d: a, per: b, sid: a };
   ui.popView = null;
   if (id === "add") ui.addQ = "";
   if (id === "filters" && r.left < innerWidth / 2) ui.pop.alignRight = false;
   render();
 }
 function closePop() { ui.pop = null; render(); }
-function openDialog(id, arg) { ui.dialog = { id, arg }; ui.pop = null; render(); }
-function openPanel(sid, d, p) {
-  ui.panel = { sid, d, sel: new Set(p != null ? [p] : []) };
-  const a = p != null ? asgAt(ST[sid], d, p) : null;
-  ui.posPick = a ? a.pos.slice() : []; ui.subPick = a ? a.sub.slice() : [];
-  ui.saveAs = a && !a.t ? "std" : "reg"; ui.panelMsg = "";
-  ui.pop = null; render();
+// Nút radio của hộp Ca bất thường: đổi hình ngay, không vẽ lại để giữ lý do đang gõ
+function pickAn(i) { ui.anPick = i; for (const el of document.querySelectorAll("[data-an]")) { const on = +el.dataset.an === i; el.setAttribute("aria-checked", on); el.classList.toggle("border-[6px]", on); el.classList.toggle("border-primary", on); el.classList.toggle("border-[1.5px]", !on); el.classList.toggle("border-foreground/30", !on); } }
+function openDialog(id, arg) { if (id === "anomaly") ui.anPick = 0; ui.dialog = { id, arg }; ui.pop = null; render(); }
+// --- Panel theo trạng thái (ADR 0031, Tony 12/11) ---
+// Ô tick là ngày làm của người đó sau khi Lưu. Mở panel tick sẵn mọi ca đã xếp trong ngày; mở từ ca chưa xếp thì tick
+// thêm ca đó như một gợi ý (chưa tính là thay đổi). Lưu chỉ ghi phần chênh lệch, ca không đụng tới giữ nguyên vị trí và giờ.
+// Ca ngữ cảnh (ctx) là ca của chip vừa bấm hoặc dòng vừa chọn: vị trí chọn trong panel áp cho nó và cho các ca mới tick.
+function initPanel(sid, d, p) {
+  const day = W().asg[sid][d], held = PERIODS.filter((q) => day[q.i]).map((q) => q.i);
+  const sel = new Set(held), posOf = {};
+  for (const q of held) posOf[q] = { pos: day[q].pos.slice(), sub: day[q].sub.slice() };
+  let suggested = null;
+  if (p != null && !day[p] && !readOnly()) { sel.add(p); posOf[p] = { pos: [], sub: [] }; suggested = p; }
+  ui.panel = { sid, d, ctx: p ?? null, initial: structuredClone(day), live: JSON.stringify(day), sel, posOf, suggested, edited: false };
+  ui.saveAs = "reg"; ui.panelMsg = ""; ui.panelReason = "";
+  syncPick();
 }
-function closePanel() { ui.panel = null; render(); }
-function panelDay(dir) { const days = visibleDays(); const i = days.indexOf(ui.panel.d) + dir; if (days[i] != null) { ui.panel.d = days[i]; ui.panel.sel = new Set(); ui.panelMsg = ""; render(); } }
-function togglePeriod(p) { const s = ui.panel.sel; s.has(p) ? s.delete(p) : s.add(p); ui.panelMsg = ""; render(); }
-function quickSel(k) { const s = ST[ui.panel.sid], d = ui.panel.d; ui.panel.sel = new Set(k === "all" ? [0, 1, 2, 3, 4] : k === "none" ? [] : PERIODS.filter((p) => regKind(s, d, p.i) !== "no").map((p) => p.i)); ui.panelMsg = ""; render(); }
+function openPanel(sid, d, p) { initPanel(sid, d, p); ui.pop = null; render(); }
+// Dữ liệu của ngày đổi từ ngoài panel (Hoàn tác, Sửa giờ ca, Thêm): nạp lại, giữ ca ngữ cảnh
+function panelFresh() {
+  const P = ui.panel; if (!P) return;
+  const day = W().asg[P.sid]?.[P.d];
+  if (day && JSON.stringify(day) !== P.live) { initPanel(P.sid, P.d, null); ui.panel.ctx = P.ctx; if (P.added && day[P.added.p]) ui.panel.added = P.added; syncPick(); }
+}
+// Ca nhận vị trí: ca ngữ cảnh (nếu đang tick) và các ca mới tick
+function panelTarget() {
+  const P = ui.panel, t = [];
+  if (P.ctx != null && P.sel.has(P.ctx)) t.push(P.ctx);
+  for (const p of [...P.sel].sort()) if (!P.initial[p] && p !== P.ctx) t.push(p);
+  return t;
+}
+// Ô chọn vị trí hiện vị trí nháp của ca nhận vị trí đầu tiên
+function syncPick() { const t = panelTarget(), v = t.length ? ui.panel.posOf[t[0]] : null; ui.posPick = v ? v.pos.slice() : []; ui.subPick = v ? v.sub.slice() : []; }
+function writePick() { for (const p of panelTarget()) ui.panel.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; }
+// Một ca sau khi Lưu (null = không có ca)
+function panelEff(p) {
+  const P = ui.panel; if (!P.sel.has(p)) return null;
+  const was = P.initial[p], v = P.posOf[p] || { pos: [], sub: [] };
+  if (was) return { ...structuredClone(was), pos: v.pos.slice(), sub: v.sub.slice() };
+  const s = ST[P.sid], cu = customAt(s, P.d);
+  const a = { pos: v.pos.slice(), sub: v.sub.slice() };
+  if (cu?.[p] && regKind(s, P.d, p) === "reg" && ui.saveAs === "reg") a.t = { ...cu[p] };
+  return a;
+}
+const asgSig = (a) => JSON.stringify([a.pos, a.sub, a.t || null]);
+function panelDiff() {
+  const P = ui.panel, out = [];
+  for (const { i: p } of PERIODS) {
+    const a = P.initial[p] || null, b = panelEff(p);
+    if (!a && b) out.push({ p, type: "add", a, b });
+    else if (a && !b) out.push({ p, type: "rem", a, b });
+    else if (a && b && asgSig(a) !== asgSig(b)) out.push({ p, type: "mod", a, b });
+  }
+  return out;
+}
+// Gợi ý lúc mở panel không tính là thay đổi chưa lưu
+const panelDirty = () => !!ui.panel && !readOnly() && panelDiff().length > 0 && !(ui.panel.suggested != null && !ui.panel.edited);
+function diffLine(x) {
+  const c = PERIODS[x.p].code, tm = (a) => (a.t ? ` ${a.t.from}–${a.t.to}` : "");
+  if (x.type === "add") return `+ ${c} · ${posLabel(x.b.pos, x.b.sub)}${tm(x.b)}`;
+  if (x.type === "rem") return `− ${c} · ${posLabel(x.a.pos, x.a.sub)}`;
+  return `~ ${c} · ${posLabel(x.a.pos, x.a.sub)}${tm(x.a)} → ${posLabel(x.b.pos, x.b.sub)}${tm(x.b)}`;
+}
+function panelEdited() { ui.panel.edited = true; ui.panelMsg = ""; syncPick(); render(); }
+// Rời panel (đóng, chip khác, ngày khác, đổi chế độ xem) khi còn thay đổi chưa lưu: hỏi Lưu / Bỏ thay đổi / Ở lại
+function leavePanel(next) { if (!panelDirty()) return next(); ui.dialog = { id: "leavePanel", arg: next }; ui.pop = null; render(); }
+function leaveSave() { const next = ui.dialog.arg; ui.dialog = null; if (panelSave()) next(); }
+function leaveDiscard() { const next = ui.dialog.arg; ui.dialog = null; next(); }
+function closePanel() { leavePanel(() => { ui.panel = null; render(); }); }
+// Huỷ bỏ luôn ca vừa xếp bằng Thêm trong lần mở panel này, khi panel chưa Lưu (Tony 12/11, phương án B).
+// Đóng panel cách khác hay Đặt lại thì ca vẫn ở lại (D9). Bước Hoàn tác của lần Thêm còn trên cùng thì rút ra luôn,
+// để Hoàn tác không đưa lại chip vừa huỷ.
+function cancelPanel() {
+  const P = ui.panel, A = P?.added, day = A ? W().asg[P.sid][P.d] : null;
+  if (A && day[A.p]) {
+    const s = ST[P.sid], before = structuredClone(day);
+    if (ui.hist.length === A.h) ui.hist.pop(); else snapshot();
+    delete day[A.p]; ui.manual.delete(`${P.sid}|${P.d}|${A.p}`);
+    if (SANDBOX) sbLogDay(s, P.d, before, day, L("Huỷ ngay sau khi Thêm", "Cancelled right after Add"));
+  }
+  ui.panel = null; ui.dialog = null; render();
+}
+function resetPanel() { const { sid, d, ctx, added } = ui.panel; initPanel(sid, d, null); ui.panel.ctx = ctx; ui.panel.added = added; syncPick(); render(); }
+function panelDay(dir) {
+  const days = visibleDays(), i = days.indexOf(ui.panel.d) + dir;
+  if (days[i] != null) { const sid = ui.panel.sid; leavePanel(() => openPanel(sid, days[i], null)); }
+}
+function panelCtx(p) { ui.panel.ctx = p; ui.panelMsg = ""; syncPick(); render(); }
+function togglePeriod(p) {
+  const P = ui.panel;
+  if (P.sel.has(p)) { P.sel.delete(p); if (!P.initial[p]) delete P.posOf[p]; }
+  // Ca mới tick nhận vị trí đang hiện ở ô chọn vị trí, chưa có thì không có vị trí (không lấy theo ca bên cạnh)
+  else { P.sel.add(p); if (!P.initial[p]) P.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; }
+  panelEdited();
+}
+// Lối tắt: "Thêm ca đăng ký" chỉ thêm, không bỏ tick ca nào; người rảnh cả tuần (FR-S19) tính là đăng ký cả 5 ca
+function quickSel(k) {
+  const P = ui.panel, s = ST[P.sid], before = new Set(P.sel);
+  if (k === "reg") for (const p of PERIODS) { if (regKind(s, P.d, p.i) !== "no") P.sel.add(p.i); }
+  else if (k === "all") for (const p of PERIODS) P.sel.add(p.i);
+  else P.sel = new Set();
+  for (const p of P.sel) if (!before.has(p) && !P.initial[p]) P.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() };
+  for (const p of before) if (!P.sel.has(p) && !P.initial[p]) delete P.posOf[p];
+  panelEdited();
+}
+function applyAllPos() { for (const p of ui.panel.sel) ui.panel.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; panelEdited(); }
 // Một ca chỉ một vị trí (góp ý 17/10): chọn vị trí khác là thay, bấm lại vị trí đang chọn là bỏ
-function pickPos(id) { ui.posPick = ui.posPick[0] === id ? [] : [id]; ui.subPick = ui.subPick.filter((s) => ui.posPick.some((p) => POS[p].subs.some((x) => x[0] === s))); ui.panelMsg = ""; render(); }
+function pickPos(id) { if (!panelTarget().length) return; ui.posPick = ui.posPick[0] === id ? [] : [id]; ui.subPick = ui.subPick.filter((s) => ui.posPick.some((p) => POS[p].subs.some((x) => x[0] === s))); writePick(); panelEdited(); }
 function pickSub(id) {
   const i = ui.subPick.indexOf(id); const parent = POSITIONS.find((p) => p.subs.some((x) => x[0] === id));
   if (i >= 0) ui.subPick.splice(i, 1);
   // Vị trí con bắt buộc (Phụ trách: Trong / Ngoài) chọn đúng một: chọn cái này thì bỏ cái kia
   else { if (parent?.subRequired) ui.subPick = ui.subPick.filter((s) => !parent.subs.some((x) => x[0] === s)); ui.subPick.push(id); }
-  ui.panelMsg = ""; render();
+  writePick(); panelEdited();
 }
 // Vị trí đã chọn mà thiếu vị trí con bắt buộc
-const missingSub = () => ui.posPick.filter((pid) => POS[pid].subRequired && !ui.subPick.some((s) => POS[pid].subs.some((x) => x[0] === s)));
+const lacksSub = (pos, sub) => pos.filter((pid) => POS[pid].subRequired && !sub.some((s) => POS[pid].subs.some((x) => x[0] === s)));
+const missingSub = () => lacksSub(ui.posPick, ui.subPick);
 function toggleSec(k) { ui.secClosed.has(k) ? ui.secClosed.delete(k) : ui.secClosed.add(k); render(); }
-function setSaveAs(v) { ui.saveAs = v; render(); }
-// Lưu và Bỏ khỏi ca luôn bấm được (góp ý 10/10). Không chọn ca nào = bỏ khỏi mọi ca trong ngày, có hộp xác nhận.
-function panelAct(kind) {
-  const { sid, d, sel } = ui.panel; const s = ST[sid]; const day = W().asg[sid][d];
+function setSaveAs(v) { ui.saveAs = v; ui.panel.edited = true; render(); }
+// Lưu ghi đúng phần chênh lệch. Không tick ca nào = bỏ khỏi mọi ca trong ngày, có hộp xác nhận. Trả về true khi đã lưu.
+function panelSave() {
+  const P = ui.panel, s = ST[P.sid], day = W().asg[P.sid][P.d];
   ui.panelMsg = "";
-  if (!sel.size) {
-    if (!Object.keys(day).length) { ui.panelMsg = L("Người này chưa có ca nào trong ngày. Chọn ca để xếp.", "They have no shift this day. Choose a shift to place them."); return render(); }
-    return openDialog("removeDay");
+  if (!P.sel.size) {
+    if (!Object.keys(day).length) { ui.panelMsg = L("Người này chưa có ca nào trong ngày. Tick ca để xếp.", "They have no shift this day. Tick a shift to place them."); render(); return false; }
+    openDialog("removeDay"); return false;
   }
-  if (kind === "save" && missingSub().length) { const m = POS[missingSub()[0]]; ui.panelMsg = L(`${m.vi} cần chọn ${m.subs.map((x) => x[1]).join(" hoặc ")}.`, `${m.en} needs ${m.subs.map((x) => x[2]).join(" or ")}.`); return render(); }
-  if (kind === "save" && published() && !ui.posPick.length) { ui.panelMsg = L("Ca đã công bố phải có vị trí. Chọn vị trí rồi Lưu.", "A published shift needs a position. Choose one, then Save."); return render(); }
+  const ds = panelDiff();
+  if (!ds.length) { P.added = null; ui.panelMsg = L("Không có gì thay đổi.", "Nothing changed."); render(); return true; }
+  const miss = ds.find((x) => x.b && lacksSub(x.b.pos, x.b.sub).length);
+  if (miss) { const m = POS[lacksSub(miss.b.pos, miss.b.sub)[0]]; ui.panelMsg = L(`${PERIODS[miss.p].code}: ${m.vi} cần chọn ${m.subs.map((x) => x[1]).join(" hoặc ")}.`, `${PERIODS[miss.p].code}: ${m.en} needs ${m.subs.map((x) => x[2]).join(" or ")}.`); render(); return false; }
+  if (published() && ds.some((x) => x.b && !x.b.pos.length)) { ui.panelMsg = L("Ca đã công bố phải có vị trí. Chọn vị trí rồi Lưu.", "A published shift needs a position. Choose one, then Save."); render(); return false; }
+  const why = (ui.panelReason || "").trim();
+  if (published() && ds.some((x) => x.type === "rem") && !why) { ui.panelMsg = L("Bỏ tick ca đã công bố là huỷ ca: ghi lý do rồi Lưu.", "Unticking a published shift cancels it: give a reason, then Save."); render(); return false; }
   snapshot();
-  const before = structuredClone(day), why = document.getElementById("panel-reason")?.value.trim() || "";
-  const cu = customAt(s, d);
-  for (const p of sel) {
-    const key = `${sid}|${d}|${p}`;
-    if (kind === "remove") { delete day[p]; ui.manual.delete(key); }
-    // Lưu áp đúng những gì đang chọn: không chọn vị trí nào = xếp vào ca, chưa có vị trí
-    // (cũng là cách gỡ vị trí đã gán nhầm); có vị trí = xếp và gán luôn.
-    if (kind === "save") {
-      const was = day[p];
-      day[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() };
-      if (cu?.[p] && regKind(s, d, p) === "reg" && ui.saveAs === "reg") day[p].t = { ...cu[p] };
-      if (!was && regKind(s, d, p) === "no") ui.manual.set(key, ++ui.seq);
-    }
+  const before = structuredClone(day);
+  for (const x of ds) {
+    const key = `${P.sid}|${P.d}|${x.p}`;
+    if (x.b) { day[x.p] = x.b; if (!x.a && regKind(s, P.d, x.p) === "no") ui.manual.set(key, ++ui.seq); }
+    else { delete day[x.p]; ui.manual.delete(key); }
   }
-  if (SANDBOX) sbLogDay(s, d, before, day, why);
-  render();
+  if (SANDBOX) sbLogDay(s, P.d, before, day, why);
+  const ctx = P.ctx; initPanel(P.sid, P.d, null); ui.panel.ctx = ctx; syncPick();
+  render(); return true;
 }
 function removeDay() {
-  const { sid, d } = ui.panel; snapshot();
-  if (SANDBOX) sbLogDay(ST[sid], d, W().asg[sid][d], {});
+  const { sid, d, ctx } = ui.panel; snapshot();
+  if (SANDBOX) sbLogDay(ST[sid], d, W().asg[sid][d], {}, (ui.panelReason || "").trim());
   for (const p in W().asg[sid][d]) ui.manual.delete(`${sid}|${d}|${p}`);
-  W().asg[sid][d] = {}; ui.dialog = null; ui.panel.sel = new Set(); render();
+  W().asg[sid][d] = {}; ui.dialog = null; initPanel(sid, d, null); ui.panel.ctx = ctx; render();
 }
 // Hoàn tác / làm lại việc xếp ca và giao vị trí: chỉ trong phiên đang mở, chỉ khi còn nháp
 const snapOf = () => structuredClone({ asg: DATA.asg, manual: [...ui.manual] });
@@ -1327,8 +1659,23 @@ function redo() { if (!ui.fut.length || published() || readOnly()) return; ui.hi
 // Phân công: số người cần
 function setNeed(d, p, pid, v) { ui.need[d][p][pid] = Math.max(0, Math.min(20, parseInt(v, 10) || 0)); ui.needCopied = false; render(); }
 function copyNeed() { ui.need = structuredClone(PREV_NEED); ui.needCopied = true; render(); }
-function addPick(sid, d, p) { ui.sel.add(sid); openPanel(sid, d, p); }
-function gatePlace(sid) { const s = ST[sid]; const d = WEEK.findIndex((_, i) => PERIODS.some((p) => canWork(s, i, p.i))); ui.dialog = null; openPanel(sid, Math.max(0, d), null); }
+// Thêm (góp ý 10/11, mục 6): tuần còn nháp thì xếp ngay vào ca, chưa có vị trí, rồi mở panel với ca đó; đóng panel vẫn giữ chip.
+// Tuần đã công bố thì chỉ mở panel, vì ca mới phải có vị trí (FR-O29).
+function addPick(sid, d, p) { leavePanel(() => addPickNow(sid, d, p)); }
+function addPickNow(sid, d, p) {
+  ui.sel.add(sid);
+  let added = null;
+  if (!published() && !readOnly() && !asgAt(ST[sid], d, p)) {
+    snapshot();
+    const day = W().asg[sid][d], before = structuredClone(day);
+    day[p] = { pos: [], sub: [] };
+    if (regKind(ST[sid], d, p) === "no") ui.manual.set(`${sid}|${d}|${p}`, ++ui.seq);
+    if (SANDBOX) sbLogDay(ST[sid], d, before, day);
+    added = { p, h: ui.hist.length };
+  }
+  initPanel(sid, d, p); ui.panel.added = added; ui.pop = null; render();
+}
+function gatePlace(sid) { const s = ST[sid]; const d = WEEK.findIndex((_, i) => PERIODS.some((p) => canWork(s, i, p.i))); ui.dialog = null; leavePanel(() => openPanel(sid, Math.max(0, d), null)); }
 function skipStaff(sid, reason) { ui.skipped.set(sid, reason); ui.pop = null; render(); }
 function toggleStaff(id) { ui.sel.has(id) ? ui.sel.delete(id) : ui.sel.add(id); render(); }
 function onlyStaff(id) { ui.sel = new Set([id]); render(); }
@@ -1336,7 +1683,16 @@ function masterToggle() { const inR = ACTIVE.filter((s) => inRange(s, visibleDay
 function invertSel() { ui.sel = new Set(ACTIVE.filter((s) => !ui.sel.has(s.id)).map((s) => s.id)); render(); }
 function optToggle(gi, oi) { const set = FG[gi].opts[oi][2]; const all = set.every((s) => ui.sel.has(s.id)); for (const s of set) all ? ui.sel.delete(s.id) : ui.sel.add(s.id); render(); }
 function optOnly(gi, oi) { ui.sel = new Set(FG[gi].opts[oi][2].map((s) => s.id)); render(); }
-function setView(v) { ui.view = v; if (v === "week") ui.start = 0; if (v === "3d") ui.start = Math.min(ui.start, 4); if (ui.panel && !visibleDays().includes(ui.panel.d)) ui.panel = null; render(); }
+// Đổi sang Ngày khi đang mở panel: lấy ngày của panel làm gốc (góp ý 10/11, mục 9). Bỏ view 3 ngày (góp ý 12/11, mục 7).
+function setView(v) {
+  const anchor = ui.panel && v !== "week" ? ui.panel.d : null;
+  ui.view = v;
+  if (v === "week") ui.start = 0;
+  else if (anchor != null) ui.start = anchor;
+  if (ui.panel && !visibleDays().includes(ui.panel.d)) ui.panel = null;
+  render();
+}
+function goDay(d) { ui.view = "day"; ui.start = d; ui.mDay = d; ui.pop = null; render(); }
 function calMove(dir) {
   const n = visibleDays().length;
   if (ui.view === "week" || (dir < 0 && ui.start === 0)) { if (dir < 0) { ui.weekOff = -1; ui.panel = null; } else ui.weekOff = 0; ui.start = 0; }
@@ -1356,6 +1712,8 @@ function jumpTo(n) {
 }
 function setRosterDay(v) { ui.rosterDay = v; render(); }
 function setMDay(v) { ui.mDay = v; if (ui.panel) ui.panel = null; render(); }
+// Đổi chế độ xem, tuần hay ngày khi panel còn thay đổi chưa lưu: hỏi trước (ADR 0031)
+for (const f of ["setView", "goDay", "calMove", "calToday", "calOldest", "jumpTo", "setMDay"]) { const g = window[f]; window[f] = (...a) => leavePanel(() => g(...a)); }
 function setLateDay(v) { ui.lateDay = v; ui.lateEdit = null; render(); }
 function editLate(i) { ui.lateEdit = i; ui.lateVal = TODAY_SHIFTS[i]?.arrive || ""; render(); setTimeout(() => document.querySelector('[data-focus-id="late-in"]')?.focus(), 30); }
 function saveLate(i) { const v = ui.lateVal.padStart(5, "0"); if (SANDBOX) sbArrive(TODAY_SHIFTS[i], v); TODAY_SHIFTS[i].arrive = v; ui.lateEdit = null; render(); }
@@ -1429,7 +1787,7 @@ function renderKeepFocus(el) { const id = el.dataset.focusId; const pos = el.sel
 // ===================================================================
 // Render
 // ===================================================================
-const SCREEN_FN = { lich: screenLich, tre: screenTre, ranh: screenRanh, ca: screenCa, nv: screenNv, nk: screenNk, dn: screenDn };
+const SCREEN_FN = { lich: screenLich, tre: screenTre, ranh: screenRanh, ca: screenCa, quan: screenQuan, nv: screenNv, nk: screenNk, dn: screenDn };
 function render() {
   const main = document.getElementById("wf-design");
   if (S.kho === "mobile" && !FRAME) {

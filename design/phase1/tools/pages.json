@@ -18,6 +18,12 @@
       "vi": "Lịch rảnh",
       "en": "Availability"
     },
+    "quan": {
+      "dir": "shop-schedule",
+      "v": "a",
+      "vi": "Lịch quán",
+      "en": "Shop schedule"
+    },
     "ca": {
       "dir": "my-profile",
       "v": "a",
@@ -307,6 +313,78 @@
       "vi": "Có dữ liệu",
       "en": "With data",
       "source": "http://localhost:4180/wireframe.html?man=ranh&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=en&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "quan",
+      "dir": "shop-schedule",
+      "file": "shop-schedule/data.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": false,
+      "only": null,
+      "vi": "Có dữ liệu",
+      "en": "With data",
+      "source": "http://localhost:4180/wireframe.html?man=quan&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "quan",
+      "dir": "shop-schedule",
+      "file": "shop-schedule/not-published.html",
+      "lang": "vi",
+      "state": "chua-cong-bo",
+      "overlay": false,
+      "only": null,
+      "vi": "Chưa công bố",
+      "en": "Not published",
+      "source": "http://localhost:4180/wireframe.html?man=quan&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=chua-cong-bo&frame=1"
+    },
+    {
+      "screen": "quan",
+      "dir": "shop-schedule",
+      "file": "shop-schedule/turned-off.html",
+      "lang": "vi",
+      "state": "tat",
+      "overlay": false,
+      "only": null,
+      "vi": "Chủ quán tắt Lịch quán",
+      "en": "Turned off by the owner",
+      "source": "http://localhost:4180/wireframe.html?man=quan&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=tat&frame=1"
+    },
+    {
+      "screen": "quan",
+      "dir": "shop-schedule",
+      "file": "shop-schedule/loading.html",
+      "lang": "vi",
+      "state": "dang-tai",
+      "overlay": false,
+      "only": null,
+      "vi": "Đang tải",
+      "en": "Loading",
+      "source": "http://localhost:4180/wireframe.html?man=quan&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=dang-tai&frame=1"
+    },
+    {
+      "screen": "quan",
+      "dir": "shop-schedule",
+      "file": "shop-schedule/error.html",
+      "lang": "vi",
+      "state": "loi",
+      "overlay": false,
+      "only": null,
+      "vi": "Lỗi",
+      "en": "Error",
+      "source": "http://localhost:4180/wireframe.html?man=quan&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=loi&frame=1"
+    },
+    {
+      "screen": "quan",
+      "dir": "shop-schedule",
+      "file": "shop-schedule/data.en.html",
+      "lang": "en",
+      "state": "du-lieu",
+      "overlay": false,
+      "only": null,
+      "vi": "Có dữ liệu",
+      "en": "With data",
+      "source": "http://localhost:4180/wireframe.html?man=quan&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=en&tt=du-lieu&frame=1"
     },
     {
       "screen": "ca",
@@ -611,6 +689,18 @@
     {
       "screen": "lich",
       "dir": "calendar",
+      "file": "calendar/data-leave-panel-dialog.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": null,
+      "vi": "Hộp Lưu thay đổi khi rời panel",
+      "en": "Unsaved panel changes dialog",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
       "file": "calendar/published-edit-shift-dialog.html",
       "lang": "vi",
       "state": "cong-bo",
@@ -631,6 +721,42 @@
       "vi": "Hộp Xuất lịch",
       "en": "Export dialog",
       "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=cong-bo&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
+      "file": "calendar/data-schedule-note.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": "desktop",
+      "vi": "Ghi chú xếp lịch của ngày",
+      "en": "Schedule note for a day",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
+      "file": "calendar/data-owner-note.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": null,
+      "vi": "Ghi chú riêng của tuần (mở rộng)",
+      "en": "Owner’s note for the week (open, full width)",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
+      "file": "calendar/data-folded-list.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": "desktop",
+      "vi": "Danh sách +N: có đăng ký, đã xếp ca khác",
+      "en": "+N list: registered, placed elsewhere",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
     },
     {
       "screen": "lich",
@@ -690,18 +816,6 @@
       "only": null,
       "vi": "Sửa nhân viên",
       "en": "Edit staff member",
-      "source": "http://localhost:4180/wireframe.html?man=nv&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
-    },
-    {
-      "screen": "nv",
-      "dir": "staff",
-      "file": "staff/data-edit-drawer-limit.html",
-      "lang": "vi",
-      "state": "du-lieu",
-      "overlay": true,
-      "only": null,
-      "vi": "Sửa nhân viên: chọn vị trí thứ ba",
-      "en": "Edit staff member: a third usual position",
       "source": "http://localhost:4180/wireframe.html?man=nv&v=a&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
     }
   ]
