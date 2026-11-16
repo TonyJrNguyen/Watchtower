@@ -1,7 +1,7 @@
 # Shift Scheduling & People Management — Epic & Story Breakdown
 
-**Source:** `shift-scheduling-solution-requirements.md` v1.10 (2026-10-17), the approved Phase 1 prototype `prototypes/phase1-demo.html` and, for every v1.9 and v1.10 change, the Phase 1 wireframe `prototypes/phase1-wireframe/wireframe.html` (approved 2026-10-17)
-**Status:** Draft for internal review. Revised 2026-09-29, 2026-10-04, 2026-10-11 and 2026-10-17 — see §0. Story IDs are stable once agreed; requirement IDs map back to the PRD.
+**Source:** `shift-scheduling-solution-requirements.md` v1.14 (2026-11-16), the approved Phase 1 prototype `prototypes/phase1-demo.html` and, for every change from v1.9 to v1.14, the Phase 1 wireframe `prototypes/phase1-wireframe/wireframe.html` (approved up to v1.10 on 2026-10-17, reviewed by the client in the Try-out since)
+**Status:** Draft for internal review. Revised 2026-09-29, 2026-10-04, 2026-10-11, 2026-10-17 and 2026-11-16 — see §0. Story IDs are stable once agreed; requirement IDs map back to the PRD.
 **Convention:** Mike Cohn use case + Gherkin acceptance criteria. Every story is a vertical slice (UI + API + data), never a technical layer.
 
 ---
@@ -69,6 +69,36 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 - **Phase 1 goes from 233 md to 238 md** of stories. Phase 2 keeps its size: S-9.2 resolves the rate by the shift's position (lead or base) instead of staff-then-default, and S-9.3 becomes the lateness deduction at the shift's rate instead of "multi-position paid once".
 - The staff page is now **My profile** ("Hồ sơ của tôi"), replacing My shifts / My Schedule everywhere.
 
+**Revision 2026-11-16 (PRD v1.11, v1.13 and v1.14; feedback of 2026-10-18, 2026-11-10 and 2026-11-12):** v1.12 changed §5.3 only.
+
+| Change | PRD | Stories | md |
+|---|---|---|---|
+| Position colour, display order and sub-position mark in the catalogue | v1.11 | S-1.14 | +1 |
+| Marks badge on markers; solid markers, no state by hue, labelled Draft/Published | v1.11 | S-4.1 | +2 |
+| Grouping by position in a cell | v1.11 | S-4.19 | +1 |
+| Registration order: first and last save, rank, "Thu 08:03" label with a toolbar switch, panel line, Add sorted by it | v1.11 | **New S-2.10** | +3 |
+| Schedule export of a published week or day, image or PDF, with legend (and, since v1.14, each day's schedule note) | v1.11 | **New S-5.7** | +4 |
+| No grace on an agreed late start: flag on the assignment, "move the start later" action, rules from minute 1 | v1.11 | S-7.2 | +2 |
+| Registered day below the daily minimum warned on the marker | v1.13 | S-4.1 | +1 |
+| Add places at once in a draft week; Cancel takes it back | v1.13 | S-4.14 | +1 |
+| Usual positions without a limit or ranking; the flag reads them | v1.13 | S-1.16 | −1 |
+| Header date opens its Day view; the view starts from the open panel's day | v1.13 | S-4.17 | +1 |
+| State-driven side panel: ticks are the day after Save, Save writes the difference with a server-side version check, context period, Reset, Cancel, leave dialog, cancel a published shift with a reason (ADR 0031) | v1.13 | S-4.12 | +4 |
+| Owner's note per week | v1.13 | **New S-4.22** | +1 |
+| Schedule note per day, published with the week, read by staff working that day, server-side read rule | v1.13 | **New S-4.23** | +3 |
+| Shop schedule for staff, with the Owner's switch and its read rule (FR-S24, ADR 0032) | v1.14 | **New S-5.8** | +3 |
+| Schedule note edits after publication apply at once (no separate publish step) | v1.14 | S-4.23 | −1 |
+| Selection tint by the marker selected | v1.14 | S-4.12 | +1 |
+| Folded "+N" marker with its list, bringing a marker back with the panel (closes O7) | v1.14 | S-4.19 | +2 |
+| Owner's note full width with basic rich text, sanitised server-side | v1.14 | S-4.22 | +1 |
+| 3 Days view removed | v1.14 | S-4.17 | −1 |
+| The shop schedule and the new panels checked on real devices | v1.14 | S-16.8 | +1 |
+| **Net** | | | **+29** |
+
+- **Phase 1 goes from 238 md to 267 md** of stories (+12%). By release: v1.11 +13, v1.13 +10, v1.14 +6.
+- The warning dot (v1.14) replaces the wavy underline (v1.13) and the "!" badge (v1.11) at no extra cost; the colour and mark changes of v1.13 are catalogue data. An empty spot closing the panel and collapsed panel sections are inside S-4.12's estimate.
+- **Phase 2 is not re-estimated here.** v1.11 added Shift Lead access (FR-L1–FR-L4) and the Administrator's evaluation (FR-P7), which have no stories yet.
+
 ---
 
 ## 1. Epic map
@@ -76,10 +106,10 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 | ID | Epic | Phase | PRD requirements | Size | Delivers |
 |---|---|---|---|---|---|
 | **E1** | Foundation, Access & Configuration | 1 | FR-A1–A14, FR-C2, FR-O16, FR-O28, NFR-1, NFR-2, NFR-6, NFR-7, NFR-11 | XL | Accounts with nickname, base and lead rates, the shift-lead switch and usual positions learned from the schedule; roles, sign-in, audit log, VI/EN, configuration of shift periods, window, positions and skip reasons |
-| **E2** | Weekly Availability Registration | 1 | FR-S1, S2, S3, S5, S12, S14, S19–S22 | L | Staff register CA 1–CA 5 inside the window, as a draft until saved, with optional custom times inside a period and a note per day |
+| **E2** | Weekly Availability Registration | 1 | FR-S1, S2, S3, S5, S12, S14, S19–S23 | L | Staff register CA 1–CA 5 inside the window, as a draft until saved, with optional custom times inside a period and a note per day |
 | **E3** | Staffing Needs, Positions & Coverage | 1 | FR-O1, O4, O22, O23, O38, O45 | M | Needs set per position, period and day in the Staffing section, sub-positions and attributes, coverage visible before and after assignment |
-| **E4** | Weekly Calendar & Shift Assignment | 1 | FR-O2, O3, O8, O10, O11, O12, O14, O15, O20, O21, O29, O32, O39, O42–O44, O46–O51 | XL | One calendar, by day, three days or week: see who registered → place people → give positions; undo/redo in draft; custom-time requests |
-| **E5** | Draft, Publish & My profile | 1 | FR-O31, O33, FR-S4, S11 | M | Publish gate (no shift, no position), skip-with-reason, the staff member's own page with their read-only schedule |
+| **E4** | Weekly Calendar & Shift Assignment | 1 | FR-O2, O3, O8, O10, O11, O12, O14, O15, O20, O21, O29, O32, O39, O42–O44, O46–O51, O53, O54 | XL | One calendar, by day or week: see who registered → place people → give positions; undo/redo in draft; custom-time requests |
+| **E5** | Draft, Publish & My profile | 1 | FR-O31, O33, O52, FR-S4, S11, S24 | M | Publish gate (no shift, no position), skip-with-reason, the staff member's own page with their read-only schedule, the schedule export and the shop schedule |
 | **E6** | Notifications & Push | **2** | FR-N1–N9, N13, NFR-4, NFR-9, NFR-10 | L | Web push + in-app inbox + install onboarding (S-1.9) |
 | **E7** | Attendance & Lateness (manual) | 1 | FR-O24, O25, O26, FR-S9, S17, S18, FR-T18, FR-B1, FR-B17, FR-C13, FR-C14 (pay estimate) | M | Lateness rules applied to manual input, in minutes and status; bonus preview; pay estimate |
 | **E8** | Control Centre | **2** | FR-O34–O37 | M | Landing surface: where is the week, what needs me |
@@ -385,7 +415,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I rename it and save
 - **Then** every screen shows the new label, existing assignments keep their data, and the change is logged.
 
-**Requirements:** FR-O28, FR-S1, FR-O33, NFR-1 · **Effort:** 5 md
+**Requirements:** FR-O28, FR-S1, FR-O33, NFR-1 · **Effort:** 6 md
 **Note:** in Phase 1 per CLAUDE.md (2026-09-29). Positions carry no rate (PRD v1.10); which position is the shift lead is part of the catalogue. Deactivating a position hides it from new assignments but keeps it on past ones.
 
 ---
@@ -429,7 +459,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I choose a third in the staff form
 - **Then** it is refused with "At most 2 usual positions. Remove one before choosing another." and nothing changes.
 
-**Requirements:** FR-A12, FR-A2, NFR-1, PositionHours (PRD §4.10) · **Effort:** 5 md
+**Requirements:** FR-A12, FR-A2, NFR-1, PositionHours (PRD §4.10) · **Effort:** 4 md
 **Note:** hours are published assignments by clock time (the whole of CA 5 counts 6 hours), Phụ trách excluded; on a tie the position already held stays. The 2 / 50 h / 12-week values are settings. Staff never see which positions are their usual ones.
 
 ---
@@ -607,7 +637,23 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-S22, FR-O42, FR-O43 · **Effort:** 2 md
 
-**E2 subtotal: 26 md**
+#### S-2.10 — Staff who register first are seen first
+- **As an** Administrator
+- **I want to** see when each staff member first saved their registration, and rank them by it
+- **so that** I can give priority to those who registered first.
+
+**AC — Scenario: the first save sets the rank**
+- **Given** staff A first saved on Thursday 08:03 and changed their registration on Friday 09:10, and staff B first saved on Thursday 10:15
+- **When** I open the calendar after the cutoff
+- **Then** A ranks before B; A's unplaced markers carry "Thu 08:03" on their top-left edge unless I turn the labels off in the toolbar; A's side panel says "Registered 1st of N · first saved Thu 08:03 · last changed Fri 09:10"; and the Add list puts A first.
+
+**AC — Scenario: no registration, no rank**
+- **Given** staff C registered nothing
+- **Then** C has no time and no rank, and a draft saved automatically at the cutoff takes the time of its last edit for both values.
+
+**Requirements:** FR-S23, FR-O42, FR-O43, FR-O46 · **Effort:** 3 md
+
+**E2 subtotal: 29 md**
 
 ---
 
@@ -742,7 +788,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I open the week
 - **Then** every active staff member appears in each period they registered — or in every period, drawn as "counted as free", if they registered nothing — as a pill labelled with their nickname, never collapsed into a count; each cell shows the people placed against the headcount needed and how many more are free but not placed; cells grow to fit; the full name shows on hover; **and** while registration is still open the calendar is read-only.
 
-**Requirements:** FR-O3, FR-O10, FR-O23, FR-O42, FR-A11 · **Effort:** 13 md *(above the Ready limit; split at planning into read view, states and hover/tap)*
+**Requirements:** FR-O3, FR-O10, FR-O23, FR-O42, FR-A11 · **Effort:** 16 md *(above the Ready limit; split at planning into read view, states, marks and warnings, and hover/tap)*
 **Note (v1.9):** markers also carry a star (every period registered), a clock (custom times) and a note icon; the open person is outlined in the accent colour; the week's state shows Draft in yellow and Published in green.
 **Note:** colour identifies the position, never the person (FR-O42). The prototype is the reference layout.
 
@@ -948,7 +994,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I press Save with no position chosen
 - **Then** the save is refused with "A published shift needs a position" — new shifts must carry a position, and published shifts are cancelled or shortened through S-4.9 and S-4.10.
 
-**Requirements:** FR-O43, FR-O29, FR-S22, FR-O50, FR-O51, NFR-1 · **Effort:** 7 md *(above the Ready limit; split at planning)*
+**Requirements:** FR-O43, FR-O29, FR-S22, FR-O50, FR-O51, NFR-1 · **Effort:** 12 md *(above the Ready limit; split at planning into the panel view, the difference Save with its version check, the leave dialog and the selection tint)*
 **Note:** assignments with times that don't match the periods are shown in the panel but edited in the shift dialog.
 
 ---
@@ -978,7 +1024,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I choose Add in Wednesday CA 1
 - **Then** the list shows only active staff who didn't register that period, by full name, each with any other shift they hold that day and their usual positions; **and When** I search by name, **Then** staff who did register, staff counted as free and staff already in this shift also appear, tagged as such; **and When** I pick someone, **Then** they are ticked in the staff list and open in the side panel with Wednesday CA 1 selected.
 
-**Requirements:** FR-O46, FR-O12 · **Effort:** 3 md
+**Requirements:** FR-O46, FR-O12 · **Effort:** 4 md
 
 ---
 
@@ -1014,7 +1060,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 ---
 
-#### S-4.17 — Administrator views the calendar by day, three days or week, and looks back at earlier weeks
+#### S-4.17 — Administrator views the calendar by day or week, and looks back at earlier weeks
 - **As an** Administrator
 - **I want to** switch the calendar between one day, three days and the whole week, move backwards and forwards, and open earlier weeks
 - **so that** I can focus on a busy day without losing the week, and check what was scheduled before.
@@ -1040,6 +1086,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **Then** it shows one day at a time with a tab for each day in view; in the Day view, previous and next replace the tabs.
 
 **Requirements:** FR-O47, FR-O10, FR-O42, FR-O43, NFR-5 · **Effort:** 6 md
+**Note (2026-11-16):** the 3 Days view was removed in PRD v1.14; a header date opens its Day view, and Day starts from the open panel's day (v1.13).
 **Note:** reads registrations and assignments by date range rather than by one week; the side panel's previous/next day steps through the days in view. The prototype is the reference layout; the Phase 1 wireframe for the navigation controls.
 
 ---
@@ -1069,7 +1116,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** CA 2 has everyone but Bob, plus Eve, and CA 3 has everyone but Alice, plus Frank and Grace
 - **Then** CA 2 reads Alice, Charlie, David, Eve and CA 3 reads Charlie, David, Eve, Frank, Grace; a marker with a warning goes first and a person added through Add goes last, in the order added, whatever the period.
 
-**Requirements:** FR-O49 · **Effort:** 2 md
+**Requirements:** FR-O49 · **Effort:** 5 md
 **Note:** "placed outside availability" is not a warning for this order, otherwise every manually added person would be both first and last. Needs the order of manual additions stored.
 
 ---
@@ -1106,7 +1153,37 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **Requirements:** FR-O51, FR-O45, FR-O11, FR-C13 · **Effort:** 3 md
 **Note:** the one block among positions (ADR 0021); every other position only flags (S-4.6).
 
-**E4 subtotal: 83 md**
+#### S-4.22 — Administrator keeps a private note for the week
+- **As an** Administrator
+- **I want to** write myself a note about the week while I schedule
+- **so that** I don't keep it on paper or in Zalo.
+
+**AC — Scenario: private, full width, formatted**
+- **Given** I open the note from the calendar's toolbar
+- **When** I write "VT asks for Saturday off" with a bulleted list and close it
+- **Then** the note opens as a full-width area above the calendar and the side panel and closes back; bold, italic, underline and lists are kept; no staff member can read it, even through the API; and the change is in the activity log.
+
+**Requirements:** FR-O53, NFR-1, NFR-2 · **Effort:** 2 md
+**Note:** stored as sanitised rich text; only the formats listed are kept.
+
+#### S-4.23 — Administrator writes a schedule note for a day
+- **As an** Administrator
+- **I want to** add a note to a day of the schedule, such as "A trains B"
+- **so that** the staff working that day know the plan.
+
+**AC — Scenario: published with the week**
+- **Given** I write a note on Tuesday while the week is a draft
+- **When** I publish the week
+- **Then** every staff member working Tuesday sees it on My profile, every staff member sees it under Tuesday on the shop schedule (S-5.8), and the export prints it under Tuesday (S-5.7).
+
+**AC — Scenario: edited after publication**
+- **Given** the week is published
+- **When** I change Tuesday's note
+- **Then** staff see the new text at once, and the change is in the activity log.
+
+**Requirements:** FR-O54, FR-S11, NFR-1, NFR-2 · **Effort:** 2 md
+
+**E4 subtotal: 99 md**
 
 ---
 
@@ -1203,7 +1280,35 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 **Requirements:** FR-O31, FR-O29 · **Effort:** 1 md
 **Note:** the change notification with previous and new values (FR-N7) is added with E6 in Phase 2. Until then the Administrator tells the staff member on Zalo.
 
-**E5 subtotal: 15 md**
+#### S-5.7 — Administrator exports the published schedule
+- **As an** Administrator
+- **I want to** export a published week, or one day, as an image or a PDF
+- **so that** I can send it to the shift leads on Zalo.
+
+**AC — Scenario: laid out as on the calendar**
+- **Given** the week is published
+- **When** I export the whole week as a PDF
+- **Then** it shows each day and period with every staff member by nickname on their position's colour, grouped as on the calendar, with marks, times only where they differ from the period's, each day's schedule note under that day and a legend; no draft shift appears; and the export is in the activity log.
+
+**Requirements:** FR-O52, FR-O54, NFR-1 · **Effort:** 4 md
+
+#### S-5.8 — Staff see the shop schedule
+- **As a** staff member
+- **I want to** see the published schedule of the whole shop
+- **so that** I can arrange a swap with someone before asking the Owner.
+
+**AC — Scenario: published weeks, as exported**
+- **Given** the Owner has the shop schedule on and the week is published
+- **When** I open Lịch quán
+- **Then** I see the week as the export lays it out, with each day's schedule note and my own markers outlined, one day at a time on a phone; and no registration, custom time asked for, lateness, pay or draft shift of anyone appears.
+
+**AC — Scenario: turned off**
+- **Given** the Owner turns the shop schedule off
+- **Then** Lịch quán leaves my menu, a direct API call for it is refused, and the change is in the activity log.
+
+**Requirements:** FR-S24, FR-O52, FR-O54, NFR-2, NFR-1 · **Effort:** 3 md
+
+**E5 subtotal: 22 md**
 
 ---
 
@@ -1313,7 +1418,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** an arrival is recorded 8 minutes late · **Then** no late penalty and no deduction are recorded
 - **When** an arrival is recorded 12 minutes late · **Then** a late penalty is recorded, the week's bonus preview shows "lost" (S-7.7), and pay is untouched.
 
-**Requirements:** FR-S9, FR-O25 · **Effort:** 3 md
+**Requirements:** FR-S9, FR-O25 · **Effort:** 5 md
 
 ---
 
@@ -1439,7 +1544,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-O24, FR-O25, FR-B17 *(proposed pending client confirmation)* · **Effort:** 2 md
 
-**E7 subtotal: 24 md**
+**E7 subtotal: 26 md**
 
 ---
 
@@ -1592,14 +1697,14 @@ The distinction that matters: the Administrator working from a phone mid-service
 - **so that** a layout that only works in one of them isn't discovered after go-live.
 
 **AC:** **Given** the Phase 1 release candidate · **When** each surface is run through its acceptance criteria on a real phone at 390px and on a desktop browser · **Then** both pass, and the results are recorded per surface.
-**Requirements:** NFR-5, NFR-10 · **Effort:** 4 md · **PHASE 1**
+**Requirements:** NFR-5, NFR-10 · **Effort:** 5 md · **PHASE 1**
 **Note:** PRD §4.13 names this cost explicitly: each surface has two layouts to check on real devices, and that belongs in the Phase 1 estimate.
 
-**E16 subtotal: 29 md — of which 23 md in Phase 1 (S-16.2, S-16.3, S-16.5, S-16.6, S-16.7, S-16.8) and 6 md in Phase 2 (S-16.1, S-16.4).**
+**E16 subtotal: 30 md — of which 24 md in Phase 1 (S-16.2, S-16.3, S-16.5, S-16.6, S-16.7, S-16.8) and 6 md in Phase 2 (S-16.1, S-16.4).**
 
 ---
 
-**Phase 1 story total, revised 2026-10-17: 238 md** (E1 45 · E2 26 · E3 22 · E4 83 · E5 15 · E7 24 · E16 23). It was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
+**Phase 1 story total, revised 2026-11-16: 267 md** (E1 45 · E2 29 · E3 22 · E4 99 · E5 22 · E7 26 · E16 24). It was 238 md on 2026-10-17: +29 md for PRD v1.11, v1.13 and v1.14, itemised in §0. Before that it was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
 
 | Change | md | Source |
 |---|---|---|
