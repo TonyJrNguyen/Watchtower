@@ -3,7 +3,7 @@
 
 ---
 
-**Version:** 1.14 · **Last updated:** 2026-11-16 · **Owner:** Tony
+**Version:** 1.15 · **Last updated:** 2026-11-16 · **Owner:** Tony
 **Status:** In review. Phase 1 scope restated per the 2026-09-08 narrowing (§4.13). Wireframe v1 predates this revision — see §5.3.
 
 ---
@@ -310,7 +310,7 @@ Formula from minute 16 onward: **deduction = minutes late × 2**.
 
 Note the two thresholds are different and both matter. **Minute 11** costs the weekly bonus. **Minute 16** starts costing pay. A staff member 12 minutes late loses 100,000 VND but no wages; one 16 minutes late loses both.
 
-**Agreed late start — no grace.** Some assignments already start later because the staff member asked to come in late and the Administrator agreed. That happens in two ways: the staff member registered **custom times starting later** than the period and was placed by those times (FR-S21, FR-O50), or they asked on the day and the Administrator **moved the assignment's start later**, marking it as an agreed late arrival (FR-O24). Lateness on such an assignment is measured from the agreed start and has **no grace**: from the first minute late the arrival records a late penalty and a deduction of twice the minutes late. A staff member placed at 08:00 by their custom times who arrives at 08:01 has a late penalty and a 2-minute deduction; at 08:20, a 40-minute deduction. The anomaly rule below is unchanged. Custom times that only end earlier leave the start where it was, so the normal grace applies. Confirmed by the client in the 2026-10-18 feedback round (FR-S9, FR-S17).
+**Agreed late start — no grace.** Some assignments already start later because the staff member asked to come in late and the Administrator agreed. That happens in two ways: the staff member registered **custom times starting later** than the period and was placed by those times (FR-S21, FR-O50), or they asked on the day and the Administrator **moved the assignment's start later**, marking it as an agreed late arrival (FR-O24). Lateness on such an assignment is measured from the agreed start and has **no grace**: from the first minute late the arrival records a late penalty and a deduction of twice the minutes late. A staff member placed at 08:00 by their custom times who arrives at 08:01 has a late penalty and a 2-minute deduction; at 08:20, a 40-minute deduction. The anomaly rule below is unchanged. Custom times that only end earlier leave the start where it was, so the normal grace applies. Confirmed by the client in the 2026-10-18 feedback round (FR-S9, FR-S17). An agreed late arrival has **no paid tolerance**, unlike an early departure of 30 minutes or less (3.8): its hours count from the agreed start. Tony's decision of 2026-11-16.
 
 **When the deduction would exceed the shift — treat as an anomaly, not a deduction**
 
@@ -441,7 +441,7 @@ It holds no state of its own. Every item is resolved on the surface that owns it
 2. System displays a combined view: assigned hours, punctuality (on-time vs. late beyond the grace window, and the tier reached), attendance (no-shows), bonus and streak status, and total payout for that period. Worked hours are not reported separately from assigned hours in the MVP — see FR-P6.
 3. This view is read-only reporting for evaluation purposes — it does not itself change pay or status. Any resulting action (e.g., a rate change or discretionary bonus) is entered separately through the Compensation Flow (3.9), keeping reporting and action clearly separated.
 4. **What the Administrator wants from it** (confirmed by the client on 2026-11-01): one place that brings together each staff member's patterns — punctuality, attendance, the hours they commit to by registering against the contract expectation (3.4), and attitude. The system **shows** these and never suggests an outcome; what to do about them is the Administrator's decision.
-5. Attitude is the Administrator's own assessment, recorded per staff member each period (FR-P7). **Only the Administrator evaluates.** Shift Leads do not write assessments in the system; the Administrator asks them on Zalo. The period is **monthly**, still to be confirmed by the client.
+5. Attitude is the Administrator's own assessment, recorded per staff member each period (FR-P7). **Only the Administrator evaluates.** Shift Leads do not write assessments in the system; the Administrator asks them on Zalo. The period is **monthly**, configurable. Tony's decision of 2026-11-16.
 
 ### 3.13 Staff Self-Performance View
 
@@ -637,7 +637,7 @@ Confirmed by the client on 2026-11-01: the Shift Lead is there for people manage
 | FR-P3 | System shall allow the Administrator to filter/sort the performance view by staff member, position, or date range. |
 | FR-P4 | The performance view shall be read-only reporting; any resulting action (rate change, bonus, deduction) must be entered separately via FR-O7. |
 | FR-P5 | System shall provide a staff-facing equivalent of the performance view (see FR-S10), server-side restricted so a staff member can only ever query their own record — enforced by the same access rule as NFR-2. It excludes the Administrator's evaluation (FR-P7). |
-| FR-P7 *(Phase 2)* | System shall let the Administrator record an **evaluation** of each staff member for each period: an assessment of attitude and a free-text note. Only the Administrator can record or read it; staff, Shift Leads included, never see it (3.13, NFR-2). The period is **monthly** *(proposed pending client confirmation; configurable)*. Its format is settled when Phase 2 is specified. |
+| FR-P7 *(Phase 2)* | System shall let the Administrator record an **evaluation** of each staff member for each period: an assessment of attitude and a free-text note. Only the Administrator can record or read it; staff, Shift Leads included, never see it (3.13, NFR-2). The period is **monthly** *(Tony, 2026-11-16; configurable)*. Its format is settled when Phase 2 is specified. |
 
 ### 4.8 Functional Requirements — Notifications
 
@@ -676,6 +676,7 @@ Delivery mechanics are specified in NFR-4, NFR-9 and NFR-10. This section specif
 | NFR-7 | **Localization** — the UI and all in-app notifications must support both Vietnamese and English, with per-user language selection. |
 | NFR-8 | **Clock display resilience** — the in-shop code display must degrade gracefully if it loses connectivity, and the system must provide a documented fallback so staff are not blocked from starting a shift by a device failure (ties to FR-T6 and FR-T7 exception handling). |
 | NFR-11 | **Timezone** — all dates, times, window boundaries, period boundaries and token validity are evaluated in **Asia/Ho_Chi_Minh (UTC+07:00)**, fixed in configuration for v1. The system serves a single location and does not support per-user or per-site timezones. Timestamps are stored with timezone information so that a future configuration option does not require a data migration. |
+| NFR-12 | **Tenant-ready data** — v1 serves one client, but the data is shaped for more. Every record that belongs to the client — staff, positions, registrations, assignments, notes, settings, audit entries — carries a **tenant** identifier from the first database migration, and every query and every server-side access rule (NFR-2) is scoped by it, so that a second client shop can be added without a data migration and without one client ever reading another's data. Each tenant's configurable rules (ADR 0017) live in that tenant's settings. A requirement only one client has is built as an **enhancement** inside the one product and switched on or off per tenant in its settings, never as a separate copy of the code; one is built only when other shops could use it too. A tenant is one shop, in the time zone of NFR-11. Self-service sign-up, billing and administration across tenants are **not** built in v1. Tony's decision of 2026-11-16 (ADR 0034). |
 
 ### 4.9.1 Audit log events (Phase 1)
 
@@ -860,6 +861,13 @@ These are decisions or unresolved edge cases the current solution/requirements d
 - **Performance evaluation** (Phase 2): patterns of punctuality, attendance, committed hours and attitude in one place; only the Administrator evaluates; the system shows and never suggests; staff don't see the evaluation but keep their own hours, lateness and bonus; no Shift Lead notes in the system; monthly, still to be confirmed (3.12, 3.13, FR-P1, FR-P5, FR-P7, FR-S10).
 - The evaluation period is the only item marked *proposed pending client confirmation*; it is Phase 2, so it is tracked in §5.1 O6 rather than in the Phase 1 pending-confirmation list.
 
+**Resolved on 2026-11-16 (Tony's answers on the Q&A page, round 3, v1.15):** Tony's decisions.
+- ~~O5~~ An agreed late arrival has **no paid tolerance**: its hours count from the agreed start, and lateness from minute 1 as before (3.8.3).
+- ~~O6~~ The evaluation period is **monthly**, configurable (3.12, FR-P7).
+- **Tenant-ready data:** one client in v1, with a tenant identifier on every client record and every query scoped by it from the start; a requirement only one client has becomes an enhancement switched on per tenant, built only when other shops could use it too (NFR-12, ADR 0034).
+- Outside the requirements: how new versions are released (ADR 0035).
+- None is added to the pending-confirmation list.
+
 **Resolved on 2026-11-16 (the feedback sheet's tab 12.11 and Tony's answers, v1.14):** recorded in `docs/feedback/2026-11-12-client-feedback.md`.
 - **Shop schedule** for staff: the published week of the whole shop, laid out as the export with each day's schedule note, read-only, on by default and switchable by the Administrator; the third exception to NFR-2. Proposed by Tony and confirmed by the client (FR-S24, FR-O54, NFR-2, ADR 0032).
 - **Schedule notes** are printed in the export and read on the shop schedule, and an edit after publication applies at once, with no separate publish step. Tony's decisions (FR-O52, FR-O54).
@@ -974,8 +982,6 @@ Every gap in the original G-series has been decided or parked; those resolutions
 | O1 | Wireframe v1 has not been reconciled against this revision (§5.3). The Phase 1 demo prototype now serves as the reference for the Phase 1 surfaces | Design handoff |
 | O2 | The week has been walked from registration through recorded lateness in the demo prototype. The weekly close — bulk confirm, holds, streak cascade — has still not been walked end to end against the finished rule set | Phase 2 build |
 | O3 | Seven rules were decided in the demo prototype and are proposed, not agreed: coverage counting (FR-O38), the double-booking block (FR-O39), cover required above 30 minutes (FR-O20), the effect of a no-show (FR-T18), the bonus preview on the lateness surface (FR-B17), password set from the account record (FR-A7), and showing sub-positions and attributes to staff on My profile (FR-O45) | Phase 1 sign-off |
-| O5 | Whether an agreed late arrival may have a small paid tolerance, as an early departure of 30 minutes or less does (3.8, 3.8.3) | Phase 1 sign-off |
-| O6 | The evaluation period, proposed as monthly (FR-P7) | Phase 2 specification |
 
 ### 5.2 Parked with Deferred Scope
 

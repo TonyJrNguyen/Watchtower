@@ -3,6 +3,15 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.15 — 2026-11-16
+- Following Tony's answers on the Q&A page of 2026-11-16, round 3
+- ~~O5~~ **No paid tolerance** on an agreed late arrival; its hours count from the agreed start. Amended §3.8.3
+- ~~O6~~ The evaluation period is **monthly**, configurable, by Tony's decision rather than pending the client. Amended §3.12, FR-P7
+- **Tenant-ready data:** new **NFR-12**; every client record carries a tenant identifier and every query and access rule is scoped by it; client-specific enhancements are switched on per tenant and built only when other shops could use them; no sign-up, billing or cross-tenant administration in v1. New ADR 0034, which amends ADR 0016
+- §5.0 resolved block for round 3; §5.1 loses O5 and O6
+- New ADR 0035 (release policy), with no requirement change
+- Backlog not re-estimated: tenant scoping is part of the data model and access-rule stories, and stays inside their estimates
+
 ## v1.14 — 2026-11-16
 - Following the feedback sheet's tab 12.11 (items 1–2 from the client, 3–7 from Tony), the client's list of real staff, and Tony's answers on the Q&A page of 2026-11-16 (`docs/feedback/2026-11-12-client-feedback.md`)
 - **Shop schedule** for staff, Phase 1: the published week of the whole shop, read-only, laid out as the export with each day's schedule note; on by default, switchable by the Administrator; the third exception to NFR-2. Proposed by Tony, confirmed by the client. New **FR-S24**; amended §3.5, FR-S11, FR-O52, FR-O54, NFR-2, §4.9.1 (Settings), §4.10 (ShopSetting), §4.13 Phase 1. New ADR 0032, which amends ADR 0030

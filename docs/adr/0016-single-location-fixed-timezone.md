@@ -5,3 +5,7 @@ The system serves one shop and the client has no expansion planned, so nothing i
 ## Consequences
 
 A second location would add a location dimension to schedules, staffing needs and staff lists. That's worth knowing, not worth building now.
+
+## Amended on 2026-11-16
+
+[ADR 0034](0034-data-is-tenant-ready.md) prepares the data for a **second client**: every record carries a tenant, and each tenant is one shop in this time zone. A second location for the **same** client is still not built.

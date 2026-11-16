@@ -16,6 +16,10 @@ _Avoid_: Manager, admin user
 The role held by the system provider, with full technical access for setup and support. Every Superadmin session is visible to the Administrator.
 _Avoid_: Developer account, root
 
+**Tenant** (Khách hàng):
+One client shop using Watchtower, with its own staff, schedules, settings and data. v1 has one tenant; every record carries its tenant so another can be added later (NFR-12).
+_Avoid_: Customer account, organisation, site (a site would be a location within one tenant)
+
 **Staff member** (Nhân viên):
 A person who works shifts at the shop and holds a Staff account.
 _Avoid_: Employee, worker, user
