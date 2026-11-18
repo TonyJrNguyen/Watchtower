@@ -453,7 +453,8 @@ function markerClick(sid, d, p) {
 }
 // --- Thứ tự chip trong một ngày (FR-O49) ---
 // Người đã có vị trí lên trước, nhóm theo thứ tự danh mục, A–Z theo biệt danh trong nhóm (khách chốt 1/11); cảnh báo không
-// đổi chỗ trong nhóm, chỉ hiện huy hiệu "!". Người chưa có vị trí (đã xếp chưa vị trí, hoặc đăng ký chưa xếp) theo sau, thứ tự cũ:
+// đổi chỗ trong nhóm, chỉ hiện chấm cảnh báo. Người đã xếp mà chưa có vị trí theo ngay sau, A–Z (Tony 18/11, PRD v1.19:
+// mọi người đã xếp nằm trên mọi người chưa xếp). Người đăng ký mà chưa xếp theo sau cùng, thứ tự cũ:
 // CA1: có cảnh báo lên đầu → còn lại A–Z theo biệt danh → người thêm thủ công xuống cuối, theo thứ tự thêm.
 // CA2–CA5 kế thừa thứ tự của ca ngay trên trong cùng ngày: tên còn lại giữ thứ tự, tên mới xếp A–Z sau nhóm kế thừa.
 // "Xếp ngoài lịch rảnh" không tính là cảnh báo khi xếp thứ tự, nên người thêm thủ công vẫn ở cuối.
@@ -475,7 +476,8 @@ function dayOrder(d) {
     prev = [...inherit(warn), ...inherit(rest), ...manual];
     const pos0 = (s) => asgAt(s, d, p)?.pos[0];
     const grouped = list.filter(pos0).sort((a, b) => CAT[pos0(a)] - CAT[pos0(b)] || az(a, b));
-    const cell = [...grouped, ...prev.filter((s) => !pos0(s))];
+    const placedNoPos = list.filter((s) => asgAt(s, d, p) && !pos0(s)).sort(az);
+    const cell = [...grouped, ...placedNoPos, ...prev.filter((s) => !asgAt(s, d, p))];
     // Người đã được xếp ca khác trong ngày xuống cuối ô (rồi gom vào +N, xem cellChips)
     out.push([...cell.filter((s) => !isElsewhere(s, d, p)), ...cell.filter((s) => isElsewhere(s, d, p))]);
   }

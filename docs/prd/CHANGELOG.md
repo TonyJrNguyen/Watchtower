@@ -3,6 +3,11 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.19 — 2026-11-18
+- Following the client's Try-out report that placed markers without a position stayed among the registered ones, and Tony's decision of 2026-11-18
+- **Placed markers first:** markers with a position, grouped by position as before, then markers placed without a position, A–Z, then markers registered and not placed in the earlier order (warnings first, inherited place down the day). Amended FR-O49
+- §5 (new resolved block), §5.0 (one row) and §5.3 updated accordingly. Backlog not re-estimated: the ordering stays inside S-4.19
+
 ## v1.18 — 2026-11-18
 - Following Tony's request for the side panel and his answers on the Q&A page of 2026-11-18, round 6
 - **Several selected periods:** selecting a period's row selects or deselects it, several at once, ticked or not; ticks and selection are independent. A position is given only through two actions: *Apply to the placed shifts (N)*, renamed from *Apply to every ticked period*, for every ticked period, and the new *Apply to the selected shifts (N)* for every selected period; choosing a position alone changes nothing, and both are unavailable at 0. Amended FR-O43
