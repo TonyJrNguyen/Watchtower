@@ -1420,6 +1420,7 @@ function popContent() {
 }
 function dialogContent() {
   const dl = ui.dialog; if (!dl) return "";
+  if (dl.id === "sbBackup" || dl.id === "sbRestore") return sbDataDialog(dl);
   if (dl.id === "publish") {
     const g = gateItems(); const ok = !g.noShift.length && !g.noPos.length;
     return `<div class="flex items-start gap-2 px-6 pt-5 pb-2"><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold">${L("Công bố lịch tuần 12–18/10?", "Publish week 12–18 Oct?")}</h2><p class="mt-2 text-sm/6 text-pretty text-muted">${ok ? L("Nhân viên sẽ thấy ca của mình ngay. Sau đó mỗi thay đổi có hiệu lực ngay, không công bố lại.", "Staff see their shifts right away. Later changes apply immediately; no re-publishing.") : L("Xong các mục dưới đây thì công bố được.", "Resolve the items below to publish.")}</p></div>${iconBtn("x", L("Đóng", "Close"), `onclick="ui.dialog=null;render()"`, "size-9")}</div>
