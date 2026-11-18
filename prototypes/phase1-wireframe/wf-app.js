@@ -800,7 +800,7 @@ function panelBody(mobile) {
       </div>
       ${iconBtn("x", L("Đóng", "Close"), `onclick="closePanel()"`, "size-9")}
     </div>
-    <div class="flex-1 space-y-5 overflow-y-auto px-5 py-4">
+    <div data-keep-scroll="panel-${sid}" class="flex-1 space-y-5 overflow-y-auto px-5 py-4">
       ${F.panelSummary ? `<dl class="grid grid-cols-2 gap-3">
         <div class="rounded-xl bg-background px-3 py-2.5"><dt class="text-xs text-muted">${L("Đăng ký tuần", "Registered")}</dt><dd class="mt-0.5 text-sm font-semibold tabular-nums">${typeOf(s) === "none" ? L("Rảnh cả tuần", "Free all week") : typeOf(s) === "all" ? L("Mọi ca", "Every shift") : `${rg.days} ${L("ngày", "days")} · ${fmtH(rg.h)}h`}</dd></div>
         <div class="rounded-xl bg-background px-3 py-2.5"><dt class="text-xs text-muted">${L("Đã xếp", "Placed")}</dt><dd class="mt-0.5 text-sm font-semibold tabular-nums">${st.shifts} ${L("ca", "shifts")} · ${fmtH(st.h)}h</dd></div>
@@ -1240,7 +1240,7 @@ function staffForm() {
   const chips = POSITIONS.filter((p) => !p.lead).map((p) => { const on = q.includes(p.id); return `<button type="button" aria-pressed="${on}" onclick="toggleStaffPos('${p.id}')" class="${cx("inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${hrsTag(hrsAt(s, p.id))}</button>`; }).join("");
   const sw = `<button type="button" role="switch" aria-checked="${canLead}" aria-labelledby="lead-label" onclick="toggleStaffPos('pt')" class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-muted/40 p-0.5 outline-hidden before:absolute before:-inset-2 transition-colors hover:bg-muted/60 aria-checked:bg-primary aria-checked:hover:bg-primary-hover"><span class="size-5 rounded-full bg-surface shadow-sm transition-transform group-aria-checked:translate-x-5 group-aria-checked:bg-primary-foreground motion-reduce:transition-none"></span></button>`;
   return `<div class="flex items-center gap-2 border-b border-border px-4 pt-4 pb-3">${iconBtn("x", L("Đóng", "Close"), `onclick="closeStaff()"`, "size-9")}<h2 class="min-w-0 flex-1 truncate text-lg font-semibold">${isNew ? L("Thêm nhân viên", "Add staff") : esc(s.name)}</h2></div>
-    <div class="flex-1 space-y-5 overflow-y-auto px-6 py-6">
+    <div data-keep-scroll="staff-${ui.staffEdit}" class="flex-1 space-y-5 overflow-y-auto px-6 py-6">
       ${field(`${L("Họ tên", "Full name")} <span class="text-err-text">*</span>`, `<input id="sf-name" class="${cx(INPUT, ui.sd.nameErr && "border-err-text")}" value="${esc(f.name ?? s.name)}" />${ui.sd.nameErr ? `<p role="alert" class="text-xs font-medium text-err-text">${ui.sd.nameErr}</p>` : ""}`)}
       ${field(L("Biệt danh", "Nickname"), `<input id="sf-nick" class="${INPUT}" value="${esc(f.nick ?? s.nick)}" placeholder="${L("Tự đề xuất: tên + chữ đầu của họ", "Suggested: given name + family initial")}" />`)}
       ${field(L("Điện thoại", "Phone"), `<input id="sf-phone" class="${INPUT} tabular-nums" value="${esc(f.phone ?? s.phone)}" inputmode="tel" />`)}
@@ -1849,9 +1849,12 @@ function render() {
     return;
   }
   const y = scrollY;
+  // Vẽ lại thay cả HTML nên khung cuộn bên trong (panel, hồ sơ nhân viên) về đầu; nhớ vị trí theo data-keep-scroll rồi trả lại (Tony 18/11).
+  const keep = Object.fromEntries([...document.querySelectorAll("[data-keep-scroll]")].map((el) => [el.dataset.keepScroll, el.scrollTop]));
   if (SANDBOX) sbPersist();
   main.innerHTML = (SANDBOX ? sbBar() : "") + SCREEN_FN[S.man]();
   renderLayer();
+  for (const el of document.querySelectorAll("[data-keep-scroll]")) if (keep[el.dataset.keepScroll]) el.scrollTop = keep[el.dataset.keepScroll];
   for (const el of document.querySelectorAll("[data-indet]")) el.indeterminate = true;
   const pop = document.querySelector("[data-pop]");
   if (pop) {
