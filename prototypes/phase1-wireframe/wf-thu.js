@@ -87,6 +87,14 @@ function sbLog(e, m = SB.clock) {
 }
 const sbSavedAt = (m) => both(() => L(`Lưu lúc ${regT(m)}`, `Saved ${regT(m)}`));
 const sbRunsTxt = (s, d, day) => { const r = runsOf(s, d, day); return r.length ? both(() => r.map((x) => { const t = runTime(x); return `${t.from}–${t.to} · ${posLabel(x.a.pos, x.a.sub)}`; }).join("; ")) : "—"; };
+// Phân công (PRD v1.17): một dòng nhật ký cho mỗi lần Áp dụng cho cả tuần hay Đặt lại, ghi tổng số cần mỗi ngày trước và sau
+function sbNeedLog(kind, d, before) {
+  const days = kind === "week" ? WEEK.map((_, i) => i).filter((i) => i !== d) : [d];
+  const sum = (need) => both(() => days.map((i) => kind === "week" ? `${dayShort(i)} ${PERIODS.reduce((a, p) => a + Object.values(need[i][p.i]).reduce((x, y) => x + y, 0), 0)}` : PERIODS.map((p) => `${p.code}: ${Object.values(need[i][p.i]).reduce((x, y) => x + y, 0)}`).join(", ")).join(", "));
+  const what = kind === "week" ? both(() => L(`Áp dụng số người cần của ${WEEK[d].viL} cho cả tuần`, `Applied ${WEEK[d].enL}'s staffing needs to the whole week`)) : ["Đặt lại số người cần về 0", "Reset staffing needs to 0"];
+  sbTick(1, 2);
+  sbLog({ what, day: kind === "week" ? both(() => L("Cả tuần", "Whole week")) : both(() => dayFull(d)), before: sum(before), after: sum(ui.need), draft: SB.phase !== "published" });
+}
 // Một lần Lưu ở panel = một dòng nhật ký cho người × ngày đó
 function sbLogDay(s, d, before, after, reason = "") {
   const b = runsOf(s, d, before), a = runsOf(s, d, after);

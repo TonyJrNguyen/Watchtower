@@ -51,7 +51,7 @@ _Avoid_: Alias, display name, short name
 ### Shift structure
 
 **Shift period** (Ca, CA 1–CA 5):
-One of the five fixed blocks a day is divided into, from 07:00 to 23:00. Staff register in shift periods, optionally with custom times inside a period. Assignments don't have to align with them. CA 5 is shown as 17:00–23:00, but worked in full it's paid until 24:00.
+One of the five fixed blocks a day is divided into, from 07:00 to 23:00, labelled Ca 1 to Ca 5 on every screen. Staff register in shift periods, optionally with custom times inside a period. Assignments don't have to align with them. CA 5 is shown as 17:00–23:00, but worked in full it's paid until 24:00.
 _Avoid_: Slot, time block, and a bare "shift" when the period is meant
 
 **Week**:
@@ -150,11 +150,12 @@ To set the position, and optionally its position details, on a placed assignment
 The panel for one staff member and one day, opened from a marker. Its ticked periods are the day that person will have after Save, and Save writes only the difference from what they held.
 _Avoid_: Selected periods (for periods an action is applied to)
 
-**Context period** (Ca đang sửa):
-The period whose marker opened the side panel, or whose row was selected in it. The position chosen in the panel goes to it and to newly ticked periods; other held periods keep theirs.
+**Selected periods** (Ca đang chọn):
+The periods highlighted in the side panel: the one whose marker opened it, plus any whose rows were selected there, ticked or not. *Apply to the selected shifts* gives them the position chosen; other periods keep theirs. Selecting is separate from ticking.
+_Avoid_: Context period (before v1.18)
 
 **Selection tint**:
-The background tint of a staff member's cells while their side panel is open: warm where they are placed when a placed marker was selected, cool where they registered when an unplaced one was.
+The background tint of a staff member's cells while their side panel is open: warm where they are placed when a placed marker was selected, cool where they registered and aren't placed when an unplaced one was.
 
 **Folded marker** (+N):
 A staff member registered for a period but placed in another period that day, shown in that period only inside a "+N" marker. Choosing them from its list brings the marker back while their side panel is open.

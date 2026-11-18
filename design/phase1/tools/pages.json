@@ -701,6 +701,30 @@
     {
       "screen": "lich",
       "dir": "calendar",
+      "file": "calendar/data-staffing-apply-week-dialog.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": null,
+      "vi": "Hộp Áp dụng số người cần cho cả tuần",
+      "en": "Apply staffing needs to the whole week dialog",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
+      "file": "calendar/data-staffing-reset-dialog.html",
+      "lang": "vi",
+      "state": "du-lieu",
+      "overlay": true,
+      "only": null,
+      "vi": "Hộp Đặt lại số người cần về 0",
+      "en": "Reset staffing needs dialog",
+      "source": "http://localhost:4180/wireframe.html?man=lich&v=b&mau=mau&nhan=cham&logo=2&kho=desktop&nav=duoi&lang=vi&tt=du-lieu&frame=1"
+    },
+    {
+      "screen": "lich",
+      "dir": "calendar",
       "file": "calendar/published-edit-shift-dialog.html",
       "lang": "vi",
       "state": "cong-bo",

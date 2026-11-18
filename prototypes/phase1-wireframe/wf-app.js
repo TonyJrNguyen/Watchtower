@@ -119,7 +119,11 @@ const hoursOf = (s) => Object.entries((s.id && HOURS[s.id]) || {}).filter(([, h]
 const hrsTag = (h) => (h ? `<span class="text-xs font-normal tabular-nums text-muted">${h}h</span>` : "");
 const posDot = (pid, c = "size-2") => `<span class="${c} shrink-0 rounded-full bg-p${pn(pid)}-dot" aria-hidden="true"></span>`;
 const dayShort = (d) => L(WEEK[d].vi, WEEK[d].en);
-const dayFull = (d) => `${dayShort(d)} ${WEEK[d].date}/10`;
+// Ngày tính từ đầu tuần đang xem (tuần mẫu bắt đầu 12/10/2026, tuần trước lùi 7 ngày), không ghi cứng tháng (PRD v1.17)
+const WEEK0 = new Date(2026, 9, 12);
+const dayDate = (d) => { const x = new Date(WEEK0); x.setDate(x.getDate() + d + 7 * Math.min(0, ui.weekOff || 0)); return x; };
+const ddmm = (d) => { const x = dayDate(d); return `${String(x.getDate()).padStart(2, "0")}/${String(x.getMonth() + 1).padStart(2, "0")}`; };
+const dayFull = (d) => { const x = dayDate(d); return `${dayShort(d)} ${x.getDate()}/${x.getMonth() + 1}`; };
 const pTime = (p) => `${PERIODS[p].from.slice(0, 2)}–${PERIODS[p].to.slice(0, 2)}`;
 // Thứ tự danh mục (PRD §3.3), dùng để nhóm chip theo vị trí trong ô (FR-O49)
 const CAT = Object.fromEntries(POSITIONS.map((p, i) => [p.id, i]));
@@ -430,7 +434,8 @@ function marker(s, d, p) {
   // Không đăng ký gì: nét đứt mảnh, mờ hẳn, không dấu tích, để tách khỏi người đã đăng ký (góp ý 10/10)
   else style = "border-dashed border-foreground/35 bg-surface text-muted opacity-55";
   const warn = !s.left && ((a && (k === "no" || flagPos(s, a))) || customPending(s, d, p) || (!a && shortDay(s, d)));
-  const selected = ui.panel && ui.panel.sid === s.id && ui.panel.d === d;
+  // Chip trên lịch hiện đang chọn khi ca đó đang được chọn (nền xanh) trong panel (Tony 18/11, L1)
+  const selected = ui.panel && ui.panel.sid === s.id && ui.panel.d === d && ui.panel.hl.has(p);
   // Ghi chú theo ngày: biểu tượng chỉ ở chip đầu tiên của người đó trong ngày, không lặp ở mọi ca
   const noteHere = noteAt(s, d) && PERIODS.find((pp) => shownIn(d, pp.i).includes(s))?.i === p;
   const solid = !!a?.pos.length, mk = marksOf(a);
@@ -438,16 +443,18 @@ function marker(s, d, p) {
   const star = typeOf(s) === "all" ? `<svg viewBox="0 0 24 24" class="${solid ? "size-3 shrink-0 fill-current" : "size-3 shrink-0 fill-(--star) text-(--star)"}" aria-label="${L("Đăng ký mọi ca", "Every shift")}"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>` : "";
   return `<button type="button" data-tip="${esc(tipFor(s, d, p))}" onclick="markerClick('${s.id}',${d},${p})" aria-pressed="${!!selected}" class="${cx("relative inline-flex h-6 max-w-[100%] cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium whitespace-nowrap outline-hidden transition-[filter] hover:brightness-95", style, selected && (ui.panel.ctx === p ? "ring-[3px] ring-primary ring-offset-1 ring-offset-surface" : "ring-2 ring-primary/45 ring-offset-1 ring-offset-surface"))}">${rs ? `<span class="pointer-events-none absolute -top-[7px] left-2 rounded-sm bg-surface px-0.5 text-[9px] leading-[11px] font-medium tabular-nums text-muted">${regT(rs.first)}</span>` : ""}${!a && k === "reg" ? ic("check", "-ml-0.5 size-3 opacity-80") : ""}${star}<span class="${cx("truncate", s.left && "line-through")}">${esc(s.nick)}</span>${warn ? `${WARN_DOT}<span class="sr-only">${L("Cần chú ý", "Needs attention")}</span>` : ""}${customShown(s, d, p) ? ic("clock", "size-3 opacity-80") : ""}${noteHere ? ic("message-square-text", "size-3 opacity-70") : ""}${mk ? `<span class="pointer-events-none absolute -top-[7px] -right-1 rounded-full bg-foreground px-1 text-[9px] leading-[13px] font-bold tabular-nums text-surface ring-2 ring-surface">${mk}</span>` : ""}</button>`;
 }
-// Bấm lại chip của ca ngữ cảnh thì đóng panel; chip khác của cùng người cùng ngày thì đổi ca ngữ cảnh; chip khác thì
-// chuyển panel, hỏi trước nếu còn thay đổi chưa lưu (góp ý 10/11 mục 11, ADR 0031)
+// Chip trên lịch chọn đúng một ca (PRD v1.18, Tony 18/11): chip khác của cùng người cùng ngày thì chỉ chọn ca đó;
+// bấm lại chip của ca đang được chọn duy nhất thì đóng panel; chip người khác hay ngày khác thì chuyển panel,
+// hỏi trước nếu còn thay đổi chưa lưu (góp ý 10/11 mục 11, ADR 0031). Chọn nhiều ca chỉ làm trong panel.
 function markerClick(sid, d, p) {
   const P = ui.panel;
-  if (P && P.sid === sid && P.d === d) return P.ctx === p ? closePanel() : panelCtx(p);
+  if (P && P.sid === sid && P.d === d) return P.hl.has(p) && P.hl.size === 1 ? closePanel() : panelOnly(p);
   leavePanel(() => openPanel(sid, d, p));
 }
 // --- Thứ tự chip trong một ngày (FR-O49) ---
 // Người đã có vị trí lên trước, nhóm theo thứ tự danh mục, A–Z theo biệt danh trong nhóm (khách chốt 1/11); cảnh báo không
-// đổi chỗ trong nhóm, chỉ hiện huy hiệu "!". Người chưa có vị trí (đã xếp chưa vị trí, hoặc đăng ký chưa xếp) theo sau, thứ tự cũ:
+// đổi chỗ trong nhóm, chỉ hiện chấm cảnh báo. Người đã xếp mà chưa có vị trí theo ngay sau, A–Z (Tony 18/11, PRD v1.19:
+// mọi người đã xếp nằm trên mọi người chưa xếp). Người đăng ký mà chưa xếp theo sau cùng, thứ tự cũ:
 // CA1: có cảnh báo lên đầu → còn lại A–Z theo biệt danh → người thêm thủ công xuống cuối, theo thứ tự thêm.
 // CA2–CA5 kế thừa thứ tự của ca ngay trên trong cùng ngày: tên còn lại giữ thứ tự, tên mới xếp A–Z sau nhóm kế thừa.
 // "Xếp ngoài lịch rảnh" không tính là cảnh báo khi xếp thứ tự, nên người thêm thủ công vẫn ở cuối.
@@ -469,7 +476,8 @@ function dayOrder(d) {
     prev = [...inherit(warn), ...inherit(rest), ...manual];
     const pos0 = (s) => asgAt(s, d, p)?.pos[0];
     const grouped = list.filter(pos0).sort((a, b) => CAT[pos0(a)] - CAT[pos0(b)] || az(a, b));
-    const cell = [...grouped, ...prev.filter((s) => !pos0(s))];
+    const placedNoPos = list.filter((s) => asgAt(s, d, p) && !pos0(s)).sort(az);
+    const cell = [...grouped, ...placedNoPos, ...prev.filter((s) => !asgAt(s, d, p))];
     // Người đã được xếp ca khác trong ngày xuống cuối ô (rồi gom vào +N, xem cellChips)
     out.push([...cell.filter((s) => !isElsewhere(s, d, p)), ...cell.filter((s) => isElsewhere(s, d, p))]);
   }
@@ -497,14 +505,15 @@ function cellChips(d, p, gap) {
 // Góp ý 12/11 mục 5, Tony chốt 16/11: bấm vùng trống trên lịch thì đóng panel (còn thay đổi chưa lưu thì vẫn hỏi), chip gỡ từ +N về lại
 function calBlank(e) { if (ui.panel && !e.target.closest("button, a, input, textarea, select, label, [role=dialog]")) closePanel(); }
 function revealPick(sid, d, p) { ui.pop = null; leavePanel(() => { openPanel(sid, d, p); ui.reveal = { sid, d, p }; render(); }); }
-// Góp ý 12/11 mục 1, Tony chốt 16/11 (theo chip vừa bấm): chip đang chọn chưa được xếp thì tô xanh (màu lạnh) mọi ca người đó
-// đăng ký (hay rảnh vì không đăng ký gì); chip đã được xếp thì tô cam (màu nóng) mọi ca người đó đã được xếp. Chỉ tô nền, không viền.
+// Góp ý 12/11 mục 1, Tony chốt 16/11 (theo chip vừa bấm): chip đang chọn chưa được xếp thì tô xanh (màu lạnh) các ca người đó
+// đăng ký (hay rảnh vì không đăng ký gì) mà chưa được xếp; chip đã được xếp thì tô cam (màu nóng) mọi ca người đó đã được xếp.
+// Hai tập ô không trùng nhau (PRD v1.16). Chỉ tô nền, không viền.
 function hlCell(d, p) {
   const P = ui.panel; if (!P || !ST[P.sid]) return "";
   const s = ST[P.sid];
   const hot = P.ctx != null ? !!asgAt(s, P.d, P.ctx) : PERIODS.some((q) => asgAt(s, P.d, q.i));
   if (hot) return asgAt(s, d, p) ? "wt-hl-hot" : "";
-  return !s.left && regKind(s, d, p) !== "no" ? "wt-hl-cold" : "";
+  return !s.left && regKind(s, d, p) !== "no" && !asgAt(s, d, p) ? "wt-hl-cold" : "";
 }
 // Giờ đăng ký (trái) và huy hiệu ký hiệu (phải) nằm trên mép trên chip, nên hàng chip luôn có khoảng cách dọc
 const peopleCls = (gap = "gap-x-1.5") => (!isEmptyWeek ? `flex flex-wrap ${gap} gap-y-2.5 pt-1.5` : `flex flex-wrap ${gap} gap-y-1`);
@@ -618,7 +627,7 @@ function onoteBar() {
     <header class="flex flex-wrap items-center gap-2 border-b border-border py-1.5 pr-1.5 pl-4"><div class="min-w-0 flex-1 basis-48"><p class="text-sm font-semibold">${L("Ghi chú riêng", "Owner’s note")} · ${L("Tuần", "Week")} ${ui.weekOff < 0 ? "5–11/10" : "12–18/10"}</p><p class="text-xs text-pretty text-muted">${L("Chỉ bạn thấy. Không công bố cho nhân viên.", "Only you see it. Never shown to staff.")}</p></div>
       ${ro ? "" : `<div role="toolbar" aria-label="${L("Định dạng", "Formatting")}" class="flex items-center gap-0.5">${tools.map(([c, i, tt]) => `<button type="button" data-fmt="${c}" onmousedown="event.preventDefault()" onclick="fmtOnote('${c}')" aria-label="${tt}" title="${tt}" aria-pressed="false" class="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground aria-pressed:bg-foreground/8 aria-pressed:text-foreground">${ic(i, "size-4")}</button>`).join("")}</div><span class="mx-1 h-5 w-px bg-border-strong"></span>`}
       ${iconBtn("x", L("Đóng ghi chú", "Close the note"), `onclick="toggleOnote()"`, "size-9")}</header>
-    <div id="onote-ed" ${ro ? "" : `contenteditable="true"`} role="textbox" aria-multiline="true" aria-readonly="${ro}" aria-label="${L("Nội dung ghi chú riêng", "Owner’s note")}" data-placeholder="${L("Ví dụ: hỏi lại Hậu có làm thêm CA 5 được không", "e.g. ask Hậu whether they can take an extra CA 5")}" oninput="onoteInput(this)" onkeyup="fmtState()" onmouseup="fmtState()" class="wt-rich max-h-[50vh] min-h-36 overflow-y-auto px-4 py-3 text-sm/6 outline-hidden">${cleanRich(v)}</div>
+    <div id="onote-ed" ${ro ? "" : `contenteditable="true"`} role="textbox" aria-multiline="true" aria-readonly="${ro}" aria-label="${L("Nội dung ghi chú riêng", "Owner’s note")}" data-placeholder="${L("Ví dụ: hỏi lại Hậu có làm thêm Ca 5 được không", "e.g. ask Hậu whether they can take an extra Ca 5")}" oninput="onoteInput(this)" onkeyup="fmtState()" onmouseup="fmtState()" class="wt-rich max-h-[50vh] min-h-36 overflow-y-auto px-4 py-3 text-sm/6 outline-hidden">${cleanRich(v)}</div>
   </section>`;
 }
 
@@ -725,7 +734,10 @@ function panelBody(mobile) {
   const cu = customAt(s, d), note = noteAt(s, d);
   const periodRow = (p) => {
     const a = asgAt(s, d, p.i), k = regKind(s, d, p.i);
-    const right = a ? (a.pos.length ? `<span class="inline-flex max-w-[100%] items-center gap-1.5 truncate rounded-full border px-2 py-0.5 text-xs font-medium border-p${pn(a.pos[0])}-bd bg-p${pn(a.pos[0])}-bg text-p${pn(a.pos[0])}-tx"><span class="truncate">${esc(posLabel(a.pos, a.sub))}</span></span>` : `<span class="rounded-full border border-foreground/40 bg-foreground/10 px-2 py-0.5 text-xs font-medium">${L("Chưa có vị trí", "No position")}</span>`) : "";
+    // Vị trí hiện trên dòng là vị trí sau khi Lưu; ca chưa tick có vị trí đã gán thì hiện mờ, "chưa giao" (PRD v1.18)
+    const posPill = (x, extra = "") => x.pos.length ? `<span class="${cx("inline-flex max-w-[100%] items-center gap-1.5 truncate rounded-full border px-2 py-0.5 text-xs font-medium", `border-p${pn(x.pos[0])}-bd bg-p${pn(x.pos[0])}-bg text-p${pn(x.pos[0])}-tx`, extra)}"><span class="truncate">${esc(posLabel(x.pos, x.sub))}</span></span>` : `<span class="rounded-full border border-foreground/40 bg-foreground/10 px-2 py-0.5 text-xs font-medium">${L("Chưa có vị trí", "No position")}</span>`;
+    const ticked = sel.has(p.i), shown = ro ? a : ticked ? panelEff(p.i) : a, pend = !ro && !ticked && !a && P.posOf[p.i]?.pos.length ? P.posOf[p.i] : null;
+    const right = shown ? posPill(shown) : pend ? `${posPill(pend, "opacity-55")}<span class="text-xs text-muted">${L("chưa giao", "not placed")}</span>` : "";
     // "Đăng ký" là chip xanh lá có dấu tích để nổi hẳn so với "Rảnh" và "Không đăng ký" (góp ý 10/10)
     const kTag = k === "reg" ? `<span class="inline-flex items-center gap-1 rounded-full bg-ok-bg px-2 py-0.5 text-xs font-medium text-ok ring-1 ring-black/5 ring-inset">${ic("check", "size-3.5")}${L("Đăng ký", "Registered")}</span>`
       : k === "free" ? `<span class="inline-flex items-center gap-1 text-xs text-foreground/80">${ic("circle-dashed", "size-3.5")}${L("Rảnh", "Free")}</span>`
@@ -733,7 +745,7 @@ function panelBody(mobile) {
     const c = k === "reg" ? cu?.[p.i] : null;
     const cuTag = c ? `<span class="${cx("inline-flex items-center gap-1 text-xs font-medium tabular-nums", a ? "text-muted" : "text-warn")}">${ic("clock", "size-3.5")}${L("Giờ riêng", "Own times")} ${c.from}–${c.to}${a ? "" : L(" · chưa quyết", " · not decided")}</span>` : "";
     const placedT = a?.t ? `<span class="text-xs tabular-nums text-muted">${L("xếp", "placed")} ${a.t.from}–${a.t.to}${hm(a.t.from) > hm(p.from) ? L(" · vào trễ đã thống nhất", " · agreed late start") : ""}</span>` : "";
-    const on = sel.has(p.i), x = dsBy[p.i], isCtx = !ro && P.ctx === p.i;
+    const on = sel.has(p.i), x = dsBy[p.i], isCtx = !ro && P.hl.has(p.i);
     // Dấu thay đổi: ca Lưu sẽ thêm, bỏ hay đổi; gợi ý lúc mở panel từ ca chưa xếp
     const badge = ro ? "" : P.suggested === p.i && !P.edited && on && !a ? chg("sug") : x ? chg(x.type) : "";
     const outside = !ro && on && !a && k === "no" ? `<span class="mt-1 block text-xs text-warn">${L("Ngoài lịch rảnh: chỉ cảnh báo, không tạo đăng ký.", "Outside availability: a flag only, no registration is created.")}</span>` : "";
@@ -752,22 +764,29 @@ function panelBody(mobile) {
   const cuSel = [...sel].sort().filter((p) => regKind(s, d, p) === "reg" && cu?.[p] && !P.initial[p]);
   const posChips = POSITIONS.filter((p) => !p.lead || canLeadShift(s)).map((p) => {
     const on = ui.posPick.includes(p.id);
-    return `<button type="button" role="radio" aria-checked="${on}" ${tgt.length ? "" : "disabled"} onclick="pickPos('${p.id}')" title="${lacksExp(s, p.id) ? L("Chưa có kinh nghiệm", "No experience") : ""}" class="${cx("relative inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors disabled:cursor-not-allowed disabled:opacity-50", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${lacksExp(s, p.id) ? `<span class="grid size-3.5 place-items-center rounded-full bg-warn text-[9px] leading-none font-bold text-white" aria-label="${L("Chưa có kinh nghiệm", "No experience")}">!</span>` : ""}</button>`;
+    return `<button type="button" role="radio" aria-checked="${on}" onclick="pickPos('${p.id}')" title="${lacksExp(s, p.id) ? L("Chưa có kinh nghiệm", "No experience") : ""}" class="${cx("relative inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-sm font-medium outline-hidden transition-colors disabled:cursor-not-allowed disabled:opacity-50", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground")}">${posDot(p.id)}${L(p.vi, p.en)}${lacksExp(s, p.id) ? `<span class="grid size-3.5 place-items-center rounded-full bg-warn text-[9px] leading-none font-bold text-white" aria-label="${L("Chưa có kinh nghiệm", "No experience")}">!</span>` : ""}</button>`;
   }).join("");
   const subRows = ui.posPick.filter((pid) => POS[pid].subs.length).map((pid) => `<div class="flex flex-wrap items-center gap-1.5"><span class="mr-1 text-xs text-muted">${posName(pid)}:</span>${POS[pid].subs.map(([id, vi, en, mk]) => { const on = ui.subPick.includes(id); return `<button type="button" aria-pressed="${on}" onclick="pickSub('${id}')" class="${cx("inline-flex h-7 cursor-pointer items-center gap-1 rounded-full px-2.5 text-xs font-medium outline-hidden", on ? "bg-foreground/[0.14] text-foreground inset-ring-1 inset-ring-foreground" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10")}">${L(vi, en)}${mk ? `<span class="font-semibold text-muted">${mk}</span>` : ""}</button>`; }).join("")}</div>`).join("");
   const dayIdx = days.indexOf(d);
   const nothing = sel.size === 0;
   const quick = ro ? "" : `<span class="-mr-1.5 flex text-xs">${[["reg", L("+ Ca đăng ký", "+ Registered")], ["all", L("Tất cả", "All")], ["none", L("Bỏ hết", "Clear all")]].map(([k, t]) => `<button type="button" onclick="quickSel('${k}')" class="inline-flex h-8 cursor-pointer items-center px-1.5 text-muted outline-hidden underline-offset-4 hover:text-foreground hover:underline">${t}</button>`).join("")}</span>`;
-  const shiftsBody = `${ro ? "" : `<p class="px-2 pb-1 text-xs text-muted">${L("Ô tick là các ca người này làm sau khi Lưu. Bấm vào một dòng để chọn ca nhận vị trí.", "Ticked shifts are the ones they work after Save. Select a row to choose the shift that gets the position.")}</p>`}<div class="flex flex-col gap-0.5">${PERIODS.map(periodRow).join("")}</div>
+  const shiftsBody = `${ro ? "" : `<p class="px-2 pb-1 text-xs text-muted">${L("Ô tick: ca người này làm sau khi Lưu. Bấm vào dòng để chọn ca muốn gán vị trí (nền xanh), bấm lại để bỏ chọn; chọn được nhiều ca.", "Ticked: the shifts they work after Save. Select rows to choose the shifts that get a position (blue); select again to clear. Several at once is fine.")}</p>`}<div class="flex flex-col gap-0.5">${PERIODS.map(periodRow).join("")}</div>
     ${!ro && nothing ? `<p class="px-2 pt-1.5 text-xs text-muted">${L("Không tick ca nào: Lưu là bỏ khỏi mọi ca trong ngày.", "Nothing ticked: Save takes them off every shift this day.")}</p>` : ""}
     ${!ro && cuSel.length ? `<div class="mt-3 space-y-1.5 px-2"><p class="text-xs text-muted">${L("Xếp theo", "Place by")} · <span class="tabular-nums">${cuSel.map((p) => `${PERIODS[p].code} ${cu[p].from}–${cu[p].to}`).join(", ")}</span></p>${segmented([["reg", L("Giờ đăng ký", "Their times")], ["std", L("Giờ ca gốc", "Standard times")]], ui.saveAs, "setSaveAs", L("Xếp theo", "Place by"))}${ui.saveAs === "reg" && cuSel.some((p) => hm(cu[p].from) > hm(PERIODS[p].from)) ? `<p class="text-xs text-pretty text-muted">${L("Giờ vào trễ hơn ca là vào trễ đã thống nhất: không có 10 phút ân hạn, trễ từ phút 1 là tính trễ và trừ gấp đôi.", "A start later than the period is an agreed late start: no 10-minute grace, late and 2× deduction from minute 1.")}</p>` : ""}</div>` : ""}`;
-  // Vị trí áp cho ca ngữ cảnh và ca mới tick; ca đã xếp khác giữ vị trí của nó (ADR 0031)
-  const tgtLine = ro ? "" : tgt.length
-    ? `<p class="text-xs text-muted">${L("Áp cho", "Applies to")}: <span class="font-medium text-foreground">${tgt.map((q) => PERIODS[q].code).join(", ")}</span>${sel.size > tgt.length ? L(". Ca đã xếp khác giữ vị trí của nó.", ". Other held shifts keep theirs.") : ""}</p>${sel.size > tgt.length ? `<button type="button" onclick="applyAllPos()" class="cursor-pointer text-xs font-medium text-primary underline underline-offset-4 outline-hidden focus-visible:ring-2 focus-visible:ring-focus">${L(`Áp cho mọi ca đã chọn (${sel.size})`, `Apply to every ticked shift (${sel.size})`)}</button>` : ""}`
-    : `<p class="text-xs text-muted">${L("Bấm vào một ca đang tick, hoặc tick ca mới, để gán vị trí.", "Select a ticked shift, or tick a new one, to give a position.")}</p>`;
-  const posBody = `<div class="space-y-2.5">${tgtLine}<div role="radiogroup" aria-label="${L("Vị trí", "Position")}" class="flex flex-wrap gap-1.5">${posChips}</div>${subRows}
+  // Chip vị trí chỉ để chọn vị trí; hai nút gán: cho mọi ca đang tick (đã giao) hoặc mọi ca đang chọn (nền xanh).
+  // Không nút nào đổi ô tick hay ca đang chọn; nút khoá khi số là 0 hoặc chưa chọn vị trí (PRD v1.18, Tony 18/11)
+  const hlList = [...P.hl].sort((x, y) => x - y), hlOff = hlList.filter((q) => !sel.has(q));
+  const pickOk = ui.posPick.length > 0 && !missingSub().length;
+  const posKey = (q) => JSON.stringify(P.posOf[q] ? [P.posOf[q].pos, P.posOf[q].sub] : [[], []]);
+  const mixed = hlList.length > 1 && new Set(hlList.map(posKey)).size > 1;
+  const actBtn = (fn, n, label, none) => btn("outline", label, { attrs: `onclick="${fn}()" ${n && pickOk ? "" : `disabled title="${esc(!n ? none : L("Chọn vị trí trước", "Choose a position first"))}"`}`, extra: "h-8 min-h-8 rounded-lg px-3 text-xs whitespace-nowrap" });
+  const actRow = ro ? "" : `<div class="flex flex-wrap gap-2 pt-1">${actBtn("applyAllPos", sel.size, L(`Áp dụng cho ca đã giao (${sel.size})`, `Apply to the placed shifts (${sel.size})`), L("Chưa tick ca nào", "Nothing ticked"))}${actBtn("applySelPos", hlList.length, L(`Áp dụng cho ca đang chọn (${hlList.length})`, `Apply to the selected shifts (${hlList.length})`), L("Chưa chọn ca nào", "No shift selected"))}</div>`;
+  const tgtLine = ro ? "" : `<p class="text-xs text-pretty text-muted">${L("Chọn vị trí rồi bấm một nút bên dưới để gán.", "Choose a position, then use a button below to give it.")}</p><p class="text-xs text-muted">${hlList.length
+    ? `${L("Ca đang chọn", "Selected shifts")}: <span class="font-medium text-foreground">${hlList.map((q) => PERIODS[q].code).join(", ")}</span>${mixed ? L(" · đang có vị trí khác nhau", " · different positions now") : ""}`
+    : L("Chưa chọn ca nào: bấm vào một dòng ở mục Ca trong ngày để chọn.", "No shift selected: select a row under Shifts this day.")}</p>${hlOff.length ? `<p class="text-xs text-pretty text-muted">${L(`${hlOff.map((q) => PERIODS[q].code).join(", ")} chưa giao: chỉ được xếp với vị trí gán cho nó nếu tick trước khi Lưu.`, `${hlOff.map((q) => PERIODS[q].code).join(", ")} not placed: placed with the position given only if ticked before Save.`)}</p>` : ""}`;
+  const posBody = `<div class="space-y-2.5">${tgtLine}<div role="radiogroup" aria-label="${L("Vị trí", "Position")}" class="flex flex-wrap gap-1.5">${posChips}</div>${subRows}${actRow}
         ${missingSub().length ? `<p class="text-xs text-muted">${L(`${POS[missingSub()[0]].vi}: chọn ${POS[missingSub()[0]].subs.map((x) => x[1]).join(" hoặc ")}.`, `${POS[missingSub()[0]].en}: choose ${POS[missingSub()[0]].subs.map((x) => x[2]).join(" or ")}.`)}</p>` : ""}
-        ${ui.posPick.length || !tgt.length ? "" : pub ? `<p class="flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${L("Ca đã công bố phải có vị trí.", "A published shift needs a position.")}</p>` : `<p class="text-xs text-muted">${L("Không chọn vị trí: Lưu là xếp vào ca, chưa có vị trí.", "No position: Save places them without one.")}</p>`}</div>`;
+        ${![...sel].some((q) => !panelEff(q)?.pos.length) ? "" : pub ? `<p class="flex items-center gap-1.5 text-xs font-medium text-warn">${ic("triangle-alert", "size-3.5")}${L("Ca đã công bố phải có vị trí.", "A published shift needs a position.")}</p>` : `<p class="text-xs text-muted">${L("Có ca đã giao chưa có vị trí: Lưu là xếp vào ca, chưa có vị trí.", "A placed shift has no position: Save places them without one.")}</p>`}</div>`;
   const reasonBody = `<label class="block"><span class="sr-only">${L("Lý do", "Reason")}</span><input id="panel-reason" class="${INPUT}" value="${esc(ui.panelReason || "")}" oninput="ui.panelReason=this.value" placeholder="${L("VD: đã thống nhất qua Zalo", "e.g. agreed on Zalo")}" /></label>`;
   return `
     <div class="${cx("flex items-start gap-2 border-b border-border px-5 pt-4 pb-3", mobile && "pt-3")}">
@@ -819,7 +838,10 @@ function assignSection(mobile) {
   const d = mobile ? ui.mDay : ui.rosterDay;
   const ro = ui.weekOff < 0;
   const need = ro ? PREV_NEED : ui.need;
-  const dayTabs = mobile ? "" : `<div class="px-4 pb-3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${w.date}`]), d, "setRosterDay", L("Ngày", "Day"))}</div>`;
+  // Tab ngày kiểu Google (PRD v1.17): thứ đầy đủ và DD/MM, tab đang chọn gạch chân màu chính. Điện thoại không có tab: theo ngày của lịch.
+  const dayTabs = mobile ? "" : `<div class="scrollbar-clean overflow-x-auto px-3"><div role="tablist" aria-label="${L("Ngày", "Day")}" class="flex w-max min-w-full">${WEEK.map((w, i) => `<button type="button" role="tab" aria-selected="${i === d}" onclick="setRosterDay(${i})" class="${cx("relative flex min-w-22 shrink-0 cursor-pointer flex-col items-center rounded-t-lg px-3 pt-2 pb-2.5 outline-hidden transition-colors after:absolute after:inset-x-2 after:bottom-0 after:h-[3px] after:rounded-t-full focus-visible:ring-2 focus-visible:ring-focus", i === d ? "text-primary after:bg-primary" : "text-muted after:bg-transparent hover:bg-foreground/5 hover:text-foreground")}"><span class="text-sm font-medium whitespace-nowrap">${L(w.viL, w.enL)}</span><span class="text-xs tabular-nums">${ddmm(i)}</span></button>`).join("")}</div></div>`;
+  const dayZero = !ro && PERIODS.every((p) => Object.values(need[d][p.i]).every((n) => !n));
+  const doneMsg = ui.needMsg || (ui.needCopied ? L("Đã chép từ tuần 5–11/10", "Copied from 5–11 Oct") : "");
   const tone = (placed, n) => (placed < n ? "font-medium text-warn" : placed > n ? "text-muted" : "");
   const numIn = (p, pid, n) => `<input type="number" min="0" max="20" inputmode="numeric" value="${n}" aria-label="${esc(`${posName(pid)} ${PERIODS[p].code} ${dayFull(d)}`)}" onchange="setNeed(${d},${p},'${pid}',this.value)" class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />`;
   const rows = POSITIONS.map((pos) => `<tr class="border-t border-border"><th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap"><span class="inline-flex items-center gap-2">${posDot(pos.id)}${L(pos.vi, pos.en)}</span></th>${PERIODS.map((p) => {
@@ -829,7 +851,7 @@ function assignSection(mobile) {
   }).join("")}</tr>`).join("");
   const total = `<tr class="border-t border-border bg-background/60"><th scope="row" class="sticky left-0 z-[1] bg-background px-4 py-2.5 text-left text-sm font-medium">${L("Tổng số người", "Total people")}</th>${PERIODS.map((p) => { const n = Object.values(need[d][p.i]).reduce((a, b) => a + b, 0), placed = placedCount(d, p.i); return `<td class="px-2 py-2.5 text-right text-sm font-medium tabular-nums whitespace-nowrap"><span class="${tone(placed, n)}">${placed}</span><span class="text-muted">/</span><span class="${ro ? "w-6" : "inline-block w-11 pr-2"}">${n}</span></td>`; }).join("")}</tr>`;
   const head = `<div class="flex flex-col items-start gap-x-4 gap-y-3 px-4 pt-4 pb-3 sm:flex-row"><div class="min-w-0 flex-1"><h2 class="text-base font-semibold">${L("Phân công", "Staffing")}</h2><p class="mt-0.5 text-sm text-pretty text-muted">${ro ? L("Số đã giao / số người cần theo vị trí.", "Assigned / needed per position.") : L("Số đã giao / số người cần theo vị trí. Sửa ô số để đặt số người cần.", "Assigned / needed per position. Edit a number to set the need.")}</p></div>
-    ${ro || SANDBOX ? "" : `<div class="flex flex-wrap items-center gap-3">${ui.needCopied ? `<span class="inline-flex items-center gap-1 text-xs text-muted">${ic("check", "size-3.5")}${L("Đã chép từ tuần 5–11/10", "Copied from 5–11 Oct")}</span>` : ""}${btn("outline", L("Chép từ tuần trước", "Copy last week"), { icon: "copy", attrs: `onclick="copyNeed()"`, extra: "whitespace-nowrap px-3" })}</div>`}</div>`;
+    ${ro ? "" : `<div class="flex flex-wrap items-center gap-2">${doneMsg ? `<span role="status" class="inline-flex items-center gap-1 text-xs text-muted">${ic("check", "size-3.5")}${doneMsg}</span>` : ""}${btn("outline", L("Đặt lại", "Reset"), { attrs: `${dayZero ? `disabled title="${esc(L("Ngày này đã là 0", "This day is already 0"))}"` : ""} onclick="openDialog('needReset',${d})"`, extra: "whitespace-nowrap px-3" })}${btn("primary", L("Áp dụng cho cả tuần", "Apply to the whole week"), { attrs: `onclick="openDialog('needWeek',${d})"`, extra: "whitespace-nowrap px-3" })}${SANDBOX ? "" : btn("primary", L("Chép từ tuần trước", "Copy last week"), { attrs: `onclick="copyNeed()"`, extra: "whitespace-nowrap px-3" })}</div>`}</div>`;
   return `<section class="rounded-2xl border border-border bg-surface pb-1" data-wf-block="6">${head}${dayTabs}
     <div class="overflow-x-auto"><table class="w-full min-w-[600px]"><thead><tr class="border-t border-border"><th class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-xs font-medium text-muted">${L("Vị trí", "Position")}${mobile ? ` · ${dayFull(d)}` : ""}</th>${PERIODS.map((p) => `<th class="px-2 py-2 text-right text-xs font-medium text-muted"><span class="block">${p.code}</span><span class="font-normal tabular-nums">${pTime(p.i)}</span></th>`).join("")}</tr></thead>
     <tbody>${total}${rows}</tbody></table></div></section>`;
@@ -1038,7 +1060,7 @@ function screenRanh() {
     const h = dayH(d);
     if (!h) return `<p class="mt-0.5 text-xs text-muted">${L("Không làm", "Can’t work")}</p>`;
     if (under(d)) return `<p class="mt-0.5 text-xs font-medium tabular-nums text-err">${L(`${fmtH(h)} giờ · dưới 8 tiếng`, `${fmtH(h)}h · under 8h`)}</p>`;
-    return `<p class="mt-0.5 text-xs tabular-nums text-muted">${fmtH(h)} ${L("giờ", "h")}${h < RULES.minDayH ? L(" · có trọn Ca 5, tính đủ", " · full CA5 counts as enough") : ""}</p>`;
+    return `<p class="mt-0.5 text-xs tabular-nums text-muted">${fmtH(h)} ${L("giờ", "h")}${h < RULES.minDayH ? L(" · có trọn Ca 5, tính đủ", " · full Ca 5 counts as enough") : ""}</p>`;
   };
   // Giờ riêng theo từng ca (spec 11/10), mở từ nút "Giờ riêng" ở hàng dưới thẻ ngày như cũ; trong ô chọn ca rồi đổi giờ.
   // Mở ra là sửa được ngay; Lưu/Huỷ chỉ hiện khi có thay đổi. Lưu ở đây chỉ chốt vào bản nháp; chủ quán thấy sau Lưu của trang.
@@ -1133,7 +1155,7 @@ function screenCa() {
   }).join("")}</ul>`;
   const sum = loading || err || notPub || empty ? "" : `<div class="grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-surface" data-wf-block="3">
     ${[[L("Ca", "Shifts"), shiftsAll.length], [L("Giờ", "Hours"), fmtH(hours)], [L("Lương ước tính", "Est. pay"), vnd(pay)]].map(([k, v]) => `<div class="px-4 py-3"><p class="text-xs text-muted">${k}</p><p class="mt-0.5 text-base font-semibold tabular-nums">${v}</p></div>`).join("")}</div>
-    <p class="-mt-2 px-1 text-xs text-pretty text-muted">${leadH && hours > leadH ? L(`Gồm ${fmtH(leadH)} giờ phụ trách × ${vnd(me.lead || me.base)} và ${fmtH(hours - leadH)} giờ × ${vnd(me.base)}. `, `${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)} and ${fmtH(hours - leadH)}h × ${vnd(me.base)}. `) : leadH ? L(`Cả ${fmtH(leadH)} giờ là phụ trách × ${vnd(me.lead || me.base)}. `, `All ${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)}. `) : ""}${L("Ước tính theo giờ được xếp, chưa trừ đi trễ, chưa có thưởng. Trọn Ca 5 tính tới 24:00.", "Based on assigned hours, before lateness and bonus. A full CA5 is paid to 24:00.")}</p>`;
+    <p class="-mt-2 px-1 text-xs text-pretty text-muted">${leadH && hours > leadH ? L(`Gồm ${fmtH(leadH)} giờ phụ trách × ${vnd(me.lead || me.base)} và ${fmtH(hours - leadH)} giờ × ${vnd(me.base)}. `, `${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)} and ${fmtH(hours - leadH)}h × ${vnd(me.base)}. `) : leadH ? L(`Cả ${fmtH(leadH)} giờ là phụ trách × ${vnd(me.lead || me.base)}. `, `All ${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)}. `) : ""}${L("Ước tính theo giờ được xếp, chưa trừ đi trễ, chưa có thưởng. Trọn Ca 5 tính tới 24:00.", "Based on assigned hours, before lateness and bonus. A full Ca 5 is paid to 24:00.")}</p>`;
   // Vị trí đã làm (FR-A14): mọi vị trí đã làm kèm giờ, nhiều giờ nhất trước, ngay dưới phần lương; không theo tuần nên hiện cả khi tuần chưa công bố
   const mine = hoursOf(me);
   const posCard = loading || err ? "" : `<section class="rounded-2xl border border-border bg-surface" data-wf-block="4"><header class="px-5 pt-4 pb-2"><h2 class="text-base font-semibold">${L("Vị trí đã làm", "Positions worked")}</h2><p class="mt-0.5 text-xs text-pretty text-muted">${L("Các ca bạn đã làm, từ khi dùng hệ thống.", "Shifts you’ve worked since the app started.")}</p></header><div class="flex flex-wrap gap-1.5 px-5 pb-4">${mine.length ? mine.map(([pid, h]) => `<span class="inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/5 px-3 text-sm font-medium">${posDot(pid)}${posName(pid)}${hrsTag(h)}</span>`).join("") : `<p class="text-sm text-muted">${L("Chưa có ca nào đã làm.", "No shifts worked yet.")}</p>`}</div></section>`;
@@ -1363,7 +1385,7 @@ function popContent() {
       ${row(chipS(reg, `${starSvg}Ngàn`), L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week"))}
       ${row(chipS(reg, `Hậu${ic("clock", "size-3 opacity-80")}`), L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)"))}
       ${row(chipS(reg, `Hậu${ic("message-square-text", "size-3 opacity-70")}`), L("Có ghi chú cho ngày này", "Has a note for this day"))}
-      ${row(`<span class="wt-hl-cold h-6 w-10 rounded-md"></span><span class="wt-hl-hot h-6 w-10 rounded-md"></span>`, L("Bấm chip chưa xếp: ô nền xanh là các ca người đó đăng ký. Bấm chip đã xếp: ô nền cam là các ca người đó đã được xếp", "Select an unplaced marker: blue cells are the shifts they registered. Select a placed one: orange cells are the shifts they’re placed in"))}
+      ${row(`<span class="wt-hl-cold h-6 w-10 rounded-md"></span><span class="wt-hl-hot h-6 w-10 rounded-md"></span>`, L("Bấm chip chưa xếp: ô nền xanh là các ca người đó đăng ký mà chưa được xếp. Bấm chip đã xếp: ô nền cam là các ca người đó đã được xếp", "Select an unplaced marker: blue cells are the shifts they registered and aren’t placed in yet. Select a placed one: orange cells are the shifts they’re placed in"))}
       ${row(`<span class="inline-flex h-6 items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted">+3</span>`, L("Người đăng ký ca này nhưng đã được xếp ca khác trong ngày. Bấm để xem và đưa chip lại vào ô", "Registered for this shift but placed in another one today. Select to see them and bring a marker back"))}</ul>
       <p class="text-xs text-pretty text-muted">${L("Thứ tự trong ô: người có vị trí trước, nhóm theo thứ tự vị trí bên dưới, A–Z trong nhóm. Sau đó người chưa có vị trí: có cảnh báo trước, rồi A–Z, người thêm thủ công cuối; ca dưới giữ thứ tự của ca trên.", "Order in a cell: people with a position first, grouped in the order below, A–Z within a group. Then those without one: warnings first, then A–Z, manually added last; each shift keeps the order of the one above.")}</p>
       <div class="border-t border-border pt-3"><p class="mb-2 text-xs font-medium text-muted">${L("Vị trí và ký hiệu", "Positions and marks")}</p><ul class="space-y-1.5">${POSITIONS.map((x) => `<li class="flex items-start gap-2 text-sm">${posDot(x.id, "mt-1.5 size-2.5")}<span><span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-muted"> · ${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-foreground">${mk}</b> ${L(vi, en)}`).join(", ")}</span>` : ""}</span></li>`).join("")}</ul></div></div>`;
@@ -1419,6 +1441,15 @@ function dialogContent() {
       ${e.scope === "day" ? `<div class="px-5 pt-3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${base + i}`]), e.day, "setExpDay", L("Ngày", "Day"))}</div>` : ""}
       <div class="px-6 pt-4"><p class="mb-1.5 text-xs font-medium text-muted">${L("Xem trước", "Preview")}</p><div class="max-h-[52vh] overflow-auto rounded-xl border border-border-strong bg-white p-3 text-zinc-900"><p class="mb-2 text-sm font-semibold">Watchtower · ${title}</p>${sheet}</div></div>
       <div class="mt-5 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", e.fmt === "pdf" ? L("Tải PDF", "Download PDF") : L("Tải ảnh", "Download image"), { icon: "download", attrs: `onclick="${SANDBOX ? "sbExport()" : "ui.dialog=null;render()"}"`, extra: "min-h-11 md:min-h-10" })}</div>`;
+  }
+  // Phân công (PRD v1.17): xác nhận trước khi ghi đè cả tuần hay đưa một ngày về 0. Câu chữ theo Tony (16/11).
+  if (dl.id === "needWeek" || dl.id === "needReset") {
+    const wk = dl.id === "needWeek";
+    const title = wk ? L("Áp dụng số lượng nhân viên cho cả tuần", "Apply the staffing numbers to the whole week") : L("Đặt lại số lượng nhân viên", "Reset the staffing numbers");
+    const msg = wk ? L(`Số lượng nhân viên của các ngày còn lại trong tuần sẽ được thay bằng số của ${WEEK[dl.arg].viL} (${ddmm(dl.arg)}). Bạn có muốn tiếp tục?`, `The other days of the week will take the staffing numbers of ${WEEK[dl.arg].enL} (${ddmm(dl.arg)}). Do you want to continue?`)
+      : L(`Số lượng nhân viên của mọi ca trong ${WEEK[dl.arg].viL} (${ddmm(dl.arg)}) sẽ về 0. Bạn có muốn tiếp tục?`, `Every staffing number of ${WEEK[dl.arg].enL} (${ddmm(dl.arg)}) will be set to 0. Do you want to continue?`);
+    return `<div class="px-6 pt-6"><h2 class="text-lg font-semibold text-balance">${title}</h2><p class="mt-2 text-sm/6 text-pretty text-muted">${msg}</p></div>
+      <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", "OK", { attrs: `onclick="${wk ? "applyNeedWeek" : "resetNeedDay"}(${dl.arg})"`, extra: "min-h-11 min-w-20 md:min-h-10" })}</div>`;
   }
   if (dl.id === "removeDay") {
     const s = ST[ui.panel.sid], d = ui.panel.d, runs = runsOf(s, d);
@@ -1504,14 +1535,16 @@ function openDialog(id, arg) { if (id === "anomaly") ui.anPick = 0; ui.dialog = 
 // --- Panel theo trạng thái (ADR 0031, Tony 12/11) ---
 // Ô tick là ngày làm của người đó sau khi Lưu. Mở panel tick sẵn mọi ca đã xếp trong ngày; mở từ ca chưa xếp thì tick
 // thêm ca đó như một gợi ý (chưa tính là thay đổi). Lưu chỉ ghi phần chênh lệch, ca không đụng tới giữ nguyên vị trí và giờ.
-// Ca ngữ cảnh (ctx) là ca của chip vừa bấm hoặc dòng vừa chọn: vị trí chọn trong panel áp cho nó và cho các ca mới tick.
+// Các ca đang chọn (hl, nền xanh) tách khỏi ô tick (PRD v1.18, Tony 18/11): bấm dòng bật/tắt chọn, chọn được nhiều ca,
+// kể cả ca chưa tick; vị trí bấm trong panel áp ngay cho các ca đang chọn. ctx là ca của chip vừa bấm trên lịch,
+// dùng cho màu tô ô trên lịch.
 function initPanel(sid, d, p) {
   const day = W().asg[sid][d], held = PERIODS.filter((q) => day[q.i]).map((q) => q.i);
   const sel = new Set(held), posOf = {};
   for (const q of held) posOf[q] = { pos: day[q].pos.slice(), sub: day[q].sub.slice() };
   let suggested = null;
   if (p != null && !day[p] && !readOnly()) { sel.add(p); posOf[p] = { pos: [], sub: [] }; suggested = p; }
-  ui.panel = { sid, d, ctx: p ?? null, initial: structuredClone(day), live: JSON.stringify(day), sel, posOf, suggested, edited: false };
+  ui.panel = { sid, d, ctx: p ?? null, hl: new Set(p != null ? [p] : []), initial: structuredClone(day), live: JSON.stringify(day), sel, posOf, suggested, edited: false };
   ui.saveAs = "reg"; ui.panelMsg = ""; ui.panelReason = "";
   syncPick();
 }
@@ -1520,18 +1553,19 @@ function openPanel(sid, d, p) { initPanel(sid, d, p); ui.pop = null; render(); }
 function panelFresh() {
   const P = ui.panel; if (!P) return;
   const day = W().asg[P.sid]?.[P.d];
-  if (day && JSON.stringify(day) !== P.live) { initPanel(P.sid, P.d, null); ui.panel.ctx = P.ctx; if (P.added && day[P.added.p]) ui.panel.added = P.added; syncPick(); }
+  if (day && JSON.stringify(day) !== P.live) { initPanel(P.sid, P.d, null); ui.panel.ctx = P.ctx; ui.panel.hl = new Set(P.hl); if (P.added && day[P.added.p]) ui.panel.added = P.added; syncPick(); }
 }
-// Ca nhận vị trí: ca ngữ cảnh (nếu đang tick) và các ca mới tick
-function panelTarget() {
-  const P = ui.panel, t = [];
-  if (P.ctx != null && P.sel.has(P.ctx)) t.push(P.ctx);
-  for (const p of [...P.sel].sort()) if (!P.initial[p] && p !== P.ctx) t.push(p);
-  return t;
+// Ca nhận vị trí khi bấm "Áp dụng cho ca đang chọn": mọi ca đang chọn (nền xanh), tick hay chưa tick
+function panelTarget() { return [...ui.panel.hl].sort((x, y) => x - y); }
+// Lúc mở panel hay bấm chip trên lịch, ô chọn vị trí hiện vị trí của ca đó; sau đó chỉ đổi khi bấm chip vị trí
+function syncPick() {
+  const t = panelTarget(); ui.posMixed = false; if (!t.length) return;
+  const vs = t.map((p) => ui.panel.posOf[p] || { pos: [], sub: [] }), k = (v) => JSON.stringify([v.pos, v.sub]);
+  if (vs.every((v) => k(v) === k(vs[0]))) { ui.posPick = vs[0].pos.slice(); ui.subPick = vs[0].sub.slice(); }
+  else { ui.posPick = []; ui.subPick = []; ui.posMixed = true; }
 }
-// Ô chọn vị trí hiện vị trí nháp của ca nhận vị trí đầu tiên
-function syncPick() { const t = panelTarget(), v = t.length ? ui.panel.posOf[t[0]] : null; ui.posPick = v ? v.pos.slice() : []; ui.subPick = v ? v.sub.slice() : []; }
-function writePick() { for (const p of panelTarget()) ui.panel.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; }
+// Áp dụng cho ca đang chọn: vị trí đang chọn cho mọi ca nền xanh, tick hay chưa; không đổi ô tick hay ca đang chọn
+function applySelPos() { const t = panelTarget(); if (!t.length || !ui.posPick.length || missingSub().length) return; for (const p of t) ui.panel.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; panelEdited(); }
 // Một ca sau khi Lưu (null = không có ca)
 function panelEff(p) {
   const P = ui.panel; if (!P.sel.has(p)) return null;
@@ -1561,7 +1595,7 @@ function diffLine(x) {
   if (x.type === "rem") return `− ${c} · ${posLabel(x.a.pos, x.a.sub)}`;
   return `~ ${c} · ${posLabel(x.a.pos, x.a.sub)}${tm(x.a)} → ${posLabel(x.b.pos, x.b.sub)}${tm(x.b)}`;
 }
-function panelEdited() { ui.panel.edited = true; ui.panelMsg = ""; syncPick(); render(); }
+function panelEdited() { ui.panel.edited = true; ui.panelMsg = ""; render(); }
 // Rời panel (đóng, chip khác, ngày khác, đổi chế độ xem) khi còn thay đổi chưa lưu: hỏi Lưu / Bỏ thay đổi / Ở lại
 function leavePanel(next) { if (!panelDirty()) return next(); ui.dialog = { id: "leavePanel", arg: next }; ui.pop = null; render(); }
 function leaveSave() { const next = ui.dialog.arg; ui.dialog = null; if (panelSave()) next(); }
@@ -1580,17 +1614,19 @@ function cancelPanel() {
   }
   ui.panel = null; ui.dialog = null; render();
 }
-function resetPanel() { const { sid, d, ctx, added } = ui.panel; initPanel(sid, d, null); ui.panel.ctx = ctx; ui.panel.added = added; syncPick(); render(); }
+function resetPanel() { const { sid, d, ctx, hl, added } = ui.panel; initPanel(sid, d, null); ui.panel.ctx = ctx; ui.panel.hl = new Set(hl); ui.panel.added = added; syncPick(); render(); }
 function panelDay(dir) {
   const days = visibleDays(), i = days.indexOf(ui.panel.d) + dir;
   if (days[i] != null) { const sid = ui.panel.sid; leavePanel(() => openPanel(sid, days[i], null)); }
 }
-function panelCtx(p) { ui.panel.ctx = p; ui.panelMsg = ""; syncPick(); render(); }
+// Bấm dòng trong panel: bật/tắt chọn ca đó, không đổi ô tick; các ca khác giữ nguyên
+function panelCtx(p) { const H = ui.panel.hl; H.has(p) ? H.delete(p) : H.add(p); ui.panelMsg = ""; render(); }
+// Bấm chip trên lịch: chỉ chọn ca đó
+function panelOnly(p) { ui.panel.ctx = p; ui.panel.hl = new Set([p]); ui.panelMsg = ""; syncPick(); render(); }
 function togglePeriod(p) {
   const P = ui.panel;
-  if (P.sel.has(p)) { P.sel.delete(p); if (!P.initial[p]) delete P.posOf[p]; }
-  // Ca mới tick nhận vị trí đang hiện ở ô chọn vị trí, chưa có thì không có vị trí (không lấy theo ca bên cạnh)
-  else { P.sel.add(p); if (!P.initial[p]) P.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; }
+  // Ô tick chỉ giao hay bỏ ca, không gán vị trí (PRD v1.18, T1): ca mới tick chỉ có vị trí nếu đã được gán khi đang chọn
+  if (P.sel.has(p)) P.sel.delete(p); else P.sel.add(p);
   panelEdited();
 }
 // Lối tắt: "Thêm ca đăng ký" chỉ thêm, không bỏ tick ca nào; người rảnh cả tuần (FR-S19) tính là đăng ký cả 5 ca
@@ -1599,19 +1635,18 @@ function quickSel(k) {
   if (k === "reg") for (const p of PERIODS) { if (regKind(s, P.d, p.i) !== "no") P.sel.add(p.i); }
   else if (k === "all") for (const p of PERIODS) P.sel.add(p.i);
   else P.sel = new Set();
-  for (const p of P.sel) if (!before.has(p) && !P.initial[p]) P.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() };
-  for (const p of before) if (!P.sel.has(p) && !P.initial[p]) delete P.posOf[p];
   panelEdited();
 }
-function applyAllPos() { for (const p of ui.panel.sel) ui.panel.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; panelEdited(); }
+// Áp dụng cho ca đã giao: vị trí đang hiện cho mọi ca đang tick; không đổi ô tick hay ca đang chọn
+function applyAllPos() { if (!ui.panel.sel.size || !ui.posPick.length || missingSub().length) return; for (const p of ui.panel.sel) ui.panel.posOf[p] = { pos: ui.posPick.slice(), sub: ui.subPick.slice() }; panelEdited(); }
 // Một ca chỉ một vị trí (góp ý 17/10): chọn vị trí khác là thay, bấm lại vị trí đang chọn là bỏ
-function pickPos(id) { if (!panelTarget().length) return; ui.posPick = ui.posPick[0] === id ? [] : [id]; ui.subPick = ui.subPick.filter((s) => ui.posPick.some((p) => POS[p].subs.some((x) => x[0] === s))); writePick(); panelEdited(); }
+function pickPos(id) { ui.posPick = ui.posPick[0] === id ? [] : [id]; ui.subPick = ui.subPick.filter((s) => ui.posPick.some((p) => POS[p].subs.some((x) => x[0] === s))); ui.panelMsg = ""; render(); }
 function pickSub(id) {
   const i = ui.subPick.indexOf(id); const parent = POSITIONS.find((p) => p.subs.some((x) => x[0] === id));
   if (i >= 0) ui.subPick.splice(i, 1);
   // Vị trí con bắt buộc (Phụ trách: Trong / Ngoài) chọn đúng một: chọn cái này thì bỏ cái kia
   else { if (parent?.subRequired) ui.subPick = ui.subPick.filter((s) => !parent.subs.some((x) => x[0] === s)); ui.subPick.push(id); }
-  writePick(); panelEdited();
+  ui.panelMsg = ""; render();
 }
 // Vị trí đã chọn mà thiếu vị trí con bắt buộc
 const lacksSub = (pos, sub) => pos.filter((pid) => POS[pid].subRequired && !sub.some((s) => POS[pid].subs.some((x) => x[0] === s)));
@@ -1641,14 +1676,14 @@ function panelSave() {
     else { delete day[x.p]; ui.manual.delete(key); }
   }
   if (SANDBOX) sbLogDay(s, P.d, before, day, why);
-  const ctx = P.ctx; initPanel(P.sid, P.d, null); ui.panel.ctx = ctx; syncPick();
+  const ctx = P.ctx, hl = new Set(P.hl); initPanel(P.sid, P.d, null); ui.panel.ctx = ctx; ui.panel.hl = hl; syncPick();
   render(); return true;
 }
 function removeDay() {
-  const { sid, d, ctx } = ui.panel; snapshot();
+  const { sid, d, ctx, hl } = ui.panel; snapshot();
   if (SANDBOX) sbLogDay(ST[sid], d, W().asg[sid][d], {}, (ui.panelReason || "").trim());
   for (const p in W().asg[sid][d]) ui.manual.delete(`${sid}|${d}|${p}`);
-  W().asg[sid][d] = {}; ui.dialog = null; initPanel(sid, d, null); ui.panel.ctx = ctx; render();
+  W().asg[sid][d] = {}; ui.dialog = null; initPanel(sid, d, null); ui.panel.ctx = ctx; ui.panel.hl = new Set(hl); render();
 }
 // Hoàn tác / làm lại việc xếp ca và giao vị trí: chỉ trong phiên đang mở, chỉ khi còn nháp
 const snapOf = () => structuredClone({ asg: DATA.asg, manual: [...ui.manual] });
@@ -1657,8 +1692,24 @@ function restoreSnap(x) { DATA.asg = x.asg; ui.manual = new Map(x.manual); ui.pa
 function undo() { if (!ui.hist.length || published() || readOnly()) return; ui.fut.push(snapOf()); restoreSnap(ui.hist.pop()); render(); }
 function redo() { if (!ui.fut.length || published() || readOnly()) return; ui.hist.push(snapOf()); restoreSnap(ui.fut.pop()); render(); }
 // Phân công: số người cần
-function setNeed(d, p, pid, v) { ui.need[d][p][pid] = Math.max(0, Math.min(20, parseInt(v, 10) || 0)); ui.needCopied = false; render(); }
-function copyNeed() { ui.need = structuredClone(PREV_NEED); ui.needCopied = true; render(); }
+function setNeed(d, p, pid, v) { ui.need[d][p][pid] = Math.max(0, Math.min(20, parseInt(v, 10) || 0)); ui.needCopied = false; ui.needMsg = ""; render(); }
+function copyNeed() { ui.need = structuredClone(PREV_NEED); ui.needCopied = true; ui.needMsg = ""; render(); }
+// Áp dụng cho cả tuần: cả 5 ca của ngày nguồn chép sang 6 ngày còn lại; chỉ đổi số cần, không đụng đăng ký hay ca đã xếp
+function applyNeedWeek(d) {
+  const before = structuredClone(ui.need);
+  ui.need = WEEK.map((_, i) => (i === d ? ui.need[d] : structuredClone(ui.need[d])));
+  ui.dialog = null; ui.needCopied = false; ui.needMsg = L(`Đã áp dụng ${WEEK[d].viL} cho cả tuần`, `Applied ${WEEK[d].enL} to the whole week`);
+  if (SANDBOX) sbNeedLog("week", d, before);
+  render();
+}
+// Đặt lại: mọi vị trí của cả 5 ca trong ngày đang chọn về 0; ngày khác giữ nguyên
+function resetNeedDay(d) {
+  const before = structuredClone(ui.need);
+  ui.need[d] = PERIODS.map(() => needFrom(0));
+  ui.dialog = null; ui.needCopied = false; ui.needMsg = L(`Đã đặt ${WEEK[d].viL} về 0`, `Set ${WEEK[d].enL} to 0`);
+  if (SANDBOX) sbNeedLog("reset", d, before);
+  render();
+}
 // Thêm (góp ý 10/11, mục 6): tuần còn nháp thì xếp ngay vào ca, chưa có vị trí, rồi mở panel với ca đó; đóng panel vẫn giữ chip.
 // Tuần đã công bố thì chỉ mở panel, vì ca mới phải có vị trí (FR-O29).
 function addPick(sid, d, p) { leavePanel(() => addPickNow(sid, d, p)); }
@@ -1710,7 +1761,7 @@ function jumpTo(n) {
   if (ui.panel && !visibleDays().includes(ui.panel.d)) ui.panel = null;
   render();
 }
-function setRosterDay(v) { ui.rosterDay = v; render(); }
+function setRosterDay(v) { ui.rosterDay = v; ui.needMsg = ""; render(); }
 function setMDay(v) { ui.mDay = v; if (ui.panel) ui.panel = null; render(); }
 // Đổi chế độ xem, tuần hay ngày khi panel còn thay đổi chưa lưu: hỏi trước (ADR 0031)
 for (const f of ["setView", "goDay", "calMove", "calToday", "calOldest", "jumpTo", "setMDay"]) { const g = window[f]; window[f] = (...a) => leavePanel(() => g(...a)); }

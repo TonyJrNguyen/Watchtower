@@ -25,11 +25,11 @@ const POSITIONS = [
 const POS = Object.fromEntries(POSITIONS.map((p) => [p.id, p]));
 
 const PERIODS = [
-  { i: 0, code: "CA1", from: "07:00", to: "11:00", h: 4 },
-  { i: 1, code: "CA2", from: "11:00", to: "13:00", h: 2 },
-  { i: 2, code: "CA3", from: "13:00", to: "15:00", h: 2 },
-  { i: 3, code: "CA4", from: "15:00", to: "17:00", h: 2 },
-  { i: 4, code: "CA5", from: "17:00", to: "23:00", h: 6 },
+  { i: 0, code: "Ca 1", from: "07:00", to: "11:00", h: 4 },
+  { i: 1, code: "Ca 2", from: "11:00", to: "13:00", h: 2 },
+  { i: 2, code: "Ca 3", from: "13:00", to: "15:00", h: 2 },
+  { i: 3, code: "Ca 4", from: "15:00", to: "17:00", h: 2 },
+  { i: 4, code: "Ca 5", from: "17:00", to: "23:00", h: 6 },
 ];
 
 // Quy tắc giờ (góp ý 10/10, chờ khách ký nên để cấu hình, không viết cứng):
@@ -212,13 +212,13 @@ balance(WEEK_DATA, 7, ["s17", "s20"]);
 WEEK_DATA.custom = { s2: { 4: { 4: { from: "18:00", to: "23:00" } } }, s9: { 0: { 3: { from: "15:30", to: "17:00" }, 4: { from: "17:00", to: "21:00" } } } };
 // Ghi chú xếp lịch theo ngày (FR-O54) và ghi chú riêng của chủ cho tuần (FR-O53), góp ý 10/11. text = bản chủ đang sửa,
 // pub = bản nhân viên đang thấy (null khi tuần chưa công bố).
-WEEK_DATA.dnote = { 1: { text: "Thạnh kèm NH ở Thu Ngân – Offline ca sáng", pub: null }, 3: { text: "Nhi thử Kiểm tra đơn CA 3, Danh kèm", pub: null } };
-WEEK_DATA.onote = "VT xin nghỉ T7, chưa chốt. Hỏi lại Hậu có làm thêm CA 5 T6 được không.";
+WEEK_DATA.dnote = { 1: { text: "Thạnh kèm NH ở Thu Ngân – Offline ca sáng", pub: null }, 3: { text: "Nhi thử Kiểm tra đơn Ca 3, Danh kèm", pub: null } };
+WEEK_DATA.onote = "VT xin nghỉ T7, chưa chốt. Hỏi lại Hậu có làm thêm Ca 5 T6 được không.";
 WEEK_DATA.note = { s2: { 4: "Học tới 17:30, 18:00 mới tới quán được" }, s9: { 0: "Sáng đi khám, chiều tới được" }, s14: { 1: "Quán vắng thì cho mình về sớm 30 phút" } };
 (function seedCustom({ reg, asg }) {
   // Lộc: T6 xin vào 18:00, chưa xếp (chủ chưa quyết)
   reg.s2[4] = [4]; delete asg.s2[4][4];
-  // Hậu: T2 xin CA4 15:30–17:00 và CA5 17:00–21:00, đã xếp theo giờ đăng ký
+  // Hậu: T2 xin Ca 4 15:30–17:00 và Ca 5 17:00–21:00, đã xếp theo giờ đăng ký
   reg.s9[0] = [3, 4]; asg.s9[0] = { 3: { pos: ["ktd"], sub: [], t: { from: "15:30", to: "17:00" } }, 4: { pos: ["ktd"], sub: [], t: { from: "17:00", to: "21:00" } } };
 })(WEEK_DATA);
 // Thứ tự đăng ký (FR-S23): giờ lưu lần đầu và giờ sửa lần cuối đăng ký tuần 12–18/10, tính bằng phút kể từ T5 8/10 00:00

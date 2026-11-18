@@ -3,6 +3,30 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.19 — 2026-11-18
+- Following the client's Try-out report that placed markers without a position stayed among the registered ones, and Tony's decision of 2026-11-18
+- **Placed markers first:** markers with a position, grouped by position as before, then markers placed without a position, A–Z, then markers registered and not placed in the earlier order (warnings first, inherited place down the day). Amended FR-O49
+- §5 (new resolved block), §5.0 (one row) and §5.3 updated accordingly. Backlog not re-estimated: the ordering stays inside S-4.19
+
+## v1.18 — 2026-11-18
+- Following Tony's request for the side panel and his answers on the Q&A page of 2026-11-18, round 6
+- **Several selected periods:** selecting a period's row selects or deselects it, several at once, ticked or not; ticks and selection are independent. A position is given only through two actions: *Apply to the placed shifts (N)*, renamed from *Apply to every ticked period*, for every ticked period, and the new *Apply to the selected shifts (N)* for every selected period; choosing a position alone changes nothing, and both are unavailable at 0. Amended FR-O43
+- Ticking a period no longer gives it the position shown; a position given to an unticked selected period is placed only if the period is ticked before Save. Amended FR-O43
+- A calendar marker selects only its own period, and the markers of the selected periods show as selected. Amended FR-O42, FR-O43, FR-O46. ADR 0031 amended
+- §5 (new resolved block) and §5.3 updated accordingly. CONTEXT.md: *context period* becomes *selected periods*
+
+## v1.17 — 2026-11-16
+- Following Tony's requests for the Staffing section and his answers on the Q&A page of 2026-11-16, round 5
+- **Staffing section:** Google-style day tabs, the full weekday over the date as DD/MM, worked out from the week in view; periods stay as columns; no tabs on a phone, where the section follows the calendar's day. Amended FR-O4
+- **Reset** sets every need of the selected day to 0 (unavailable when already 0); **Apply to the whole week** copies the selected day's needs to every other day of the week, overwriting theirs. Both confirm first (OK, Cancel), change only the needs and work in a published week; buttons in the order Reset, Apply to the whole week, Copy from last week, with no icons. Amended FR-O1, 4.9.1
+- The periods are labelled **Ca 1** to **Ca 5** on every screen. Amended §3.3
+- §5 (new resolved block) and §5.3 updated accordingly. CONTEXT.md: *shift period*
+
+## v1.16 — 2026-11-16
+- Following Tony's try of the v1.14 Try-out: an unplaced marker selected tinted the cells its staff member was placed in as well, so a staff member who registered most of the week tinted nearly the whole calendar
+- **Selection tint:** selecting an unplaced marker tints only the registered cells the staff member is not placed in; the warm tint of a placed marker is unchanged, and the two never overlap. Amended FR-O42
+- §5 (new resolved block), §5.0 (one row) and §5.3 (drawn in the wireframe; `design/phase1/` unchanged, since none of its pages has a marker selected) updated accordingly. CONTEXT.md: *selection tint*
+
 ## v1.15 — 2026-11-16
 - Following Tony's answers on the Q&A page of 2026-11-16, round 3
 - ~~O5~~ **No paid tolerance** on an agreed late arrival; its hours count from the agreed start. Amended §3.8.3
