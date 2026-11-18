@@ -497,14 +497,15 @@ function cellChips(d, p, gap) {
 // Góp ý 12/11 mục 5, Tony chốt 16/11: bấm vùng trống trên lịch thì đóng panel (còn thay đổi chưa lưu thì vẫn hỏi), chip gỡ từ +N về lại
 function calBlank(e) { if (ui.panel && !e.target.closest("button, a, input, textarea, select, label, [role=dialog]")) closePanel(); }
 function revealPick(sid, d, p) { ui.pop = null; leavePanel(() => { openPanel(sid, d, p); ui.reveal = { sid, d, p }; render(); }); }
-// Góp ý 12/11 mục 1, Tony chốt 16/11 (theo chip vừa bấm): chip đang chọn chưa được xếp thì tô xanh (màu lạnh) mọi ca người đó
-// đăng ký (hay rảnh vì không đăng ký gì); chip đã được xếp thì tô cam (màu nóng) mọi ca người đó đã được xếp. Chỉ tô nền, không viền.
+// Góp ý 12/11 mục 1, Tony chốt 16/11 (theo chip vừa bấm): chip đang chọn chưa được xếp thì tô xanh (màu lạnh) các ca người đó
+// đăng ký (hay rảnh vì không đăng ký gì) mà chưa được xếp; chip đã được xếp thì tô cam (màu nóng) mọi ca người đó đã được xếp.
+// Hai tập ô không trùng nhau (PRD v1.16). Chỉ tô nền, không viền.
 function hlCell(d, p) {
   const P = ui.panel; if (!P || !ST[P.sid]) return "";
   const s = ST[P.sid];
   const hot = P.ctx != null ? !!asgAt(s, P.d, P.ctx) : PERIODS.some((q) => asgAt(s, P.d, q.i));
   if (hot) return asgAt(s, d, p) ? "wt-hl-hot" : "";
-  return !s.left && regKind(s, d, p) !== "no" ? "wt-hl-cold" : "";
+  return !s.left && regKind(s, d, p) !== "no" && !asgAt(s, d, p) ? "wt-hl-cold" : "";
 }
 // Giờ đăng ký (trái) và huy hiệu ký hiệu (phải) nằm trên mép trên chip, nên hàng chip luôn có khoảng cách dọc
 const peopleCls = (gap = "gap-x-1.5") => (!isEmptyWeek ? `flex flex-wrap ${gap} gap-y-2.5 pt-1.5` : `flex flex-wrap ${gap} gap-y-1`);
@@ -1363,7 +1364,7 @@ function popContent() {
       ${row(chipS(reg, `${starSvg}Ngàn`), L("Đăng ký đủ mọi ca trong tuần", "Registered every shift this week"))}
       ${row(chipS(reg, `Hậu${ic("clock", "size-3 opacity-80")}`), L("Giờ riêng (đăng ký hoặc đã xếp theo giờ riêng)", "Own times (asked for, or placed by them)"))}
       ${row(chipS(reg, `Hậu${ic("message-square-text", "size-3 opacity-70")}`), L("Có ghi chú cho ngày này", "Has a note for this day"))}
-      ${row(`<span class="wt-hl-cold h-6 w-10 rounded-md"></span><span class="wt-hl-hot h-6 w-10 rounded-md"></span>`, L("Bấm chip chưa xếp: ô nền xanh là các ca người đó đăng ký. Bấm chip đã xếp: ô nền cam là các ca người đó đã được xếp", "Select an unplaced marker: blue cells are the shifts they registered. Select a placed one: orange cells are the shifts they’re placed in"))}
+      ${row(`<span class="wt-hl-cold h-6 w-10 rounded-md"></span><span class="wt-hl-hot h-6 w-10 rounded-md"></span>`, L("Bấm chip chưa xếp: ô nền xanh là các ca người đó đăng ký mà chưa được xếp. Bấm chip đã xếp: ô nền cam là các ca người đó đã được xếp", "Select an unplaced marker: blue cells are the shifts they registered and aren’t placed in yet. Select a placed one: orange cells are the shifts they’re placed in"))}
       ${row(`<span class="inline-flex h-6 items-center rounded-full border border-dashed border-foreground/40 bg-surface px-2 text-xs font-medium tabular-nums text-muted">+3</span>`, L("Người đăng ký ca này nhưng đã được xếp ca khác trong ngày. Bấm để xem và đưa chip lại vào ô", "Registered for this shift but placed in another one today. Select to see them and bring a marker back"))}</ul>
       <p class="text-xs text-pretty text-muted">${L("Thứ tự trong ô: người có vị trí trước, nhóm theo thứ tự vị trí bên dưới, A–Z trong nhóm. Sau đó người chưa có vị trí: có cảnh báo trước, rồi A–Z, người thêm thủ công cuối; ca dưới giữ thứ tự của ca trên.", "Order in a cell: people with a position first, grouped in the order below, A–Z within a group. Then those without one: warnings first, then A–Z, manually added last; each shift keeps the order of the one above.")}</p>
       <div class="border-t border-border pt-3"><p class="mb-2 text-xs font-medium text-muted">${L("Vị trí và ký hiệu", "Positions and marks")}</p><ul class="space-y-1.5">${POSITIONS.map((x) => `<li class="flex items-start gap-2 text-sm">${posDot(x.id, "mt-1.5 size-2.5")}<span><span class="font-medium">${L(x.vi, x.en)}</span>${x.subs.length ? `<span class="text-muted"> · ${x.subs.map(([, vi, en, mk]) => `<b class="font-semibold text-foreground">${mk}</b> ${L(vi, en)}`).join(", ")}</span>` : ""}</span></li>`).join("")}</ul></div></div>`;

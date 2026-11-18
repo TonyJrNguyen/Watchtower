@@ -3,6 +3,11 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.16 — 2026-11-16
+- Following Tony's try of the v1.14 Try-out: an unplaced marker selected tinted the cells its staff member was placed in as well, so a staff member who registered most of the week tinted nearly the whole calendar
+- **Selection tint:** selecting an unplaced marker tints only the registered cells the staff member is not placed in; the warm tint of a placed marker is unchanged, and the two never overlap. Amended FR-O42
+- §5 (new resolved block), §5.0 (one row) and §5.3 (drawn in the wireframe; `design/phase1/` unchanged, since none of its pages has a marker selected) updated accordingly. CONTEXT.md: *selection tint*
+
 ## v1.15 — 2026-11-16
 - Following Tony's answers on the Q&A page of 2026-11-16, round 3
 - ~~O5~~ **No paid tolerance** on an agreed late arrival; its hours count from the agreed start. Amended §3.8.3

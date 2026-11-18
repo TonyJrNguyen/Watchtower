@@ -154,7 +154,7 @@ _Avoid_: Selected periods (for periods an action is applied to)
 The period whose marker opened the side panel, or whose row was selected in it. The position chosen in the panel goes to it and to newly ticked periods; other held periods keep theirs.
 
 **Selection tint**:
-The background tint of a staff member's cells while their side panel is open: warm where they are placed when a placed marker was selected, cool where they registered when an unplaced one was.
+The background tint of a staff member's cells while their side panel is open: warm where they are placed when a placed marker was selected, cool where they registered and aren't placed when an unplaced one was.
 
 **Folded marker** (+N):
 A staff member registered for a period but placed in another period that day, shown in that period only inside a "+N" marker. Choosing them from its list brings the marker back while their side panel is open.
