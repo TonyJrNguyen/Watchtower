@@ -4,7 +4,7 @@
 // Chỉ có dữ liệu nhân viên: đăng ký, ca, vị trí, số người cần, đi trễ và nhật ký đều bắt đầu trống, để khách tự đi hết
 // một vòng: nhân viên đăng ký → khoá đăng ký → chủ quán xếp ca, giao vị trí → công bố → ghi đi trễ, nhân viên xem ca.
 // Dữ liệu nằm trong localStorage của trình duyệt (dự phòng window.name), nên đổi màn hay tải lại trang vẫn còn;
-// "Làm lại từ đầu" xoá hết. Đồng hồ là đồng hồ giả: mỗi lần lưu tiến vài phút, dải Trải nghiệm có nút tua tới mốc kế tiếp.
+// "Làm lại từ đầu" xoá hết; "Sao lưu" / "Khôi phục" chép dữ liệu thành một đoạn chữ để mang sang máy hay link khác. Đồng hồ là đồng hồ giả: mỗi lần lưu tiến vài phút, dải Trải nghiệm có nút tua tới mốc kế tiếp.
 // File nạp sau wf-data.js, trước wf-app.js: thay dữ liệu mẫu bằng dữ liệu đã lưu trước khi wf-app.js dựng màn.
 // Các hàm gọi lúc chạy (sau khi trang nạp xong) dùng được mọi thứ của wf-app.js.
 
@@ -402,6 +402,8 @@ function sbBar() {
     hint = L(`Tuần đã công bố, ${today}. Ghi giờ đến ở Đi trễ; đăng nhập nhân viên để xem ca ở Hồ sơ của tôi. Sửa giờ ca, đổi ca ở panel trên Lịch tuần.`, `The week is published; ${today}. Record arrivals under Lateness; sign in as staff to see shifts under My profile. Edit or swap shifts from the schedule panel.`);
     acts = [SC.role === "owner" ? A(L("Mở Đi trễ", "Open Lateness"), "tre") : A(L("Đăng nhập chủ quán", "Sign in as owner"), "tre"), signIn(L("Xem ca của nhân viên", "See a staff member’s shifts")), SB.day < 6 ? B(SB.day < 0 ? L("Sang T2 12/10 · tuần bắt đầu", "Go to Mon 12 Oct · week starts") : L(`Sang ${dayFull(SB.day + 1)}`, `Go to ${dayFull(SB.day + 1)}`), `onclick="sbNextDay()"`, true) : ""];
   }
+  const dataBtn = (icon, label, id) => `<button type="button" onclick="openDialog('${id}')" class="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-focus">${ic(icon, "size-3.5")}${label}</button>`;
+  const dataBtns = ui.sbReset ? "" : dataBtn("download", L("Sao lưu", "Back up"), "sbBackup") + dataBtn("upload", L("Khôi phục", "Restore"), "sbRestore");
   const reset = ui.sbReset ? `<span class="inline-flex items-center gap-2"><span class="text-xs font-medium text-danger">${L("Xoá hết dữ liệu đã thử?", "Erase everything you tried?")}</span>${B(L("Thôi", "No"), `onclick="ui.sbReset=false;render()"`)}<button type="button" onclick="sbReset()" class="${cx(BTN_BASE, BTN.danger, "h-8 min-h-8 rounded-lg px-3 text-xs whitespace-nowrap")}">${L("Xoá và làm lại", "Erase and restart")}</button></span>`
     : `<button type="button" onclick="ui.sbReset=true;render()" class="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground">${ic("rotate-ccw", "size-3.5")}${L("Làm lại từ đầu", "Start over")}</button>`;
   return `<section id="sb-bar" aria-label="${L("Trải nghiệm", "Try-out")}" class="border-b border-dashed border-primary/40 bg-primary-light px-4 py-3 lg:px-6">
@@ -409,11 +411,48 @@ function sbBar() {
       <span class="inline-flex items-center gap-1.5 rounded-md bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">${ic("flask-conical", "size-3.5")}${L("Trải nghiệm", "Try-out")}</span>
       <span class="inline-flex items-center gap-1.5 text-sm">${ic("clock", "size-4 text-muted")}<span class="text-muted">${L("Bây giờ", "Now")}</span><span class="font-medium tabular-nums">${sbNow()}</span></span>
       <span class="inline-flex min-w-0 items-center gap-1.5 text-sm">${ic("user-round", "size-4 text-muted")}<span class="truncate">${who}</span></span>
-      <span class="ml-auto">${reset}</span>
+      <span class="ml-auto flex flex-wrap items-center gap-1">${dataBtns}${reset}</span>
     </div>
     <ol class="scrollbar-clean mt-2.5 flex gap-1 overflow-x-auto" aria-label="${L("Các bước", "Steps")}">${stepEl}</ol>
     <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2"><p class="min-w-0 basis-full text-sm text-pretty text-foreground/85 xl:basis-auto xl:flex-1">${hint}</p><div class="flex flex-wrap gap-2">${acts.join("")}</div></div>
   </section>`;
+}
+// --- Sao lưu / Khôi phục (Tony 18/11) ---
+// Dữ liệu dùng thử chỉ nằm trong trình duyệt, gắn với một link. Sao lưu chép toàn bộ thành một đoạn chữ (base64 của JSON, có
+// tiền tố để nhận ra); Khôi phục dán đoạn đó vào, thay dữ liệu đang có rồi tải lại trang. Không tải file (khung artifact chặn tải xuống).
+const SB_TAG = "WATCHTOWER-THU-2:";
+function sbExport() { sbSave(); return SB_TAG + btoa(unescape(encodeURIComponent(JSON.stringify(SB)))); }
+function sbParse(text) {
+  const t = String(text || "").replace(/\s+/g, "");
+  if (!t.startsWith(SB_TAG)) return null;
+  try { const o = JSON.parse(decodeURIComponent(escape(atob(t.slice(SB_TAG.length))))); return o && typeof o === "object" && typeof o.phase === "string" && typeof o.clock === "number" && Array.isArray(o.audit) ? o : null; } catch { return null; }
+}
+function sbDataDialog(dl) {
+  const foot = (main) => `<div class="mt-5 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", dl.id === "sbBackup" ? L("Đóng", "Close") : L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${main}</div>`;
+  const area = "mt-3 block w-full resize-y rounded-xl border border-border-strong bg-background px-3 py-2 font-mono text-xs break-all text-foreground outline-hidden focus:border-focus focus:ring-2 focus:ring-focus";
+  if (dl.id === "sbBackup") return `<div class="px-6 pt-6"><h2 class="text-lg font-semibold">${L("Sao lưu dữ liệu dùng thử", "Back up your try-out data")}</h2>
+      <p class="mt-2 text-sm/6 text-pretty text-muted">${L("Dữ liệu dùng thử chỉ nằm trong trình duyệt này. Chép đoạn chữ dưới đây và cất lại, ví dụ gửi Zalo cho chính mình. Ở máy khác hoặc link khác, bấm Khôi phục rồi dán vào để làm tiếp.", "Your try-out data lives only in this browser. Copy the text below and keep it, for example by sending it to yourself. On another device or link, use Restore and paste it to carry on.")}</p>
+      <textarea id="sb-code" readonly rows="5" aria-label="${L("Đoạn chữ sao lưu", "Backup text")}" onclick="this.select()" class="${area}">${esc(sbExport())}</textarea>
+      <p id="sb-copy-msg" role="status" class="mt-1.5 min-h-4 text-xs text-ok"></p></div>
+      ${foot(btn("primary", L("Chép đoạn chữ", "Copy the text"), { icon: "copy", attrs: `onclick="sbCopy()"`, extra: "min-h-11 md:min-h-10" }))}`;
+  return `<div class="px-6 pt-6"><h2 class="text-lg font-semibold">${L("Khôi phục dữ liệu dùng thử", "Restore try-out data")}</h2>
+      <p class="mt-2 text-sm/6 text-pretty text-muted">${L("Dán đoạn chữ đã sao lưu (bắt đầu bằng WATCHTOWER-THU-2:). Dữ liệu dùng thử đang có ở đây sẽ được thay hết bằng dữ liệu trong đoạn chữ.", "Paste the backup text (it starts with WATCHTOWER-THU-2:). The try-out data here will be replaced by the data in the text.")}</p>
+      <textarea id="sb-paste" rows="5" aria-label="${L("Đoạn chữ sao lưu", "Backup text")}" oninput="document.getElementById('sb-paste-err').textContent=''" class="${area}" placeholder="WATCHTOWER-THU-2:…"></textarea>
+      <p id="sb-paste-err" role="alert" class="mt-1.5 min-h-4 text-xs font-medium text-danger"></p></div>
+      ${foot(btn("primary", L("Khôi phục", "Restore"), { attrs: `onclick="sbRestore()"`, extra: "min-h-11 md:min-h-10" }))}`;
+}
+function sbCopy() {
+  const ta = document.getElementById("sb-code"), msg = document.getElementById("sb-copy-msg");
+  const ok = () => { msg.textContent = L("Đã chép. Dán vào nơi bạn muốn cất.", "Copied. Paste it wherever you keep it."); };
+  const fb = () => { ta.focus(); ta.select(); msg.textContent = L("Không chép tự động được: đoạn chữ đã được chọn, bấm Ctrl+C (trên điện thoại: giữ rồi chọn Sao chép).", "Couldn’t copy automatically: the text is selected, press Ctrl+C (on a phone: press and hold, then Copy)."); };
+  try { navigator.clipboard.writeText(ta.value).then(ok, fb); } catch { fb(); }
+}
+function sbRestore() {
+  const o = sbParse(document.getElementById("sb-paste").value);
+  if (!o) { document.getElementById("sb-paste-err").textContent = L("Đoạn chữ không đúng hoặc bị thiếu. Hãy dán nguyên đoạn đã sao lưu, bắt đầu bằng WATCHTOWER-THU-2:.", "That text isn’t a complete backup. Paste the whole backup text, starting with WATCHTOWER-THU-2:."); return; }
+  const raw = JSON.stringify({ ...sbFresh(), ...o });
+  try { localStorage.setItem(SB_KEY, raw); } catch {} try { window.name = SB_KEY + raw; } catch {}
+  location.reload();
 }
 function sbReset() { try { localStorage.removeItem(SB_KEY); } catch {} try { window.name = ""; } catch {} location.href = sbLink("dn"); if (S.man === "dn") location.reload(); }
 // Khung mobile: ứng dụng chạy trong iframe, dải nằm ở trang ngoài; iframe lưu thì trang ngoài vẽ lại dải
