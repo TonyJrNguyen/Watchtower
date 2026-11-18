@@ -3,6 +3,13 @@
 Each entry matches a commit that applies a patch from a chat session with
 Claude. For the details of each change, see the commit or the chat history.
 
+## v1.18 — 2026-11-18
+- Following Tony's request for the side panel and his answers on the Q&A page of 2026-11-18, round 6
+- **Several selected periods:** selecting a period's row selects or deselects it, several at once, ticked or not; ticks and selection are independent. A position is given only through two actions: *Apply to the placed shifts (N)*, renamed from *Apply to every ticked period*, for every ticked period, and the new *Apply to the selected shifts (N)* for every selected period; choosing a position alone changes nothing, and both are unavailable at 0. Amended FR-O43
+- Ticking a period no longer gives it the position shown; a position given to an unticked selected period is placed only if the period is ticked before Save. Amended FR-O43
+- A calendar marker selects only its own period, and the markers of the selected periods show as selected. Amended FR-O42, FR-O43, FR-O46. ADR 0031 amended
+- §5 (new resolved block) and §5.3 updated accordingly. CONTEXT.md: *context period* becomes *selected periods*
+
 ## v1.17 — 2026-11-16
 - Following Tony's requests for the Staffing section and his answers on the Q&A page of 2026-11-16, round 5
 - **Staffing section:** Google-style day tabs, the full weekday over the date as DD/MM, worked out from the week in view; periods stay as columns; no tabs on a phone, where the section follows the calendar's day. Amended FR-O4

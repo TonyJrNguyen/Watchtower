@@ -150,8 +150,9 @@ To set the position, and optionally its position details, on a placed assignment
 The panel for one staff member and one day, opened from a marker. Its ticked periods are the day that person will have after Save, and Save writes only the difference from what they held.
 _Avoid_: Selected periods (for periods an action is applied to)
 
-**Context period** (Ca đang sửa):
-The period whose marker opened the side panel, or whose row was selected in it. The position chosen in the panel goes to it and to newly ticked periods; other held periods keep theirs.
+**Selected periods** (Ca đang chọn):
+The periods highlighted in the side panel: the one whose marker opened it, plus any whose rows were selected there, ticked or not. *Apply to the selected shifts* gives them the position chosen; other periods keep theirs. Selecting is separate from ticking.
+_Avoid_: Context period (before v1.18)
 
 **Selection tint**:
 The background tint of a staff member's cells while their side panel is open: warm where they are placed when a placed marker was selected, cool where they registered and aren't placed when an unplaced one was.

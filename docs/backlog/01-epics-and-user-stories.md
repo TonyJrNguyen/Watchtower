@@ -101,6 +101,8 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 
 **Revision 2026-11-16, later (PRD v1.17):** the Staffing section's day tabs, Reset and Apply to the whole week, with their confirmations and audit entries, add **+2 md** to S-3.1 (5 → 7). The Ca 1–Ca 5 labels are wording only. **Phase 1 goes from 267 md to 269 md.**
 
+**Revision 2026-11-18 (PRD v1.18):** several selected periods in the side panel, with positions kept for unticked periods until Save and *Apply to the placed shifts*, add **+1 md** to S-4.12 (12 → 13). **Phase 1 goes from 269 md to 270 md.**
+
 ---
 
 ## 1. Epic map
@@ -1001,7 +1003,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I press Save with no position chosen
 - **Then** the save is refused with "A published shift needs a position" — new shifts must carry a position, and published shifts are cancelled or shortened through S-4.9 and S-4.10.
 
-**Requirements:** FR-O43, FR-O29, FR-S22, FR-O50, FR-O51, NFR-1 · **Effort:** 12 md *(above the Ready limit; split at planning into the panel view, the difference Save with its version check, the leave dialog and the selection tint)*
+**Requirements:** FR-O43, FR-O29, FR-S22, FR-O50, FR-O51, NFR-1 · **Effort:** 13 md *(above the Ready limit; split at planning into the panel view, the difference Save with its version check, the leave dialog, the selection tint and the selected periods)*
 **Note:** assignments with times that don't match the periods are shown in the panel but edited in the shift dialog.
 
 ---
@@ -1190,7 +1192,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-O54, FR-S11, NFR-1, NFR-2 · **Effort:** 2 md
 
-**E4 subtotal: 99 md**
+**E4 subtotal: 100 md**
 
 ---
 
@@ -1711,7 +1713,7 @@ The distinction that matters: the Administrator working from a phone mid-service
 
 ---
 
-**Phase 1 story total, revised 2026-11-16: 269 md** (E1 45 · E2 29 · E3 24 · E4 99 · E5 22 · E7 26 · E16 24): 267 md for PRD v1.11–v1.14, then +2 md for v1.17 (§0). It was 238 md on 2026-10-17: +29 md for PRD v1.11, v1.13 and v1.14, itemised in §0. Before that it was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
+**Phase 1 story total, revised 2026-11-18: 270 md** (E1 45 · E2 29 · E3 24 · E4 100 · E5 22 · E7 26 · E16 24): 267 md for PRD v1.11–v1.14, then +2 md for v1.17 and +1 md for v1.18 (§0). It was 238 md on 2026-10-17: +29 md for PRD v1.11, v1.13 and v1.14, itemised in §0. Before that it was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
 
 | Change | md | Source |
 |---|---|---|
