@@ -119,7 +119,11 @@ const hoursOf = (s) => Object.entries((s.id && HOURS[s.id]) || {}).filter(([, h]
 const hrsTag = (h) => (h ? `<span class="text-xs font-normal tabular-nums text-muted">${h}h</span>` : "");
 const posDot = (pid, c = "size-2") => `<span class="${c} shrink-0 rounded-full bg-p${pn(pid)}-dot" aria-hidden="true"></span>`;
 const dayShort = (d) => L(WEEK[d].vi, WEEK[d].en);
-const dayFull = (d) => `${dayShort(d)} ${WEEK[d].date}/10`;
+// Ngày tính từ đầu tuần đang xem (tuần mẫu bắt đầu 12/10/2026, tuần trước lùi 7 ngày), không ghi cứng tháng (PRD v1.17)
+const WEEK0 = new Date(2026, 9, 12);
+const dayDate = (d) => { const x = new Date(WEEK0); x.setDate(x.getDate() + d + 7 * Math.min(0, ui.weekOff || 0)); return x; };
+const ddmm = (d) => { const x = dayDate(d); return `${String(x.getDate()).padStart(2, "0")}/${String(x.getMonth() + 1).padStart(2, "0")}`; };
+const dayFull = (d) => { const x = dayDate(d); return `${dayShort(d)} ${x.getDate()}/${x.getMonth() + 1}`; };
 const pTime = (p) => `${PERIODS[p].from.slice(0, 2)}–${PERIODS[p].to.slice(0, 2)}`;
 // Thứ tự danh mục (PRD §3.3), dùng để nhóm chip theo vị trí trong ô (FR-O49)
 const CAT = Object.fromEntries(POSITIONS.map((p, i) => [p.id, i]));
@@ -619,7 +623,7 @@ function onoteBar() {
     <header class="flex flex-wrap items-center gap-2 border-b border-border py-1.5 pr-1.5 pl-4"><div class="min-w-0 flex-1 basis-48"><p class="text-sm font-semibold">${L("Ghi chú riêng", "Owner’s note")} · ${L("Tuần", "Week")} ${ui.weekOff < 0 ? "5–11/10" : "12–18/10"}</p><p class="text-xs text-pretty text-muted">${L("Chỉ bạn thấy. Không công bố cho nhân viên.", "Only you see it. Never shown to staff.")}</p></div>
       ${ro ? "" : `<div role="toolbar" aria-label="${L("Định dạng", "Formatting")}" class="flex items-center gap-0.5">${tools.map(([c, i, tt]) => `<button type="button" data-fmt="${c}" onmousedown="event.preventDefault()" onclick="fmtOnote('${c}')" aria-label="${tt}" title="${tt}" aria-pressed="false" class="inline-flex size-9 cursor-pointer items-center justify-center rounded-lg text-muted outline-hidden hover:bg-foreground/5 hover:text-foreground aria-pressed:bg-foreground/8 aria-pressed:text-foreground">${ic(i, "size-4")}</button>`).join("")}</div><span class="mx-1 h-5 w-px bg-border-strong"></span>`}
       ${iconBtn("x", L("Đóng ghi chú", "Close the note"), `onclick="toggleOnote()"`, "size-9")}</header>
-    <div id="onote-ed" ${ro ? "" : `contenteditable="true"`} role="textbox" aria-multiline="true" aria-readonly="${ro}" aria-label="${L("Nội dung ghi chú riêng", "Owner’s note")}" data-placeholder="${L("Ví dụ: hỏi lại Hậu có làm thêm CA 5 được không", "e.g. ask Hậu whether they can take an extra CA 5")}" oninput="onoteInput(this)" onkeyup="fmtState()" onmouseup="fmtState()" class="wt-rich max-h-[50vh] min-h-36 overflow-y-auto px-4 py-3 text-sm/6 outline-hidden">${cleanRich(v)}</div>
+    <div id="onote-ed" ${ro ? "" : `contenteditable="true"`} role="textbox" aria-multiline="true" aria-readonly="${ro}" aria-label="${L("Nội dung ghi chú riêng", "Owner’s note")}" data-placeholder="${L("Ví dụ: hỏi lại Hậu có làm thêm Ca 5 được không", "e.g. ask Hậu whether they can take an extra Ca 5")}" oninput="onoteInput(this)" onkeyup="fmtState()" onmouseup="fmtState()" class="wt-rich max-h-[50vh] min-h-36 overflow-y-auto px-4 py-3 text-sm/6 outline-hidden">${cleanRich(v)}</div>
   </section>`;
 }
 
@@ -820,7 +824,10 @@ function assignSection(mobile) {
   const d = mobile ? ui.mDay : ui.rosterDay;
   const ro = ui.weekOff < 0;
   const need = ro ? PREV_NEED : ui.need;
-  const dayTabs = mobile ? "" : `<div class="px-4 pb-3">${boxedTabs(WEEK.map((w, i) => [i, `${dayShort(i)} ${w.date}`]), d, "setRosterDay", L("Ngày", "Day"))}</div>`;
+  // Tab ngày kiểu Google (PRD v1.17): thứ đầy đủ và DD/MM, tab đang chọn gạch chân màu chính. Điện thoại không có tab: theo ngày của lịch.
+  const dayTabs = mobile ? "" : `<div class="scrollbar-clean overflow-x-auto px-3"><div role="tablist" aria-label="${L("Ngày", "Day")}" class="flex w-max min-w-full">${WEEK.map((w, i) => `<button type="button" role="tab" aria-selected="${i === d}" onclick="setRosterDay(${i})" class="${cx("relative flex min-w-22 shrink-0 cursor-pointer flex-col items-center rounded-t-lg px-3 pt-2 pb-2.5 outline-hidden transition-colors after:absolute after:inset-x-2 after:bottom-0 after:h-[3px] after:rounded-t-full focus-visible:ring-2 focus-visible:ring-focus", i === d ? "text-primary after:bg-primary" : "text-muted after:bg-transparent hover:bg-foreground/5 hover:text-foreground")}"><span class="text-sm font-medium whitespace-nowrap">${L(w.viL, w.enL)}</span><span class="text-xs tabular-nums">${ddmm(i)}</span></button>`).join("")}</div></div>`;
+  const dayZero = !ro && PERIODS.every((p) => Object.values(need[d][p.i]).every((n) => !n));
+  const doneMsg = ui.needMsg || (ui.needCopied ? L("Đã chép từ tuần 5–11/10", "Copied from 5–11 Oct") : "");
   const tone = (placed, n) => (placed < n ? "font-medium text-warn" : placed > n ? "text-muted" : "");
   const numIn = (p, pid, n) => `<input type="number" min="0" max="20" inputmode="numeric" value="${n}" aria-label="${esc(`${posName(pid)} ${PERIODS[p].code} ${dayFull(d)}`)}" onchange="setNeed(${d},${p},'${pid}',this.value)" class="h-8 w-11 rounded-lg border border-border-strong bg-surface px-1.5 text-right text-sm tabular-nums outline-hidden [appearance:textfield] focus:border-focus focus:ring-2 focus:ring-focus [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />`;
   const rows = POSITIONS.map((pos) => `<tr class="border-t border-border"><th scope="row" class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-sm font-normal whitespace-nowrap"><span class="inline-flex items-center gap-2">${posDot(pos.id)}${L(pos.vi, pos.en)}</span></th>${PERIODS.map((p) => {
@@ -830,7 +837,7 @@ function assignSection(mobile) {
   }).join("")}</tr>`).join("");
   const total = `<tr class="border-t border-border bg-background/60"><th scope="row" class="sticky left-0 z-[1] bg-background px-4 py-2.5 text-left text-sm font-medium">${L("Tổng số người", "Total people")}</th>${PERIODS.map((p) => { const n = Object.values(need[d][p.i]).reduce((a, b) => a + b, 0), placed = placedCount(d, p.i); return `<td class="px-2 py-2.5 text-right text-sm font-medium tabular-nums whitespace-nowrap"><span class="${tone(placed, n)}">${placed}</span><span class="text-muted">/</span><span class="${ro ? "w-6" : "inline-block w-11 pr-2"}">${n}</span></td>`; }).join("")}</tr>`;
   const head = `<div class="flex flex-col items-start gap-x-4 gap-y-3 px-4 pt-4 pb-3 sm:flex-row"><div class="min-w-0 flex-1"><h2 class="text-base font-semibold">${L("Phân công", "Staffing")}</h2><p class="mt-0.5 text-sm text-pretty text-muted">${ro ? L("Số đã giao / số người cần theo vị trí.", "Assigned / needed per position.") : L("Số đã giao / số người cần theo vị trí. Sửa ô số để đặt số người cần.", "Assigned / needed per position. Edit a number to set the need.")}</p></div>
-    ${ro || SANDBOX ? "" : `<div class="flex flex-wrap items-center gap-3">${ui.needCopied ? `<span class="inline-flex items-center gap-1 text-xs text-muted">${ic("check", "size-3.5")}${L("Đã chép từ tuần 5–11/10", "Copied from 5–11 Oct")}</span>` : ""}${btn("outline", L("Chép từ tuần trước", "Copy last week"), { icon: "copy", attrs: `onclick="copyNeed()"`, extra: "whitespace-nowrap px-3" })}</div>`}</div>`;
+    ${ro ? "" : `<div class="flex flex-wrap items-center gap-2">${doneMsg ? `<span role="status" class="inline-flex items-center gap-1 text-xs text-muted">${ic("check", "size-3.5")}${doneMsg}</span>` : ""}${btn("outline", L("Đặt lại", "Reset"), { attrs: `${dayZero ? `disabled title="${esc(L("Ngày này đã là 0", "This day is already 0"))}"` : ""} onclick="openDialog('needReset',${d})"`, extra: "whitespace-nowrap px-3" })}${btn("primary", L("Áp dụng cho cả tuần", "Apply to the whole week"), { attrs: `onclick="openDialog('needWeek',${d})"`, extra: "whitespace-nowrap px-3" })}${SANDBOX ? "" : btn("primary", L("Chép từ tuần trước", "Copy last week"), { attrs: `onclick="copyNeed()"`, extra: "whitespace-nowrap px-3" })}</div>`}</div>`;
   return `<section class="rounded-2xl border border-border bg-surface pb-1" data-wf-block="6">${head}${dayTabs}
     <div class="overflow-x-auto"><table class="w-full min-w-[600px]"><thead><tr class="border-t border-border"><th class="sticky left-0 z-[1] bg-surface px-4 py-2 text-left text-xs font-medium text-muted">${L("Vị trí", "Position")}${mobile ? ` · ${dayFull(d)}` : ""}</th>${PERIODS.map((p) => `<th class="px-2 py-2 text-right text-xs font-medium text-muted"><span class="block">${p.code}</span><span class="font-normal tabular-nums">${pTime(p.i)}</span></th>`).join("")}</tr></thead>
     <tbody>${total}${rows}</tbody></table></div></section>`;
@@ -1039,7 +1046,7 @@ function screenRanh() {
     const h = dayH(d);
     if (!h) return `<p class="mt-0.5 text-xs text-muted">${L("Không làm", "Can’t work")}</p>`;
     if (under(d)) return `<p class="mt-0.5 text-xs font-medium tabular-nums text-err">${L(`${fmtH(h)} giờ · dưới 8 tiếng`, `${fmtH(h)}h · under 8h`)}</p>`;
-    return `<p class="mt-0.5 text-xs tabular-nums text-muted">${fmtH(h)} ${L("giờ", "h")}${h < RULES.minDayH ? L(" · có trọn Ca 5, tính đủ", " · full CA5 counts as enough") : ""}</p>`;
+    return `<p class="mt-0.5 text-xs tabular-nums text-muted">${fmtH(h)} ${L("giờ", "h")}${h < RULES.minDayH ? L(" · có trọn Ca 5, tính đủ", " · full Ca 5 counts as enough") : ""}</p>`;
   };
   // Giờ riêng theo từng ca (spec 11/10), mở từ nút "Giờ riêng" ở hàng dưới thẻ ngày như cũ; trong ô chọn ca rồi đổi giờ.
   // Mở ra là sửa được ngay; Lưu/Huỷ chỉ hiện khi có thay đổi. Lưu ở đây chỉ chốt vào bản nháp; chủ quán thấy sau Lưu của trang.
@@ -1134,7 +1141,7 @@ function screenCa() {
   }).join("")}</ul>`;
   const sum = loading || err || notPub || empty ? "" : `<div class="grid grid-cols-3 divide-x divide-border rounded-2xl border border-border bg-surface" data-wf-block="3">
     ${[[L("Ca", "Shifts"), shiftsAll.length], [L("Giờ", "Hours"), fmtH(hours)], [L("Lương ước tính", "Est. pay"), vnd(pay)]].map(([k, v]) => `<div class="px-4 py-3"><p class="text-xs text-muted">${k}</p><p class="mt-0.5 text-base font-semibold tabular-nums">${v}</p></div>`).join("")}</div>
-    <p class="-mt-2 px-1 text-xs text-pretty text-muted">${leadH && hours > leadH ? L(`Gồm ${fmtH(leadH)} giờ phụ trách × ${vnd(me.lead || me.base)} và ${fmtH(hours - leadH)} giờ × ${vnd(me.base)}. `, `${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)} and ${fmtH(hours - leadH)}h × ${vnd(me.base)}. `) : leadH ? L(`Cả ${fmtH(leadH)} giờ là phụ trách × ${vnd(me.lead || me.base)}. `, `All ${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)}. `) : ""}${L("Ước tính theo giờ được xếp, chưa trừ đi trễ, chưa có thưởng. Trọn Ca 5 tính tới 24:00.", "Based on assigned hours, before lateness and bonus. A full CA5 is paid to 24:00.")}</p>`;
+    <p class="-mt-2 px-1 text-xs text-pretty text-muted">${leadH && hours > leadH ? L(`Gồm ${fmtH(leadH)} giờ phụ trách × ${vnd(me.lead || me.base)} và ${fmtH(hours - leadH)} giờ × ${vnd(me.base)}. `, `${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)} and ${fmtH(hours - leadH)}h × ${vnd(me.base)}. `) : leadH ? L(`Cả ${fmtH(leadH)} giờ là phụ trách × ${vnd(me.lead || me.base)}. `, `All ${fmtH(leadH)}h as shift lead × ${vnd(me.lead || me.base)}. `) : ""}${L("Ước tính theo giờ được xếp, chưa trừ đi trễ, chưa có thưởng. Trọn Ca 5 tính tới 24:00.", "Based on assigned hours, before lateness and bonus. A full Ca 5 is paid to 24:00.")}</p>`;
   // Vị trí đã làm (FR-A14): mọi vị trí đã làm kèm giờ, nhiều giờ nhất trước, ngay dưới phần lương; không theo tuần nên hiện cả khi tuần chưa công bố
   const mine = hoursOf(me);
   const posCard = loading || err ? "" : `<section class="rounded-2xl border border-border bg-surface" data-wf-block="4"><header class="px-5 pt-4 pb-2"><h2 class="text-base font-semibold">${L("Vị trí đã làm", "Positions worked")}</h2><p class="mt-0.5 text-xs text-pretty text-muted">${L("Các ca bạn đã làm, từ khi dùng hệ thống.", "Shifts you’ve worked since the app started.")}</p></header><div class="flex flex-wrap gap-1.5 px-5 pb-4">${mine.length ? mine.map(([pid, h]) => `<span class="inline-flex h-8 items-center gap-1.5 rounded-full bg-foreground/5 px-3 text-sm font-medium">${posDot(pid)}${posName(pid)}${hrsTag(h)}</span>`).join("") : `<p class="text-sm text-muted">${L("Chưa có ca nào đã làm.", "No shifts worked yet.")}</p>`}</div></section>`;
@@ -1421,6 +1428,15 @@ function dialogContent() {
       <div class="px-6 pt-4"><p class="mb-1.5 text-xs font-medium text-muted">${L("Xem trước", "Preview")}</p><div class="max-h-[52vh] overflow-auto rounded-xl border border-border-strong bg-white p-3 text-zinc-900"><p class="mb-2 text-sm font-semibold">Watchtower · ${title}</p>${sheet}</div></div>
       <div class="mt-5 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", e.fmt === "pdf" ? L("Tải PDF", "Download PDF") : L("Tải ảnh", "Download image"), { icon: "download", attrs: `onclick="${SANDBOX ? "sbExport()" : "ui.dialog=null;render()"}"`, extra: "min-h-11 md:min-h-10" })}</div>`;
   }
+  // Phân công (PRD v1.17): xác nhận trước khi ghi đè cả tuần hay đưa một ngày về 0. Câu chữ theo Tony (16/11).
+  if (dl.id === "needWeek" || dl.id === "needReset") {
+    const wk = dl.id === "needWeek";
+    const title = wk ? L("Áp dụng số lượng nhân viên cho cả tuần", "Apply the staffing numbers to the whole week") : L("Đặt lại số lượng nhân viên", "Reset the staffing numbers");
+    const msg = wk ? L(`Số lượng nhân viên của các ngày còn lại trong tuần sẽ được thay bằng số của ${WEEK[dl.arg].viL} (${ddmm(dl.arg)}). Bạn có muốn tiếp tục?`, `The other days of the week will take the staffing numbers of ${WEEK[dl.arg].enL} (${ddmm(dl.arg)}). Do you want to continue?`)
+      : L(`Số lượng nhân viên của mọi ca trong ${WEEK[dl.arg].viL} (${ddmm(dl.arg)}) sẽ về 0. Bạn có muốn tiếp tục?`, `Every staffing number of ${WEEK[dl.arg].enL} (${ddmm(dl.arg)}) will be set to 0. Do you want to continue?`);
+    return `<div class="px-6 pt-6"><h2 class="text-lg font-semibold text-balance">${title}</h2><p class="mt-2 text-sm/6 text-pretty text-muted">${msg}</p></div>
+      <div class="mt-6 flex flex-col-reverse gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">${btn("secondary", L("Huỷ", "Cancel"), { attrs: `onclick="ui.dialog=null;render()"`, extra: "min-h-11 md:min-h-10" })}${btn("primary", "OK", { attrs: `onclick="${wk ? "applyNeedWeek" : "resetNeedDay"}(${dl.arg})"`, extra: "min-h-11 min-w-20 md:min-h-10" })}</div>`;
+  }
   if (dl.id === "removeDay") {
     const s = ST[ui.panel.sid], d = ui.panel.d, runs = runsOf(s, d);
     return `<div class="flex items-start gap-4 px-6 pt-6"><div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-danger-bg">${ic("calendar-x-2", "size-5 text-danger")}</div><div class="min-w-0 flex-1"><h2 class="text-lg font-semibold text-balance">${L(`Bỏ ${s.name} khỏi mọi ca ngày ${dayFull(d)}?`, `Take ${s.name} off every shift on ${dayFull(d)}?`)}</h2>
@@ -1658,8 +1674,24 @@ function restoreSnap(x) { DATA.asg = x.asg; ui.manual = new Map(x.manual); ui.pa
 function undo() { if (!ui.hist.length || published() || readOnly()) return; ui.fut.push(snapOf()); restoreSnap(ui.hist.pop()); render(); }
 function redo() { if (!ui.fut.length || published() || readOnly()) return; ui.hist.push(snapOf()); restoreSnap(ui.fut.pop()); render(); }
 // Phân công: số người cần
-function setNeed(d, p, pid, v) { ui.need[d][p][pid] = Math.max(0, Math.min(20, parseInt(v, 10) || 0)); ui.needCopied = false; render(); }
-function copyNeed() { ui.need = structuredClone(PREV_NEED); ui.needCopied = true; render(); }
+function setNeed(d, p, pid, v) { ui.need[d][p][pid] = Math.max(0, Math.min(20, parseInt(v, 10) || 0)); ui.needCopied = false; ui.needMsg = ""; render(); }
+function copyNeed() { ui.need = structuredClone(PREV_NEED); ui.needCopied = true; ui.needMsg = ""; render(); }
+// Áp dụng cho cả tuần: cả 5 ca của ngày nguồn chép sang 6 ngày còn lại; chỉ đổi số cần, không đụng đăng ký hay ca đã xếp
+function applyNeedWeek(d) {
+  const before = structuredClone(ui.need);
+  ui.need = WEEK.map((_, i) => (i === d ? ui.need[d] : structuredClone(ui.need[d])));
+  ui.dialog = null; ui.needCopied = false; ui.needMsg = L(`Đã áp dụng ${WEEK[d].viL} cho cả tuần`, `Applied ${WEEK[d].enL} to the whole week`);
+  if (SANDBOX) sbNeedLog("week", d, before);
+  render();
+}
+// Đặt lại: mọi vị trí của cả 5 ca trong ngày đang chọn về 0; ngày khác giữ nguyên
+function resetNeedDay(d) {
+  const before = structuredClone(ui.need);
+  ui.need[d] = PERIODS.map(() => needFrom(0));
+  ui.dialog = null; ui.needCopied = false; ui.needMsg = L(`Đã đặt ${WEEK[d].viL} về 0`, `Set ${WEEK[d].enL} to 0`);
+  if (SANDBOX) sbNeedLog("reset", d, before);
+  render();
+}
 // Thêm (góp ý 10/11, mục 6): tuần còn nháp thì xếp ngay vào ca, chưa có vị trí, rồi mở panel với ca đó; đóng panel vẫn giữ chip.
 // Tuần đã công bố thì chỉ mở panel, vì ca mới phải có vị trí (FR-O29).
 function addPick(sid, d, p) { leavePanel(() => addPickNow(sid, d, p)); }
@@ -1711,7 +1743,7 @@ function jumpTo(n) {
   if (ui.panel && !visibleDays().includes(ui.panel.d)) ui.panel = null;
   render();
 }
-function setRosterDay(v) { ui.rosterDay = v; render(); }
+function setRosterDay(v) { ui.rosterDay = v; ui.needMsg = ""; render(); }
 function setMDay(v) { ui.mDay = v; if (ui.panel) ui.panel = null; render(); }
 // Đổi chế độ xem, tuần hay ngày khi panel còn thay đổi chưa lưu: hỏi trước (ADR 0031)
 for (const f of ["setView", "goDay", "calMove", "calToday", "calOldest", "jumpTo", "setMDay"]) { const g = window[f]; window[f] = (...a) => leavePanel(() => g(...a)); }

@@ -71,6 +71,8 @@ const OVERLAYS = [
   { man: "lich", file: "data-publish-dialog", vi: "Hộp Công bố", en: "Publish dialog", steps: [openPanel, "openDialog('publish')"] },
   { man: "lich", file: "data-remove-day-dialog", vi: "Hộp Bỏ khỏi mọi ca trong ngày", en: "Take off every shift dialog", steps: [openPanel, "ui.panel.sel = new Set(); openDialog('removeDay')"] },
   { man: "lich", file: "data-leave-panel-dialog", vi: "Hộp Lưu thay đổi khi rời panel", en: "Unsaved panel changes dialog", steps: [openPanel, "togglePeriod(4); closePanel()"] },
+  { man: "lich", file: "data-staffing-apply-week-dialog", vi: "Hộp Áp dụng số người cần cho cả tuần", en: "Apply staffing needs to the whole week dialog", steps: ["setRosterDay(2); openDialog('needWeek', 2)"] },
+  { man: "lich", file: "data-staffing-reset-dialog", vi: "Hộp Đặt lại số người cần về 0", en: "Reset staffing needs dialog", steps: ["setRosterDay(2); openDialog('needReset', 2)"] },
   { man: "lich", tt: "cong-bo", file: "published-edit-shift-dialog", vi: "Hộp Sửa ca (đã công bố)", en: "Edit shift dialog (published)", steps: [openPanel, "openDialog('shift')"] },
   { man: "lich", tt: "cong-bo", file: "published-export-dialog", vi: "Hộp Xuất lịch", en: "Export dialog", steps: [openPanel, "openDialog('export')"] },
   { man: "lich", file: "data-schedule-note", vi: "Ghi chú xếp lịch của ngày", en: "Schedule note for a day", only: "desktop", steps: [openPanel, visibleClick(`[onclick^="openPop(event,'dnote',1"]`)] },

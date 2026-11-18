@@ -99,6 +99,8 @@ This document was first written on 2026-09-08 against PRD v1.1. This revision br
 - The warning dot (v1.14) replaces the wavy underline (v1.13) and the "!" badge (v1.11) at no extra cost; the colour and mark changes of v1.13 are catalogue data. An empty spot closing the panel and collapsed panel sections are inside S-4.12's estimate.
 - **Phase 2 is not re-estimated here.** v1.11 added Shift Lead access (FR-L1–FR-L4) and the Administrator's evaluation (FR-P7), which have no stories yet.
 
+**Revision 2026-11-16, later (PRD v1.17):** the Staffing section's day tabs, Reset and Apply to the whole week, with their confirmations and audit entries, add **+2 md** to S-3.1 (5 → 7). The Ca 1–Ca 5 labels are wording only. **Phase 1 goes from 267 md to 269 md.**
+
 ---
 
 ## 1. Epic map
@@ -669,7 +671,12 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 - **When** I set CA 5 on Saturday to require 2 × Pha chế and 1 × Bếp
 - **Then** those needs are stored against that date and period, are not visible to any staff member, and become the denominator in the coverage view — per position, and summed as the total headcount shown in the calendar cell; **and When** I choose Copy from last week, **Then** every need of the week is replaced by last week's.
 
-**Requirements:** FR-O1, FR-O4, FR-S4 · **Effort:** 5 md
+**AC — Scenario: one day applied to the whole week, or reset** *(PRD v1.17)*
+- **Given** I am on Wednesday in the Staffing section
+- **When** I choose Apply to the whole week and confirm with OK
+- **Then** every other day of the week gets Wednesday's needs for all five periods, overwriting theirs, Wednesday is unchanged, no registration or assignment changes, and one activity-log entry holds the old and new needs; **and When** I choose Reset and confirm, every need of Wednesday becomes 0 and Reset is then unavailable for that day; Cancel changes nothing.
+
+**Requirements:** FR-O1, FR-O4, FR-S4 · **Effort:** 7 md
 **Note:** needs are set per position only, never per sub-position or attribute (§3.3).
 
 ---
@@ -772,7 +779,7 @@ Effort is in man-days (md), covering design + build + test for that slice. Where
 
 **Requirements:** FR-O38 *(proposed pending client confirmation — keep the rule configurable)* · **Effort:** 2 md
 
-**E3 subtotal: 22 md**
+**E3 subtotal: 24 md**
 
 ---
 
@@ -1704,7 +1711,7 @@ The distinction that matters: the Administrator working from a phone mid-service
 
 ---
 
-**Phase 1 story total, revised 2026-11-16: 267 md** (E1 45 · E2 29 · E3 22 · E4 99 · E5 22 · E7 26 · E16 24). It was 238 md on 2026-10-17: +29 md for PRD v1.11, v1.13 and v1.14, itemised in §0. Before that it was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
+**Phase 1 story total, revised 2026-11-16: 269 md** (E1 45 · E2 29 · E3 24 · E4 99 · E5 22 · E7 26 · E16 24): 267 md for PRD v1.11–v1.14, then +2 md for v1.17 (§0). It was 238 md on 2026-10-17: +29 md for PRD v1.11, v1.13 and v1.14, itemised in §0. Before that it was 233 md on 2026-10-11: +5 md for PRD v1.10, itemised in §0. Before that it was 209 md on 2026-10-04: +24 md for PRD v1.9. Before that it was 200 md on 2026-09-29: +9 md for the calendar views and earlier weeks (S-4.17, 5 md), the date-scoped staff list and filters (S-4.2, +2 md) and earlier weeks on the Lateness screen (S-7.9, 2 md), PRD v1.7–v1.8. It was 136 md on 2026-09-08. Where the 64 md added on 2026-09-29 came from:
 
 | Change | md | Source |
 |---|---|---|

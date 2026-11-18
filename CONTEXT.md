@@ -51,7 +51,7 @@ _Avoid_: Alias, display name, short name
 ### Shift structure
 
 **Shift period** (Ca, CA 1–CA 5):
-One of the five fixed blocks a day is divided into, from 07:00 to 23:00. Staff register in shift periods, optionally with custom times inside a period. Assignments don't have to align with them. CA 5 is shown as 17:00–23:00, but worked in full it's paid until 24:00.
+One of the five fixed blocks a day is divided into, from 07:00 to 23:00, labelled Ca 1 to Ca 5 on every screen. Staff register in shift periods, optionally with custom times inside a period. Assignments don't have to align with them. CA 5 is shown as 17:00–23:00, but worked in full it's paid until 24:00.
 _Avoid_: Slot, time block, and a bare "shift" when the period is meant
 
 **Week**:

@@ -3,7 +3,7 @@
 
 ---
 
-**Version:** 1.16 · **Last updated:** 2026-11-16 · **Owner:** Tony
+**Version:** 1.17 · **Last updated:** 2026-11-16 · **Owner:** Tony
 **Status:** In review. Phase 1 scope restated per the 2026-09-08 narrowing (§4.13). Wireframe v1 predates this revision — see §5.3.
 
 ---
@@ -74,7 +74,7 @@ A custom shift management system with a calendar-style interface — similar in 
 
 ### 3.3 Shift Structure
 
-The shop operates **seven days a week with no closed day**, from 07:00 to 23:00. The day is divided into five fixed shift periods, which act as the selectable building blocks for registration:
+The shop operates **seven days a week with no closed day**, from 07:00 to 23:00. The day is divided into five fixed shift periods, which act as the selectable building blocks for registration. On every screen they are labelled **Ca 1** to **Ca 5** (Tony, 2026-11-16); this document keeps the codes CA 1–CA 5:
 
 | Shift | Time | Duration |
 |---|---|---|
@@ -506,12 +506,12 @@ It holds no state of its own. Every item is resolved on the surface that owns it
 
 | ID | Requirement |
 |---|---|
-| FR-O1 | System shall allow the Administrator to define the week's staffing needs (shift periods, positions, headcount needed) prior to the registration window opening, for internal planning purposes. Needs are set per position, not per sub-position or attribute (3.3); Phụ trách's need covers Trong and Ngoài together. They are entered in the **Staffing** section below the weekly calendar, per position, period and day, with an action that copies the previous week's needs; each calendar cell shows their total (FR-O42). |
+| FR-O1 | System shall allow the Administrator to define the week's staffing needs (shift periods, positions, headcount needed) prior to the registration window opening, for internal planning purposes. Needs are set per position, not per sub-position or attribute (3.3); Phụ trách's need covers Trong and Ngoài together. They are entered in the **Staffing** section below the weekly calendar, per position, period and day, with three actions, in this order: **Reset**, which sets every need of the selected day, all five periods, to 0 and is unavailable when they are all 0 already; **Apply to the whole week**, which copies the selected day's needs, all five periods, to every other day of the week in view and overwrites theirs; and **Copy from last week**, which copies the previous week's needs. Reset and Apply to the whole week ask for confirmation first; all three change only the needs, never a registration or an assignment, and work in a draft or a published week. Each calendar cell shows the total (FR-O42). |
 | FR-O2 | System shall allow the Administrator to assign and reassign any staff member to any shift and position. |
 | FR-O29 | System shall let an assignment carry **one position**: in each shift period a staff member holds at most one position. Different periods of the same day may carry different positions, which makes them separate assignments (FR-O44). While the week is in **draft**, an assignment may carry **no position yet** — the person is placed, and the position is given later (3.5, step 2); such an assignment counts toward headcount per shift period but toward no position's coverage, and blocks publication (FR-O33). An assignment created on or after publication shall carry a position. |
 | FR-O45 | System shall allow the position on an assignment to carry, optionally, one or more of that position's **sub-positions or attributes** (3.3). The exception is Phụ trách, which shall carry **exactly one** of Trong and Ngoài and cannot be saved without it. The system shall display it as "Position - sub-position/attribute" wherever the assignment is shown, including the staff member's own schedule. Sub-positions and attributes shall not affect headcount, coverage, rate, pay, experience flags or bonus. *(display to staff on My profile proposed pending client confirmation)* |
 | FR-O3 | System shall provide full Read access across all staff's registered availability, assigned schedules, and actual hours. |
-| FR-O4 | System shall provide a coverage view showing, before assignment, how registered availability maps to staffing needs, and after assignment, which shifts are filled / understaffed / overstaffed. A staffing need with no registered availability behind it shall be marked distinctly and prominently. Coverage is counted per position; an assignment with no position yet (FR-O29) counts only toward the headcount per shift period shown on the weekly calendar (FR-O42). In Phase 1 this view is the **Staffing** section below the weekly calendar (Phân công): for a chosen day, each position's assigned count against its need in each period and the period totals, with the needs edited in place (FR-O1). |
+| FR-O4 | System shall provide a coverage view showing, before assignment, how registered availability maps to staffing needs, and after assignment, which shifts are filled / understaffed / overstaffed. A staffing need with no registered availability behind it shall be marked distinctly and prominently. Coverage is counted per position; an assignment with no position yet (FR-O29) counts only toward the headcount per shift period shown on the weekly calendar (FR-O42). In Phase 1 this view is the **Staffing** section below the weekly calendar (Phân công): for a chosen day, each position's assigned count against its need in each period and the period totals, with the needs edited in place (FR-O1). The days are tabs showing the full weekday and the date as DD/MM, worked out from the week in view, the selected one underlined; the periods stay as columns. On a phone the section follows the day shown on the calendar and has no day tabs. |
 | FR-O22 | System shall display, per staff member per week, the number of days and total hours registered, and shall flag any staff member registering below the contract expectation of 5 days at 8 hours. The flag is informational: it shall not block registration or assignment. A staff member treated as fully available under FR-S19 shall not be flagged. A day that includes the whole of CA 5 meets the daily expectation (FR-S3). |
 | FR-O23 | System shall distinguish, on the weekly calendar (FR-O42), a staff member who **explicitly registered all periods** from one who **registered nothing** and is treated as fully available by default, so the Administrator can see which staff have actively confirmed their week. A staff member who registered every period of the week is marked with a **star**; one who registered nothing is drawn with a dashed outline and faded, and is left out of the selection by default (FR-O11). |
 | FR-O7 | System shall allow the Administrator to apply performance-based adjustments (rate changes, bonuses, deductions) tied to a staff profile. |
@@ -687,7 +687,7 @@ Every event records the actor, the time, the previous and new values and any rea
 | Accounts | Create an account; edit the profile, nickname, base rate or lead rate; turn the shift-lead switch on or off; add or remove a usual position by hand; set a password; deactivate or reactivate | Administrator |
 | Usual positions | Add or remove a usual position, with the hours as the reason (FR-A12) | System |
 | Registration | A staff member saves their registration (shown with its time only); a draft is saved automatically at the cutoff; the window locks | Staff, System |
-| Staffing needs | Change a headcount; copy the previous week's needs | Administrator |
+| Staffing needs | Change a headcount; reset a day's needs to 0; apply a day's needs to the whole week; copy the previous week's needs | Administrator |
 | Scheduling, draft | Place; give or change a position or sub-position; change times; take off a shift; place outside availability; undo or redo (FR-O48) | Administrator |
 | Publishing | Publish the week; skip a staff member, with the reason (FR-O33) | Administrator |
 | After publishing | Change times, reassign or cancel; early departure with cover; swap; move a start later as an agreed late arrival (FR-O24); export the schedule (FR-O52) | Administrator |
@@ -861,6 +861,11 @@ These are decisions or unresolved edge cases the current solution/requirements d
 - **Performance evaluation** (Phase 2): patterns of punctuality, attendance, committed hours and attitude in one place; only the Administrator evaluates; the system shows and never suggests; staff don't see the evaluation but keep their own hours, lateness and bonus; no Shift Lead notes in the system; monthly, still to be confirmed (3.12, 3.13, FR-P1, FR-P5, FR-P7, FR-S10).
 - The evaluation period is the only item marked *proposed pending client confirmation*; it is Phase 2, so it is tracked in §5.1 O6 rather than in the Phase 1 pending-confirmation list.
 
+**Resolved on 2026-11-16 (Tony's requests for the Staffing section, Q&A page round 5, v1.17):** Tony's decisions.
+- **Staffing section:** Google-style day tabs with the full weekday and the date as DD/MM; the periods stay as columns; **Reset** (a day's needs to 0) and **Apply to the whole week** (a day's needs to every other day) beside Copy from last week, in the order Reset, Apply to the whole week, Copy from last week, with no icons, Reset in white and the other two in the accent colour; both new actions confirm first with OK and Cancel, work in a published week too and are in the Try-out (FR-O1, FR-O4, 4.9.1).
+- The periods are labelled **Ca 1** to **Ca 5** on every screen (3.3).
+- None is added to the pending-confirmation list.
+
 **Resolved on 2026-11-16 (Tony, trying the v1.14 Try-out, v1.16):**
 - **Selection tint:** selecting an unplaced marker tints only the cells its staff member registered and is not placed in. The cells they are placed in, tinted warm when a placed marker is selected, are no longer tinted cool as well, so the two tints never overlap. Tony's decision (FR-O42).
 - None is added to the pending-confirmation list.
@@ -1022,3 +1027,5 @@ Roughly six of the 36 Figma artboards draw surfaces that no longer exist. Reconc
 **Feedback of 2026-11-12.** The sheet's tab 12.11 and the client's list of real staff (`docs/feedback/2026-11-12-client-feedback.md`) were drawn in the wireframe on 2026-11-16 as v1.14: the shop schedule screen for staff, with its switch in the Administrator's account menu; the warning dot; the selection tint; the folded "+N" marker with its list; the full-width owner's note; the calendar without the 3 Days view; schedule notes in the export; and the 32 real staff in the sample data and the Try-out. The O7 switch is gone. `design/phase1/` was regenerated from it the same day.
 
 **v1.16.** The narrower cool selection tint was drawn in the wireframe and its Try-out on 2026-11-16. `design/phase1/` has no page with a marker selected, so it is unchanged. v1.15 changed no screen.
+
+**v1.17.** The Staffing section's day tabs, its Reset and Apply to the whole week actions with their confirmations, and the Ca 1–Ca 5 labels on every screen were drawn in the wireframe and its Try-out on 2026-11-16, and `design/phase1/` regenerated.
